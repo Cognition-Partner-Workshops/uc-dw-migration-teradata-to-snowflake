@@ -5,7 +5,7 @@
  * Key changes:
  *   - Removed MULTISET, NO FALLBACK, JOURNAL, CHECKSUM, MERGEBLOCKRATIO
  *   - COMPRESS clauses removed
- *   - NOT CASESPECIFIC -> COLLATE 'en-ci' (CURRENCY_CODE)
+ *   - SMALLINT used in place of Teradata BYTEINT (not present here)
  *   - FORMAT on DATE columns removed
  *   - PRIMARY INDEX removed (fact table, no PK)
  *   - PARTITION BY RANGE_N with NO RANGE -> CLUSTER BY (SNAPSHOT_DATE)
