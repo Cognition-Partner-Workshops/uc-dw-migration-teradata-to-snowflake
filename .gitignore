@@ -12,3 +12,7 @@ Thumbs.db
 # Temp files
 *.tmp
 *.bak
+
+# Environment / secrets
+.envrc
+.env
