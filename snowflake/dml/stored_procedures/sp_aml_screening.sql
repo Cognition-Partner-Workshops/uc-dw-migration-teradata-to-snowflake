@@ -1,0 +1,120 @@
+/**********************************************************************
+ * SP_AML_SCREENING -- Anti-Money Laundering Screening (Snowflake)
+ * Converted from Teradata MACRO BANKING_DW.AML_SCREENING
+ * - Replaced: REPLACE MACRO -> CREATE OR REPLACE PROCEDURE
+ * - Multi-statement macro returning 3 result sets combined with UNION ALL
+ * - Replaced: :param -> procedure parameter references
+ * - Replaced: SEL -> SELECT
+ * - Removed: FORMAT expressions
+ * - Replaced: DATE FORMAT 'YYYY-MM-DD' DEFAULT DATE -> DATE DEFAULT CURRENT_DATE()
+ * - Uses Snowflake SQL Scripting with RESULTSET
+ **********************************************************************/
+
+CREATE OR REPLACE PROCEDURE BANKING_DW.SP_AML_SCREENING(
+    SCREENING_DATE DATE DEFAULT CURRENT_DATE(),
+    LOOKBACK_DAYS INTEGER DEFAULT 30,
+    AMOUNT_THRESHOLD DECIMAL(15,2) DEFAULT 50000.00
+)
+RETURNS TABLE (
+    PATTERN_TYPE        VARCHAR(30),
+    CUSTOMER_ID         INTEGER,
+    CUSTOMER_NAME       VARCHAR(101),
+    DETAIL_1            VARCHAR(200),
+    DETAIL_2            VARCHAR(200),
+    DETAIL_3            VARCHAR(200),
+    DETAIL_4            VARCHAR(200),
+    DETAIL_5            VARCHAR(200),
+    DETAIL_6            VARCHAR(200)
+)
+LANGUAGE SQL
+AS
+$$
+DECLARE
+    res RESULTSET;
+BEGIN
+    res := (
+        -- Pattern 1: Structuring — multiple transactions just below threshold
+        SELECT
+            'STRUCTURING' AS PATTERN_TYPE,
+            c.CUSTOMER_ID,
+            c.FIRST_NAME || ' ' || c.LAST_NAME AS CUSTOMER_NAME,
+            c.KYC_STATUS AS DETAIL_1,
+            a.ACCOUNT_ID AS DETAIL_2,
+            CAST(COUNT(*) AS VARCHAR) AS DETAIL_3,
+            CAST(SUM(ft.BASE_CURRENCY_AMOUNT) AS VARCHAR) AS DETAIL_4,
+            CAST(AVG(ft.BASE_CURRENCY_AMOUNT) AS VARCHAR) AS DETAIL_5,
+            CAST(MAX(ft.TRANSACTION_DATE) AS VARCHAR) AS DETAIL_6
+        FROM BANKING_DW.FACT_TRANSACTION ft
+        INNER JOIN BANKING_DW.DIM_ACCOUNT a
+            ON ft.ACCOUNT_KEY = a.ACCOUNT_KEY AND a.CURRENT_FLAG = 'Y'
+        INNER JOIN BANKING_DW.DIM_CUSTOMER c
+            ON ft.CUSTOMER_KEY = c.CUSTOMER_KEY AND c.CURRENT_FLAG = 'Y'
+        WHERE ft.TRANSACTION_DATE BETWEEN DATEADD('day', -:LOOKBACK_DAYS, :SCREENING_DATE) AND :SCREENING_DATE
+          AND ft.TRANSACTION_TYPE IN ('CREDIT', 'DEBIT')
+          AND ft.BASE_CURRENCY_AMOUNT BETWEEN (:AMOUNT_THRESHOLD * 0.8) AND :AMOUNT_THRESHOLD
+        GROUP BY c.CUSTOMER_ID, c.FIRST_NAME, c.LAST_NAME, c.KYC_STATUS, a.ACCOUNT_ID
+        HAVING COUNT(*) >= 3
+
+        UNION ALL
+
+        -- Pattern 2: Rapid movement — large deposits followed by immediate withdrawals
+        SELECT
+            'RAPID_MOVEMENT' AS PATTERN_TYPE,
+            c.CUSTOMER_ID,
+            c.FIRST_NAME || ' ' || c.LAST_NAME AS CUSTOMER_NAME,
+            a.ACCOUNT_ID AS DETAIL_1,
+            CAST(cr.CREDIT_DATE AS VARCHAR) AS DETAIL_2,
+            CAST(cr.CREDIT_AMOUNT AS VARCHAR) AS DETAIL_3,
+            CAST(dr.DEBIT_DATE AS VARCHAR) AS DETAIL_4,
+            CAST(dr.DEBIT_AMOUNT AS VARCHAR) AS DETAIL_5,
+            CAST(DATEDIFF('day', cr.CREDIT_DATE, dr.DEBIT_DATE) AS VARCHAR) AS DETAIL_6
+        FROM BANKING_DW.DIM_CUSTOMER c
+        INNER JOIN BANKING_DW.DIM_ACCOUNT a
+            ON c.CUSTOMER_ID = a.CUSTOMER_ID AND a.CURRENT_FLAG = 'Y'
+        INNER JOIN (
+            SELECT ACCOUNT_KEY, TRANSACTION_DATE AS CREDIT_DATE,
+                   BASE_CURRENCY_AMOUNT AS CREDIT_AMOUNT
+            FROM BANKING_DW.FACT_TRANSACTION
+            WHERE TRANSACTION_TYPE = 'CREDIT'
+              AND BASE_CURRENCY_AMOUNT >= :AMOUNT_THRESHOLD
+              AND TRANSACTION_DATE BETWEEN DATEADD('day', -:LOOKBACK_DAYS, :SCREENING_DATE) AND :SCREENING_DATE
+        ) cr ON a.ACCOUNT_KEY = cr.ACCOUNT_KEY
+        INNER JOIN (
+            SELECT ACCOUNT_KEY, TRANSACTION_DATE AS DEBIT_DATE,
+                   BASE_CURRENCY_AMOUNT AS DEBIT_AMOUNT
+            FROM BANKING_DW.FACT_TRANSACTION
+            WHERE TRANSACTION_TYPE IN ('DEBIT', 'TRANSFER')
+              AND BASE_CURRENCY_AMOUNT >= :AMOUNT_THRESHOLD * 0.9
+              AND TRANSACTION_DATE BETWEEN DATEADD('day', -:LOOKBACK_DAYS, :SCREENING_DATE) AND :SCREENING_DATE
+        ) dr ON cr.ACCOUNT_KEY = dr.ACCOUNT_KEY
+            AND dr.DEBIT_DATE BETWEEN cr.CREDIT_DATE AND DATEADD('day', 3, cr.CREDIT_DATE)
+        WHERE c.CURRENT_FLAG = 'Y'
+
+        UNION ALL
+
+        -- Pattern 3: International high-value transactions from newly onboarded customers
+        SELECT
+            'NEW_CUSTOMER_INTL' AS PATTERN_TYPE,
+            c.CUSTOMER_ID,
+            c.FIRST_NAME || ' ' || c.LAST_NAME AS CUSTOMER_NAME,
+            CAST(c.ONBOARDING_DATE AS VARCHAR) AS DETAIL_1,
+            CAST(DATEDIFF('day', c.ONBOARDING_DATE, :SCREENING_DATE) AS VARCHAR) AS DETAIL_2,
+            c.KYC_STATUS AS DETAIL_3,
+            CAST(COUNT(*) AS VARCHAR) AS DETAIL_4,
+            CAST(SUM(ft.BASE_CURRENCY_AMOUNT) AS VARCHAR) AS DETAIL_5,
+            NULL AS DETAIL_6
+        FROM BANKING_DW.FACT_TRANSACTION ft
+        INNER JOIN BANKING_DW.DIM_CUSTOMER c
+            ON ft.CUSTOMER_KEY = c.CUSTOMER_KEY AND c.CURRENT_FLAG = 'Y'
+        WHERE ft.IS_INTERNATIONAL = 1
+          AND ft.TRANSACTION_DATE BETWEEN DATEADD('day', -:LOOKBACK_DAYS, :SCREENING_DATE) AND :SCREENING_DATE
+          AND c.ONBOARDING_DATE >= DATEADD('day', -90, :SCREENING_DATE)
+        GROUP BY c.CUSTOMER_ID, c.FIRST_NAME, c.LAST_NAME,
+                 c.ONBOARDING_DATE, c.KYC_STATUS
+        HAVING SUM(ft.BASE_CURRENCY_AMOUNT) >= :AMOUNT_THRESHOLD
+
+        ORDER BY PATTERN_TYPE, DETAIL_4 DESC
+    );
+    RETURN TABLE(res);
+END;
+$$;
