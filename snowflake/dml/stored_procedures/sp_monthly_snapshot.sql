@@ -42,7 +42,7 @@ BEGIN
     v_prev_snapshot_date := DATEADD('day', -1, :v_period_start);
 
     -- Create temporary table for aggregated transaction data
-    CREATE TEMPORARY TABLE IF NOT EXISTS TMP_TXN_AGGREGATES AS
+    CREATE OR REPLACE TEMPORARY TABLE TMP_TXN_AGGREGATES AS
         SELECT
             ft.ACCOUNT_KEY,
             SUM(CASE WHEN ft.TRANSACTION_TYPE IN ('DEBIT', 'FEE')

@@ -89,18 +89,9 @@ BEGIN
 
     -- ================================================================
     -- Export 3: AML Screening Results
+    -- Run AML screening first, capture results in temp table, then export
     -- ================================================================
-    COPY INTO @BANKING_DW.ETL_EXPORT_STAGE/reports/aml_screening_
-        FROM (
-            SELECT * FROM TABLE(RESULT_SCAN(LAST_QUERY_ID()))
-        )
-        FILE_FORMAT = (TYPE = 'CSV' HEADER = TRUE FIELD_OPTIONALLY_ENCLOSED_BY = '"')
-        OVERWRITE = TRUE
-        SINGLE = TRUE;
-
-    -- Run AML screening and export via table function
-    -- Note: For the AML export, call the procedure first, then export from a temp table
-    CREATE TEMPORARY TABLE IF NOT EXISTS TMP_AML_RESULTS AS
+    CREATE OR REPLACE TEMPORARY TABLE TMP_AML_RESULTS AS
         SELECT * FROM TABLE(
             BANKING_DW.SP_AML_SCREENING(CURRENT_DATE(), 30, 50000.00)
         );
