@@ -1,0 +1,5 @@
+pytest>=7.0
+snowflake-connector-python>=3.0
+pandas>=1.5
+# Optional: install teradatasql for source-to-target comparison
+# teradatasql>=17.20
