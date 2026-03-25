@@ -1,0 +1,91 @@
+-- ============================================================================
+-- Schema Validation SQL Queries
+-- Category 1: Tests S-01 through S-09
+-- Target: Snowflake BANKING_DW schema
+-- ============================================================================
+
+-- S-01: Verify all 7 tables exist in Snowflake
+-- Expected: DIM_CUSTOMER, DIM_ACCOUNT, DIM_PRODUCT, DIM_BRANCH, DIM_DATE,
+--           FACT_TRANSACTION, FACT_MONTHLY_ACCOUNT_SNAPSHOT
+SELECT TABLE_NAME
+FROM INFORMATION_SCHEMA.TABLES
+WHERE TABLE_SCHEMA = '{schema}'
+  AND TABLE_TYPE = 'BASE TABLE'
+ORDER BY TABLE_NAME;
+
+-- S-02: Verify all 3 views exist in Snowflake
+-- Expected: VW_CUSTOMER_360, VW_REGULATORY_LARGE_TRANSACTIONS, VW_BRANCH_PERFORMANCE
+SELECT TABLE_NAME
+FROM INFORMATION_SCHEMA.VIEWS
+WHERE TABLE_SCHEMA = '{schema}'
+ORDER BY TABLE_NAME;
+
+-- S-03: Verify column count per table matches Teradata DDL
+SELECT TABLE_NAME, COUNT(*) AS COLUMN_COUNT
+FROM INFORMATION_SCHEMA.COLUMNS
+WHERE TABLE_SCHEMA = '{schema}'
+GROUP BY TABLE_NAME
+ORDER BY TABLE_NAME;
+
+-- S-04: Verify column names match between source DDL and Snowflake
+SELECT COLUMN_NAME
+FROM INFORMATION_SCHEMA.COLUMNS
+WHERE TABLE_SCHEMA = '{schema}'
+  AND TABLE_NAME = '{table_name}'
+ORDER BY ORDINAL_POSITION;
+
+-- S-05: Verify column data types are correctly translated
+SELECT
+    COLUMN_NAME,
+    DATA_TYPE,
+    NUMERIC_PRECISION,
+    NUMERIC_SCALE,
+    CHARACTER_MAXIMUM_LENGTH
+FROM INFORMATION_SCHEMA.COLUMNS
+WHERE TABLE_SCHEMA = '{schema}'
+  AND TABLE_NAME = '{table_name}'
+ORDER BY ORDINAL_POSITION;
+
+-- S-06: Verify NOT NULL constraints are preserved
+SELECT
+    COLUMN_NAME,
+    IS_NULLABLE
+FROM INFORMATION_SCHEMA.COLUMNS
+WHERE TABLE_SCHEMA = '{schema}'
+  AND TABLE_NAME = '{table_name}'
+  AND IS_NULLABLE = 'NO'
+ORDER BY ORDINAL_POSITION;
+
+-- S-07: Verify DEFAULT values are translated
+SELECT
+    COLUMN_NAME,
+    COLUMN_DEFAULT
+FROM INFORMATION_SCHEMA.COLUMNS
+WHERE TABLE_SCHEMA = '{schema}'
+  AND TABLE_NAME = '{table_name}'
+  AND COLUMN_DEFAULT IS NOT NULL
+ORDER BY ORDINAL_POSITION;
+
+-- S-08: Verify IDENTITY/AUTOINCREMENT columns
+-- Check if CUSTOMER_KEY and ACCOUNT_KEY have identity properties
+SELECT
+    COLUMN_NAME,
+    IS_IDENTITY,
+    IDENTITY_GENERATION,
+    IDENTITY_START,
+    IDENTITY_INCREMENT
+FROM INFORMATION_SCHEMA.COLUMNS
+WHERE TABLE_SCHEMA = '{schema}'
+  AND TABLE_NAME = '{table_name}'
+  AND IS_IDENTITY = 'YES'
+ORDER BY ORDINAL_POSITION;
+
+-- S-09: Verify TIMESTAMP column types match timezone strategy
+SELECT
+    COLUMN_NAME,
+    DATA_TYPE
+FROM INFORMATION_SCHEMA.COLUMNS
+WHERE TABLE_SCHEMA = '{schema}'
+  AND TABLE_NAME = '{table_name}'
+  AND DATA_TYPE LIKE 'TIMESTAMP%'
+ORDER BY ORDINAL_POSITION;
