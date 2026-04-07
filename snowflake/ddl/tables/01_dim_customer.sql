@@ -1,0 +1,61 @@
+/**********************************************************************
+ * DIM_CUSTOMER -- Customer Dimension (Snowflake)
+ *
+ * Converted from Teradata SET table.
+ * Changes:
+ *   - Removed SET, NO FALLBACK, JOURNAL, CHECKSUM, MERGEBLOCKRATIO
+ *   - UNIQUE PRIMARY INDEX -> PRIMARY KEY constraint
+ *   - Non-unique indexes -> comments (Snowflake auto-optimizes)
+ *   - COMPRESS clauses removed (Snowflake auto-compresses)
+ *   - NOT CASESPECIFIC -> COLLATE 'en-ci' for case-insensitive columns
+ *   - DATE FORMAT -> removed (use TO_CHAR in queries)
+ *   - BYTEINT -> SMALLINT (Snowflake minimum integer type)
+ *   - PARTITION BY RANGE_N -> CLUSTER BY on date column
+ *   - COLLECT STATISTICS -> removed (Snowflake auto-manages)
+ *   - GENERATED ALWAYS AS IDENTITY -> AUTOINCREMENT
+ **********************************************************************/
+
+CREATE OR REPLACE TABLE BANKING_DW.DIM_CUSTOMER
+(
+    CUSTOMER_ID         INTEGER          NOT NULL,
+    CUSTOMER_KEY        BIGINT           NOT NULL AUTOINCREMENT START 1 INCREMENT 1,
+    FIRST_NAME          VARCHAR(50)      COLLATE 'en-ci' NOT NULL,
+    LAST_NAME           VARCHAR(50)      COLLATE 'en-ci' NOT NULL,
+    DATE_OF_BIRTH       DATE,
+    GENDER              CHAR(1),
+    MARITAL_STATUS      CHAR(1),
+    EMAIL_ADDRESS       VARCHAR(100)     COLLATE 'en-ci',
+    PHONE_NUMBER        VARCHAR(20),
+    ADDRESS_LINE_1      VARCHAR(100)     COLLATE 'en-ci',
+    ADDRESS_LINE_2      VARCHAR(100)     COLLATE 'en-ci',
+    CITY                VARCHAR(50)      COLLATE 'en-ci',
+    STATE_PROVINCE      VARCHAR(50)      COLLATE 'en-ci',
+    POSTAL_CODE         VARCHAR(10),
+    COUNTRY_CODE        CHAR(3)          COLLATE 'en-ci' DEFAULT 'NOR',
+    CUSTOMER_SEGMENT    VARCHAR(20)      COLLATE 'en-ci',
+    RISK_SCORE          DECIMAL(5,2),
+    CREDIT_RATING       CHAR(3),
+    KYC_STATUS          VARCHAR(15)      COLLATE 'en-ci' DEFAULT 'PENDING',
+    ONBOARDING_DATE     DATE             NOT NULL,
+    LAST_REVIEW_DATE    DATE,
+    IS_ACTIVE           SMALLINT         DEFAULT 1,
+    EFFECTIVE_FROM      TIMESTAMP_NTZ(0) DEFAULT CURRENT_TIMESTAMP(),
+    EFFECTIVE_TO        TIMESTAMP_NTZ(0) DEFAULT '9999-12-31 23:59:59'::TIMESTAMP_NTZ,
+    CURRENT_FLAG        CHAR(1)          DEFAULT 'Y',
+    ETL_BATCH_ID        BIGINT,
+    ETL_INSERT_TS       TIMESTAMP_NTZ(0) DEFAULT CURRENT_TIMESTAMP(),
+    ETL_UPDATE_TS       TIMESTAMP_NTZ(0) DEFAULT CURRENT_TIMESTAMP(),
+
+    CONSTRAINT PK_DIM_CUSTOMER PRIMARY KEY (CUSTOMER_KEY)
+)
+CLUSTER BY (ONBOARDING_DATE)
+COMMENT = 'SCD Type 2 customer dimension with KYC and risk attributes';
+
+-- Snowflake does not enforce uniqueness via indexes; declare as comments for documentation:
+-- Original Teradata NUPI: INDEX NUPI_CUSTOMER_ID (CUSTOMER_ID)
+-- Original Teradata Index: INDEX IDX_CUST_SEGMENT (CUSTOMER_SEGMENT)
+-- Original Teradata Index: INDEX IDX_CUST_COUNTRY (COUNTRY_CODE)
+
+COMMENT ON COLUMN BANKING_DW.DIM_CUSTOMER.CUSTOMER_KEY IS 'Surrogate key for SCD Type 2';
+COMMENT ON COLUMN BANKING_DW.DIM_CUSTOMER.CUSTOMER_ID IS 'Natural key from source system';
+COMMENT ON COLUMN BANKING_DW.DIM_CUSTOMER.KYC_STATUS IS 'Know Your Customer verification status';
