@@ -29,6 +29,7 @@ Usage
 from __future__ import annotations
 
 import argparse
+import warnings
 from pathlib import Path
 from typing import Optional
 
@@ -38,18 +39,14 @@ matplotlib.use("Agg")  # non-interactive backend for server environments
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from statsmodels.stats.stattools import durbin_watson
 from statsmodels.tsa.api import VAR
 from statsmodels.tsa.stattools import adfuller, grangercausalitytests
+from statsmodels.tsa.vector_ar.var_model import VARResults
 
 # ---------------------------------------------------------------------------
 # Constants
 # ---------------------------------------------------------------------------
-SERIES_NAMES = [
-    "transaction_volume",
-    "avg_balance",
-    "new_accounts",
-    "interest_rate",
-]
 DEFAULT_FORECAST_STEPS = 12
 OUTPUT_DIR = Path(__file__).resolve().parent / "output"
 
@@ -191,20 +188,16 @@ def make_stationary(df: pd.DataFrame, significance: float = 0.05) -> tuple[pd.Da
 # Model selection & fitting
 # ---------------------------------------------------------------------------
 
-def select_lag_order(df: pd.DataFrame, max_lags: int = 15) -> pd.DataFrame:
-    """Evaluate information criteria across lag orders.
-
-    Returns a DataFrame of AIC, BIC, HQIC, FPE per lag.
-    """
+def select_lag_order(df: pd.DataFrame, max_lags: int = 15) -> None:
+    """Evaluate and print information criteria across lag orders."""
     model = VAR(df)
     results = model.select_order(maxlags=max_lags)
     summary = results.summary()
     print("\n=== Lag Order Selection ===")
     print(summary)
-    return results
 
 
-def fit_var(df: pd.DataFrame, lag_order: Optional[int] = None, max_lags: int = 15) -> object:
+def fit_var(df: pd.DataFrame, lag_order: Optional[int] = None, max_lags: int = 15) -> VARResults:
     """Fit the VAR model.
 
     If *lag_order* is None the optimal lag is chosen by AIC.
@@ -225,7 +218,7 @@ def fit_var(df: pd.DataFrame, lag_order: Optional[int] = None, max_lags: int = 1
 # Diagnostics
 # ---------------------------------------------------------------------------
 
-def run_diagnostics(fitted_model) -> dict:
+def run_diagnostics(fitted_model: VARResults) -> dict:
     """Run residual diagnostics on the fitted VAR model.
 
     Returns a dict with Durbin-Watson stats, whiteness test, and normality test.
@@ -233,7 +226,6 @@ def run_diagnostics(fitted_model) -> dict:
     diagnostics: dict = {}
 
     # Durbin-Watson (per equation)
-    from statsmodels.stats.stattools import durbin_watson
     dw = durbin_watson(fitted_model.resid)
     dw_results = {
         col: round(val, 4) for col, val in zip(fitted_model.names, dw)
@@ -291,7 +283,6 @@ def run_granger_causality(
                 continue
             test_data = df[[target, predictor]].dropna()
             try:
-                import warnings
                 with warnings.catch_warnings():
                     warnings.simplefilter("ignore", FutureWarning)
                     gc = grangercausalitytests(test_data, maxlag=max_lag, verbose=False)
@@ -333,7 +324,7 @@ def run_granger_causality(
 # Impulse Response & Variance Decomposition
 # ---------------------------------------------------------------------------
 
-def plot_irf(fitted_model, periods: int = 20) -> None:
+def plot_irf(fitted_model: VARResults, periods: int = 20) -> None:
     """Plot impulse response functions and save to output directory."""
     irf = fitted_model.irf(periods)
     fig = irf.plot(orth=True)
@@ -345,7 +336,7 @@ def plot_irf(fitted_model, periods: int = 20) -> None:
     print(f"\nIRF plot saved to {outpath}")
 
 
-def plot_fevd(fitted_model, periods: int = 20) -> None:
+def plot_fevd(fitted_model: VARResults, periods: int = 20) -> None:
     """Plot Forecast Error Variance Decomposition and save."""
     fevd = fitted_model.fevd(periods)
     print("\n=== Forecast Error Variance Decomposition ===")
@@ -365,7 +356,7 @@ def plot_fevd(fitted_model, periods: int = 20) -> None:
 # ---------------------------------------------------------------------------
 
 def forecast(
-    fitted_model,
+    fitted_model: VARResults,
     df_original: pd.DataFrame,
     steps: int = DEFAULT_FORECAST_STEPS,
     diff_order: int = 0,
