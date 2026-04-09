@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Excel Evolved | Dynamic Array Functions for Data Engineers</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <canvas id="three-canvas"></canvas>
+
+    <!-- Navigation -->
+    <nav id="main-nav">
+        <div class="nav-logo">
+            <span class="logo-icon">&#9638;</span>
+            <span class="logo-text">Excel<span class="accent">3D</span></span>
+        </div>
+        <div class="nav-links">
+            <a href="#hero" class="nav-link active" data-section="0">Home</a>
+            <a href="#overview" class="nav-link" data-section="1">Overview</a>
+            <a href="#filter" class="nav-link" data-section="2">FILTER</a>
+            <a href="#sort" class="nav-link" data-section="3">SORT</a>
+            <a href="#unique" class="nav-link" data-section="4">UNIQUE</a>
+            <a href="#xlookup" class="nav-link" data-section="5">XLOOKUP</a>
+            <a href="#let-lambda" class="nav-link" data-section="6">LET/LAMBDA</a>
+            <a href="#stack-group" class="nav-link" data-section="7">STACK/GROUP</a>
+            <a href="#etl" class="nav-link" data-section="8">ETL Map</a>
+        </div>
+        <div class="nav-progress">
+            <div class="nav-progress-bar" id="scroll-progress"></div>
+        </div>
+    </nav>
+
+    <!-- Scroll indicator -->
+    <div class="scroll-indicator" id="scroll-indicator">
+        <div class="scroll-mouse">
+            <div class="scroll-wheel"></div>
+        </div>
+        <span>Scroll to explore</span>
+    </div>
+
+    <!-- Section: Hero -->
+    <section id="hero" class="section hero-section">
+        <div class="hero-content">
+            <div class="hero-badge">FOR DATA &amp; ANALYTICS ENGINEERS</div>
+            <h1 class="hero-title">
+                <span class="line">Excel</span>
+                <span class="line accent-glow">Evolved</span>
+            </h1>
+            <p class="hero-subtitle">
+                Discover how Excel's Dynamic Array Functions transform your data workflows.
+                <br>From complex nested formulas to elegant, spill-range powered solutions.
+            </p>
+            <div class="hero-stats">
+                <div class="stat">
+                    <span class="stat-number" data-count="9">0</span>
+                    <span class="stat-label">New Functions</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-number" data-count="75">0</span><span class="stat-suffix">%</span>
+                    <span class="stat-label">Less Formula Complexity</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-number" data-count="10">0</span><span class="stat-suffix">x</span>
+                    <span class="stat-label">Faster Data Prep</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section: Overview -->
+    <section id="overview" class="section overview-section">
+        <div class="section-content">
+            <div class="section-header">
+                <span class="section-tag">THE PARADIGM SHIFT</span>
+                <h2>Dynamic Arrays Changed Everything</h2>
+                <p class="section-desc">Before dynamic arrays, every formula returned a single value. Now, a single formula can spill results across multiple cells automatically. This is the biggest change to Excel's calculation engine in 30 years.</p>
+            </div>
+            <div class="concept-grid">
+                <div class="concept-card old">
+                    <div class="card-icon">&#128683;</div>
+                    <h3>The Old Way</h3>
+                    <div class="formula-display">
+                        <code>=INDEX($B$2:$B$100, SMALL(IF($A$2:$A$100="Sales", ROW($A$2:$A$100)-ROW($A$2)+1), ROW(1:1)))</code>
+                    </div>
+                    <ul>
+                        <li>Ctrl+Shift+Enter required (CSE arrays)</li>
+                        <li>Must guess output size in advance</li>
+                        <li>Nested INDEX/MATCH/IF combos</li>
+                        <li>Helper columns everywhere</li>
+                        <li>Fragile and hard to audit</li>
+                    </ul>
+                </div>
+                <div class="concept-card new">
+                    <div class="card-icon">&#9889;</div>
+                    <h3>The New Way</h3>
+                    <div class="formula-display">
+                        <code>=FILTER(B2:B100, A2:A100="Sales")</code>
+                    </div>
+                    <ul>
+                        <li>Results spill automatically</li>
+                        <li>Dynamic output size</li>
+                        <li>Clean, readable formulas</li>
+                        <li>No helper columns needed</li>
+                        <li>Composable &mdash; chain functions together</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section: FILTER -->
+    <section id="filter" class="section function-section">
+        <div class="section-content split-layout">
+            <div class="text-panel">
+                <span class="function-badge">DYNAMIC ARRAY</span>
+                <h2 class="function-name">FILTER</h2>
+                <p class="function-syntax">=FILTER(array, include, [if_empty])</p>
+                <p class="function-desc">
+                    Extract rows that meet your criteria &mdash; like a <strong>WHERE clause</strong> right in your spreadsheet.
+                    No more CSE array formulas or helper columns.
+                </p>
+                <div class="comparison-box">
+                    <div class="comp-old">
+                        <h4>&#128308; Before (INDEX/MATCH/IF)</h4>
+                        <code>=IFERROR(INDEX($B$2:$B$1000, SMALL(IF($C$2:$C$1000&gt;100000, ROW($C$2:$C$1000)-1), ROW(A1))),"")</code>
+                        <span class="comp-note">CSE array + drag down for each row</span>
+                    </div>
+                    <div class="comp-new">
+                        <h4>&#128994; After (FILTER)</h4>
+                        <code>=FILTER(A2:D1000, C2:C1000&gt;100000, "No results")</code>
+                        <span class="comp-note">Single formula, auto-spills all matching rows</span>
+                    </div>
+                </div>
+                <div class="etl-parallel">
+                    <span class="etl-icon">&#128640;</span>
+                    <span><strong>ETL Parallel:</strong> SQL WHERE, Spark .filter(), dbt WHERE clause, Databricks filter transformation</span>
+                </div>
+            </div>
+            <div class="viz-panel" id="filter-viz">
+                <!-- Three.js renders here via overlay -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Section: SORT -->
+    <section id="sort" class="section function-section">
+        <div class="section-content split-layout reverse">
+            <div class="viz-panel" id="sort-viz"></div>
+            <div class="text-panel">
+                <span class="function-badge">DYNAMIC ARRAY</span>
+                <h2 class="function-name">SORT / SORTBY</h2>
+                <p class="function-syntax">=SORT(array, [sort_index], [sort_order])</p>
+                <p class="function-desc">
+                    Dynamically sort any range by one or more columns. Like <strong>ORDER BY</strong> for your spreadsheet.
+                    SORTBY lets you sort by a column that isn't even in your output.
+                </p>
+                <div class="comparison-box">
+                    <div class="comp-old">
+                        <h4>&#128308; Before (SMALL/LARGE + INDEX)</h4>
+                        <code>=INDEX($A$2:$D$100, MATCH(SMALL($C$2:$C$100, ROW(1:1)), $C$2:$C$100, 0), 1)</code>
+                        <span class="comp-note">Helper column + SMALL ranking + INDEX retrieval</span>
+                    </div>
+                    <div class="comp-new">
+                        <h4>&#128994; After (SORT)</h4>
+                        <code>=SORT(A2:D100, 3, 1)</code>
+                        <span class="comp-note">Sort by column 3, ascending. Done.</span>
+                    </div>
+                </div>
+                <div class="etl-parallel">
+                    <span class="etl-icon">&#128640;</span>
+                    <span><strong>ETL Parallel:</strong> SQL ORDER BY, Spark .orderBy(), Pandas .sort_values(), Databricks sort transformation</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section: UNIQUE -->
+    <section id="unique" class="section function-section">
+        <div class="section-content split-layout">
+            <div class="text-panel">
+                <span class="function-badge">DYNAMIC ARRAY</span>
+                <h2 class="function-name">UNIQUE</h2>
+                <p class="function-syntax">=UNIQUE(array, [by_col], [exactly_once])</p>
+                <p class="function-desc">
+                    Extract distinct values instantly &mdash; your spreadsheet's <strong>DISTINCT</strong> operator.
+                    Combine with SORT and FILTER for powerful data deduplication.
+                </p>
+                <div class="comparison-box">
+                    <div class="comp-old">
+                        <h4>&#128308; Before (COUNTIF helper)</h4>
+                        <code>=IF(COUNTIF($A$1:A1, A2)=0, A2, "")</code>
+                        <span class="comp-note">Helper column + drag down + manual cleanup of blanks</span>
+                    </div>
+                    <div class="comp-new">
+                        <h4>&#128994; After (UNIQUE)</h4>
+                        <code>=UNIQUE(A2:A1000)</code>
+                        <span class="comp-note">One formula returns all unique values</span>
+                    </div>
+                </div>
+                <div class="etl-parallel">
+                    <span class="etl-icon">&#128640;</span>
+                    <span><strong>ETL Parallel:</strong> SQL SELECT DISTINCT, Spark .distinct(), Pandas .drop_duplicates(), dedup transformation</span>
+                </div>
+            </div>
+            <div class="viz-panel" id="unique-viz"></div>
+        </div>
+    </section>
+
+    <!-- Section: XLOOKUP -->
+    <section id="xlookup" class="section function-section">
+        <div class="section-content split-layout reverse">
+            <div class="viz-panel" id="xlookup-viz"></div>
+            <div class="text-panel">
+                <span class="function-badge">MODERN LOOKUP</span>
+                <h2 class="function-name">XLOOKUP</h2>
+                <p class="function-syntax">=XLOOKUP(lookup, lookup_array, return_array, [not_found], [match_mode], [search_mode])</p>
+                <p class="function-desc">
+                    The definitive replacement for VLOOKUP, HLOOKUP, and INDEX/MATCH. Looks in <strong>any direction</strong>,
+                    returns multiple columns, supports wildcards, and has a built-in error handler.
+                </p>
+                <div class="comparison-box">
+                    <div class="comp-old">
+                        <h4>&#128308; Before (VLOOKUP / INDEX-MATCH)</h4>
+                        <code>=IFERROR(INDEX($D$2:$D$500, MATCH(G2, $A$2:$A$500, 0)), "Not Found")</code>
+                        <span class="comp-note">Lookup column must be leftmost for VLOOKUP, or use INDEX/MATCH</span>
+                    </div>
+                    <div class="comp-new">
+                        <h4>&#128994; After (XLOOKUP)</h4>
+                        <code>=XLOOKUP(G2, A2:A500, D2:D500, "Not Found")</code>
+                        <span class="comp-note">Any direction, built-in default, binary search option</span>
+                    </div>
+                </div>
+                <div class="etl-parallel">
+                    <span class="etl-icon">&#128640;</span>
+                    <span><strong>ETL Parallel:</strong> SQL JOIN / LEFT JOIN, Spark .join(), Pandas .merge(), Databricks lookup transformation</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section: LET & LAMBDA -->
+    <section id="let-lambda" class="section function-section">
+        <div class="section-content split-layout">
+            <div class="text-panel">
+                <span class="function-badge">FORMULA ENGINEERING</span>
+                <h2 class="function-name">LET &amp; LAMBDA</h2>
+                <p class="function-syntax">=LET(name1, value1, ..., calculation)</p>
+                <p class="function-syntax">=LAMBDA([param1], ..., calculation)</p>
+                <p class="function-desc">
+                    <strong>LET</strong> introduces named variables inside formulas &mdash; compute once, reuse many times.
+                    <strong>LAMBDA</strong> lets you create reusable custom functions without VBA. Together, they bring
+                    <strong>software engineering principles</strong> to spreadsheet formulas.
+                </p>
+                <div class="comparison-box">
+                    <div class="comp-old">
+                        <h4>&#128308; Before (Repeated calculations)</h4>
+                        <code>=IF(SUMPRODUCT((A2:A100="Sales")*(C2:C100)) / COUNTIF(A2:A100,"Sales") &gt; SUMPRODUCT((A2:A100="Sales")*(C2:C100)) / COUNTIF(A2:A100,"Sales") * 0.9, "Above", "Below")</code>
+                        <span class="comp-note">Same sub-expression calculated multiple times</span>
+                    </div>
+                    <div class="comp-new">
+                        <h4>&#128994; After (LET)</h4>
+                        <code>=LET(avg, AVERAGEIF(A2:A100,"Sales",C2:C100), IF(avg &gt; avg*0.9, "Above", "Below"))</code>
+                        <span class="comp-note">Calculate once, reference by name. Clean and performant.</span>
+                    </div>
+                </div>
+                <div class="etl-parallel">
+                    <span class="etl-icon">&#128640;</span>
+                    <span><strong>ETL Parallel:</strong> SQL CTEs / WITH clause, Spark .withColumn() + variables, dbt Jinja macros, UDFs in Databricks</span>
+                </div>
+            </div>
+            <div class="viz-panel" id="let-lambda-viz"></div>
+        </div>
+    </section>
+
+    <!-- Section: VSTACK/HSTACK & GROUPBY -->
+    <section id="stack-group" class="section function-section">
+        <div class="section-content split-layout reverse">
+            <div class="viz-panel" id="stack-group-viz"></div>
+            <div class="text-panel">
+                <span class="function-badge">DATA RESHAPING (2024)</span>
+                <h2 class="function-name">VSTACK / HSTACK / GROUPBY</h2>
+                <p class="function-syntax">=VSTACK(array1, array2, ...)</p>
+                <p class="function-syntax">=GROUPBY(row_fields, values, function)</p>
+                <p class="function-desc">
+                    <strong>VSTACK/HSTACK</strong> combine arrays vertically or horizontally &mdash; like UNION ALL in SQL.
+                    <strong>GROUPBY</strong> and <strong>PIVOTBY</strong> bring native aggregation and pivoting, turning Excel into a true
+                    <strong>data transformation engine</strong>.
+                </p>
+                <div class="comparison-box">
+                    <div class="comp-old">
+                        <h4>&#128308; Before (Manual copy + Pivot Tables)</h4>
+                        <code>Copy-paste sheets together, create Pivot Table, refresh manually</code>
+                        <span class="comp-note">Static, breaks on data changes, separate pivot cache</span>
+                    </div>
+                    <div class="comp-new">
+                        <h4>&#128994; After (VSTACK + GROUPBY)</h4>
+                        <code>=GROUPBY(VSTACK(Sheet1!A:B, Sheet2!A:B), VSTACK(Sheet1!C:C, Sheet2!C:C), SUM)</code>
+                        <span class="comp-note">Dynamic union + aggregation in a single formula</span>
+                    </div>
+                </div>
+                <div class="etl-parallel">
+                    <span class="etl-icon">&#128640;</span>
+                    <span><strong>ETL Parallel:</strong> SQL UNION ALL + GROUP BY, Spark .union() + .groupBy().agg(), dbt union + group by, Databricks merge/aggregate</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section: ETL Mapping -->
+    <section id="etl" class="section etl-section">
+        <div class="section-content">
+            <div class="section-header">
+                <span class="section-tag">FOR DATA ENGINEERS</span>
+                <h2>Excel Functions &harr; ETL Operations</h2>
+                <p class="section-desc">As a data professional, you already think in transformations. Here's how Excel's new functions map directly to the operations you use every day in your data pipelines.</p>
+            </div>
+            <div class="etl-mapping-grid">
+                <div class="etl-map-card">
+                    <div class="etl-excel-side">
+                        <span class="etl-func">FILTER</span>
+                    </div>
+                    <div class="etl-arrow">&#8596;</div>
+                    <div class="etl-pipeline-side">
+                        <span>WHERE / .filter()</span>
+                        <small>Row selection</small>
+                    </div>
+                </div>
+                <div class="etl-map-card">
+                    <div class="etl-excel-side">
+                        <span class="etl-func">SORT</span>
+                    </div>
+                    <div class="etl-arrow">&#8596;</div>
+                    <div class="etl-pipeline-side">
+                        <span>ORDER BY / .orderBy()</span>
+                        <small>Row ordering</small>
+                    </div>
+                </div>
+                <div class="etl-map-card">
+                    <div class="etl-excel-side">
+                        <span class="etl-func">UNIQUE</span>
+                    </div>
+                    <div class="etl-arrow">&#8596;</div>
+                    <div class="etl-pipeline-side">
+                        <span>DISTINCT / .distinct()</span>
+                        <small>Deduplication</small>
+                    </div>
+                </div>
+                <div class="etl-map-card">
+                    <div class="etl-excel-side">
+                        <span class="etl-func">XLOOKUP</span>
+                    </div>
+                    <div class="etl-arrow">&#8596;</div>
+                    <div class="etl-pipeline-side">
+                        <span>JOIN / .merge()</span>
+                        <small>Lookup enrichment</small>
+                    </div>
+                </div>
+                <div class="etl-map-card">
+                    <div class="etl-excel-side">
+                        <span class="etl-func">LET</span>
+                    </div>
+                    <div class="etl-arrow">&#8596;</div>
+                    <div class="etl-pipeline-side">
+                        <span>CTE / WITH clause</span>
+                        <small>Named expressions</small>
+                    </div>
+                </div>
+                <div class="etl-map-card">
+                    <div class="etl-excel-side">
+                        <span class="etl-func">LAMBDA</span>
+                    </div>
+                    <div class="etl-arrow">&#8596;</div>
+                    <div class="etl-pipeline-side">
+                        <span>UDF / Custom Function</span>
+                        <small>Reusable logic</small>
+                    </div>
+                </div>
+                <div class="etl-map-card">
+                    <div class="etl-excel-side">
+                        <span class="etl-func">VSTACK</span>
+                    </div>
+                    <div class="etl-arrow">&#8596;</div>
+                    <div class="etl-pipeline-side">
+                        <span>UNION ALL / .union()</span>
+                        <small>Vertical combine</small>
+                    </div>
+                </div>
+                <div class="etl-map-card">
+                    <div class="etl-excel-side">
+                        <span class="etl-func">GROUPBY</span>
+                    </div>
+                    <div class="etl-arrow">&#8596;</div>
+                    <div class="etl-pipeline-side">
+                        <span>GROUP BY / .groupBy()</span>
+                        <small>Aggregation</small>
+                    </div>
+                </div>
+                <div class="etl-map-card highlight">
+                    <div class="etl-excel-side">
+                        <span class="etl-func">PIVOTBY</span>
+                    </div>
+                    <div class="etl-arrow">&#8596;</div>
+                    <div class="etl-pipeline-side">
+                        <span>PIVOT / .pivot()</span>
+                        <small>Cross-tabulation</small>
+                    </div>
+                </div>
+            </div>
+            <div class="etl-insight">
+                <div class="insight-icon">&#128161;</div>
+                <p><strong>Key Insight:</strong> Excel is converging with data engineering paradigms. Dynamic array functions bring the same declarative, set-based thinking you use in SQL, Spark, and Databricks directly into the spreadsheet. This means less context-switching and faster prototyping for data professionals.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section: Summary -->
+    <section id="summary" class="section summary-section">
+        <div class="section-content">
+            <div class="section-header">
+                <span class="section-tag">THE BOTTOM LINE</span>
+                <h2>Why This Matters for Your Data Workflow</h2>
+            </div>
+            <div class="summary-grid">
+                <div class="summary-card">
+                    <div class="summary-icon">&#9889;</div>
+                    <h3>Faster Prototyping</h3>
+                    <p>Test transformation logic in Excel before building full ETL pipelines. Dynamic arrays make Excel a legitimate data prototyping tool.</p>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-icon">&#128269;</div>
+                    <h3>Better Auditability</h3>
+                    <p>Clean, readable formulas replace nested monstrosities. Stakeholders can actually understand and verify your logic.</p>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-icon">&#128640;</div>
+                    <h3>Composable Operations</h3>
+                    <p>Chain FILTER, SORT, UNIQUE together like a mini data pipeline. =SORT(UNIQUE(FILTER(...))) reads like a transformation DAG.</p>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-icon">&#9881;</div>
+                    <h3>Less VBA Dependency</h3>
+                    <p>LAMBDA and LET handle most custom logic that previously required VBA macros, reducing security risks and maintenance burden.</p>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-icon">&#128202;</div>
+                    <h3>Native Aggregation</h3>
+                    <p>GROUPBY and PIVOTBY replace static pivot tables with dynamic, formula-driven aggregation that updates in real-time.</p>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-icon">&#127919;</div>
+                    <h3>Familiar Paradigm</h3>
+                    <p>If you think in SQL, Spark, or Pandas, you already know these functions. The mental model transfers directly.</p>
+                </div>
+            </div>
+            <div class="final-cta">
+                <h3>The Formula Pipeline</h3>
+                <div class="pipeline-formula">
+                    <code>=SORT(UNIQUE(FILTER(VSTACK(Sales!A:D, Returns!A:D), VSTACK(Sales!B:B, Returns!B:B)&gt;1000)), 3, -1)</code>
+                </div>
+                <p class="pipeline-desc">Union two sheets &rarr; Filter by amount &rarr; Deduplicate &rarr; Sort descending. One formula. Zero VBA. Pure data engineering.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
