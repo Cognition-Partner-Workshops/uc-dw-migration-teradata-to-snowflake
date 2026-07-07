@@ -1,0 +1,43 @@
+/**********************************************************************
+ * DIM_DATE — Date Dimension  (Snowflake)
+ * Converted from Teradata SET table.
+ *   - SET/table options/COMPRESS/DATE FORMAT/COLLECT STATISTICS removed
+ *   - BYTEINT/SMALLINT preserved as SMALLINT (all map to NUMBER(38,0))
+ *   - UNIQUE PRIMARY INDEX -> PRIMARY KEY + CLUSTER BY on calendar date
+ **********************************************************************/
+
+CREATE OR REPLACE TABLE BANKING_DW.DIM_DATE
+(
+    DATE_KEY            INTEGER          NOT NULL,   -- YYYYMMDD format
+    CALENDAR_DATE       DATE             NOT NULL,
+    DAY_OF_WEEK         SMALLINT         NOT NULL,   -- 1=Monday, 7=Sunday
+    DAY_NAME            VARCHAR(10)      NOT NULL,
+    DAY_OF_MONTH        SMALLINT         NOT NULL,
+    DAY_OF_YEAR         SMALLINT         NOT NULL,
+    WEEK_OF_YEAR        SMALLINT         NOT NULL,
+    ISO_WEEK            SMALLINT         NOT NULL,
+    MONTH_NUM           SMALLINT         NOT NULL,
+    MONTH_NAME          VARCHAR(15)      NOT NULL,
+    MONTH_SHORT         CHAR(3)          NOT NULL,
+    QUARTER_NUM         SMALLINT         NOT NULL,
+    QUARTER_NAME        CHAR(2)          NOT NULL,    -- Q1, Q2, Q3, Q4
+    HALF_YEAR           SMALLINT         NOT NULL,
+    CALENDAR_YEAR       SMALLINT         NOT NULL,
+    FISCAL_YEAR         SMALLINT         NOT NULL,
+    FISCAL_QUARTER      SMALLINT         NOT NULL,
+    IS_WEEKEND          SMALLINT         NOT NULL,
+    IS_NORWEGIAN_HOLIDAY SMALLINT        DEFAULT 0,
+    HOLIDAY_NAME        VARCHAR(50),
+    IS_BUSINESS_DAY     SMALLINT         NOT NULL,
+    IS_MONTH_END        SMALLINT         NOT NULL,
+    IS_QUARTER_END      SMALLINT         NOT NULL,
+    IS_YEAR_END         SMALLINT         NOT NULL,
+    PRIOR_DAY_DATE      DATE,
+    NEXT_DAY_DATE       DATE,
+    SAME_DAY_PREV_YEAR  DATE,
+    CONSTRAINT PK_DIM_DATE PRIMARY KEY (DATE_KEY)
+)
+CLUSTER BY (CALENDAR_DATE);
+-- Teradata secondary indexes IDX_CALENDAR_DATE / IDX_YEAR_MONTH have no Snowflake equivalent.
+
+COMMENT ON TABLE BANKING_DW.DIM_DATE IS 'Calendar dimension with Norwegian holidays and fiscal year alignment';
