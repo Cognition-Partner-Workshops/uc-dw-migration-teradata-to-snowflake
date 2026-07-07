@@ -1,0 +1,53 @@
+/**********************************************************************
+ * VW_BRANCH_PERFORMANCE — Branch Performance Dashboard View  (Snowflake)
+ * Converted from Teradata.
+ *   - REPLACE VIEW -> CREATE OR REPLACE VIEW; LOCKING ROW FOR ACCESS removed
+ *   - SEL -> SELECT
+ *   - column (FORMAT '9999') -> TO_CHAR(...) ; value (FORMAT '...') -> TO_CHAR(...)
+ *   - CSUM(x, sortcol) -> SUM(x) OVER (ORDER BY sortcol ROWS UNBOUNDED PRECEDING)
+ *   - MAVG(x, 3, sortcol) -> AVG(x) OVER (ORDER BY sortcol ROWS BETWEEN 2 PRECEDING AND CURRENT ROW)
+ *   - RANK() / NULLIFZERO retained; ADD_MONTHS retained (native in Snowflake)
+ **********************************************************************/
+
+CREATE OR REPLACE VIEW BANKING_DW.VW_BRANCH_PERFORMANCE AS
+SELECT
+    b.BRANCH_ID,
+    b.BRANCH_NAME,
+    b.BRANCH_TYPE,
+    b.REGION,
+    b.CITY,
+    snap.SNAPSHOT_MONTH_KEY,
+    d.MONTH_NAME || ' ' || TRIM(TO_CHAR(d.CALENDAR_YEAR)) AS MONTH_LABEL,
+    COUNT(DISTINCT snap.ACCOUNT_KEY) AS ACCOUNTS_SERVICED,
+    COUNT(DISTINCT snap.CUSTOMER_KEY) AS CUSTOMERS_SERVICED,
+    TO_CHAR(SUM(snap.CLOSING_BALANCE), '999,999,999,990.99') AS TOTAL_DEPOSITS,
+    SUM(snap.TOTAL_DEBITS + snap.TOTAL_CREDITS) AS TOTAL_VOLUME,
+    SUM(snap.FEES_CHARGED) AS TOTAL_FEES_EARNED,
+    SUM(snap.INTEREST_CHARGED) AS TOTAL_INTEREST_INCOME,
+    AVG(snap.CLOSING_BALANCE) AS AVG_ACCOUNT_BALANCE,
+    /* Teradata CSUM — cumulative sum, ordered by month */
+    SUM(SUM(snap.FEES_CHARGED))
+        OVER (ORDER BY snap.SNAPSHOT_MONTH_KEY ROWS UNBOUNDED PRECEDING) AS CUMULATIVE_FEES_YTD,
+    /* Teradata MAVG — moving average (3-month window) */
+    AVG(SUM(snap.TOTAL_DEBITS + snap.TOTAL_CREDITS))
+        OVER (ORDER BY snap.SNAPSHOT_MONTH_KEY ROWS BETWEEN 2 PRECEDING AND CURRENT ROW)
+        AS MOVING_AVG_VOLUME_3M,
+    /* Rank branches within region */
+    RANK() OVER (PARTITION BY b.REGION, snap.SNAPSHOT_MONTH_KEY
+                 ORDER BY SUM(snap.CLOSING_BALANCE) DESC) AS REGION_DEPOSIT_RANK,
+    TO_CHAR(
+        SUM(snap.CLOSING_BALANCE) /
+            NULLIFZERO(SUM(SUM(snap.CLOSING_BALANCE))
+                       OVER (PARTITION BY b.REGION, snap.SNAPSHOT_MONTH_KEY)) * 100,
+        '990.99') AS PCT_OF_REGION_DEPOSITS
+FROM BANKING_DW.FACT_MONTHLY_ACCOUNT_SNAPSHOT snap
+INNER JOIN BANKING_DW.DIM_BRANCH b
+    ON snap.BRANCH_ID = b.BRANCH_ID
+INNER JOIN BANKING_DW.DIM_DATE d
+    ON snap.SNAPSHOT_DATE = d.CALENDAR_DATE
+WHERE b.IS_ACTIVE = 1
+  AND snap.SNAPSHOT_DATE >= ADD_MONTHS(CURRENT_DATE, -24)
+GROUP BY b.BRANCH_ID, b.BRANCH_NAME, b.BRANCH_TYPE, b.REGION, b.CITY,
+         snap.SNAPSHOT_MONTH_KEY, d.MONTH_NAME, d.CALENDAR_YEAR;
+
+COMMENT ON VIEW BANKING_DW.VW_BRANCH_PERFORMANCE IS 'Monthly branch performance with cumulative sums, moving averages, and regional rankings';
