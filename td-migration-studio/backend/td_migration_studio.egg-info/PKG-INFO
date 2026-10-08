@@ -1,0 +1,26 @@
+Metadata-Version: 2.4
+Name: td-migration-studio
+Version: 0.1.0
+Summary: Teradata -> Azure Synapse / Google BigQuery / Amazon Redshift migration studio
+Requires-Python: >=3.10
+Requires-Dist: fastapi>=0.110
+Requires-Dist: uvicorn[standard]>=0.27
+Requires-Dist: pydantic>=2.6
+Requires-Dist: pydantic-settings>=2.2
+Requires-Dist: pyyaml>=6.0
+Requires-Dist: psycopg[binary,pool]>=3.1
+Requires-Dist: pyarrow>=15
+Requires-Dist: duckdb>=1.0
+Requires-Dist: sqlglot>=23
+Requires-Dist: sse-starlette>=2.0
+Provides-Extra: real
+Requires-Dist: teradatasql>=20.0; extra == "real"
+Requires-Dist: google-cloud-bigquery>=3.17; extra == "real"
+Requires-Dist: redshift-connector>=2.1; extra == "real"
+Requires-Dist: boto3>=1.34; extra == "real"
+Requires-Dist: pyodbc>=5.1; extra == "real"
+Requires-Dist: azure-storage-file-datalake>=12.14; extra == "real"
+Provides-Extra: dev
+Requires-Dist: pytest>=8; extra == "dev"
+Requires-Dist: httpx>=0.27; extra == "dev"
+Requires-Dist: ruff>=0.4; extra == "dev"

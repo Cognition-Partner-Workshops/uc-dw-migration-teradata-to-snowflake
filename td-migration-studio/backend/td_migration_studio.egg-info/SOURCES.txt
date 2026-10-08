@@ -1,0 +1,12 @@
+pyproject.toml
+app/__init__.py
+app/settings.py
+app/contracts/__init__.py
+app/contracts/models.py
+app/contracts/source.py
+app/contracts/target.py
+td_migration_studio.egg-info/PKG-INFO
+td_migration_studio.egg-info/SOURCES.txt
+td_migration_studio.egg-info/dependency_links.txt
+td_migration_studio.egg-info/requires.txt
+td_migration_studio.egg-info/top_level.txt

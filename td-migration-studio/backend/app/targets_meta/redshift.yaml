@@ -1,0 +1,49 @@
+# SKELETON (scaffold). The targets workstream completes type_mappings, dq and governance.
+id: redshift
+display_name: Amazon Redshift
+vendor: Amazon Web Services
+dialect: redshift
+container_label: schema
+description: MPP columnar warehouse (RA3). Distribution style + sort keys drive performance.
+real_mode_required_env: [REDSHIFT_HOST, REDSHIFT_DATABASE, REDSHIFT_USER, REDSHIFT_PASSWORD]
+connection_fields:
+  - {key: host, label: Host, type: text, required: true, env: REDSHIFT_HOST}
+  - {key: port, label: Port, type: number, default: 5439, env: REDSHIFT_PORT}
+  - {key: database, label: Database, type: text, required: true, env: REDSHIFT_DATABASE}
+  - {key: user, label: User, type: text, env: REDSHIFT_USER}
+  - {key: password, label: Password, type: password, env: REDSHIFT_PASSWORD}
+  - {key: s3_bucket, label: S3 staging bucket, type: text, env: REDSHIFT_S3_BUCKET}
+  - {key: iam_role_arn, label: COPY IAM role ARN, type: text, env: REDSHIFT_IAM_ROLE_ARN}
+config_fields:
+  - {key: schema, label: Schema, type: text, default: retail_dw}
+  - {key: node_type, label: Node type, type: select, options: [ra3.xlplus, ra3.4xlarge, ra3.16xlarge, dc2.large], default: ra3.xlplus}
+  - {key: node_count, label: Nodes, type: number, default: 2, min: 1, max: 128}
+  - {key: load_method, label: Load method, type: select, options: [COPY_S3_PARQUET, INSERT_BATCHES], default: COPY_S3_PARQUET}
+  - {key: diststyle, label: Dist style, type: select, scope: table, options: [AUTO, KEY, EVEN, ALL], default: AUTO}
+  - {key: distkey, label: Dist key, type: column, scope: table, show_if: {diststyle: KEY}}
+  - {key: sortkey_type, label: Sort key type, type: select, scope: table, options: [COMPOUND, INTERLEAVED], default: COMPOUND}
+  - {key: sortkeys, label: Sort keys, type: columns, scope: table, max_items: 8}
+load_methods: [COPY_S3_PARQUET, INSERT_BATCHES]
+identifiers: {max_length: 127, case: lower, quote: "\""}
+type_mappings:
+  - {source: BYTEINT, target: SMALLINT}
+  - {source: SMALLINT, target: SMALLINT}
+  - {source: INTEGER, target: INTEGER}
+  - {source: BIGINT, target: BIGINT}
+  - {source: DECIMAL, target: "DECIMAL({precision},{scale})"}
+  - {source: NUMBER, target: "DECIMAL(38,15)", lossy: true, severity: warning, reason: "Unbounded NUMBER fixed to DECIMAL(38,15)"}
+  - {source: FLOAT, target: "DOUBLE PRECISION"}
+  - {source: CHAR, when: "charset == 'UNICODE'", target: "VARCHAR({length*4})", reason: "Redshift CHAR is single-byte only"}
+  - {source: CHAR, target: "CHAR({length})"}
+  - {source: VARCHAR, when: "charset == 'UNICODE'", target: "VARCHAR({min(length*4, 65535)})", reason: "Redshift lengths are bytes; UTF-8 needs up to 4 bytes/char"}
+  - {source: VARCHAR, target: "VARCHAR({length})"}
+  - {source: DATE, target: DATE}
+  - {source: TIMESTAMP, target: TIMESTAMP}
+  - {source: TIMESTAMP_TZ, target: TIMESTAMPTZ, lossy: true, severity: info, reason: "Stored as UTC; original offset not retained", transform: tz_to_utc}
+dq:
+  enforces_pk_fk: false
+governance:
+  encryption_at_rest: AWS KMS cluster encryption (AES-256)
+  encryption_in_transit: require_ssl=true parameter group; sslmode=verify-full
+  access_model: CREATE ROLE + GRANT USAGE/SELECT on schema; Redshift dynamic data masking policies optional
+  role_script_template: ""

@@ -1,0 +1,49 @@
+# SKELETON (scaffold). The targets workstream completes type_mappings, dq and governance.
+id: synapse
+display_name: Azure Synapse Analytics
+vendor: Microsoft Azure
+dialect: tsql
+container_label: schema
+description: Dedicated SQL pool (MPP). Tables are hash/round-robin/replicated across 60 distributions.
+real_mode_required_env: [SYNAPSE_SERVER, SYNAPSE_DATABASE, SYNAPSE_USER, SYNAPSE_PASSWORD]
+connection_fields:
+  - {key: server, label: Server, type: text, required: true, env: SYNAPSE_SERVER}
+  - {key: database, label: Database, type: text, required: true, env: SYNAPSE_DATABASE}
+  - {key: user, label: User, type: text, env: SYNAPSE_USER}
+  - {key: password, label: Password, type: password, env: SYNAPSE_PASSWORD}
+  - {key: adls_account, label: ADLS Gen2 account (staging), type: text, env: SYNAPSE_ADLS_ACCOUNT}
+  - {key: adls_container, label: ADLS container, type: text, env: SYNAPSE_ADLS_CONTAINER}
+config_fields:
+  - {key: schema, label: Schema, type: text, default: retail_dw}
+  - {key: dwu, label: Performance level (DWU), type: select, options: [DW100c, DW200c, DW500c, DW1000c, DW3000c, DW6000c], default: DW500c}
+  - {key: resource_class, label: Load resource class, type: select, options: [smallrc, mediumrc, largerc, xlargerc], default: largerc}
+  - {key: load_method, label: Load method, type: select, options: [COPY_INTO, POLYBASE, BULK_INSERT], default: COPY_INTO}
+  - {key: distribution, label: Distribution, type: select, scope: table, options: [HASH, ROUND_ROBIN, REPLICATE], default: ROUND_ROBIN}
+  - {key: distribution_column, label: Hash column, type: column, scope: table, show_if: {distribution: HASH}}
+  - {key: index_type, label: Index, type: select, scope: table, options: [CLUSTERED_COLUMNSTORE, HEAP, CLUSTERED_INDEX], default: CLUSTERED_COLUMNSTORE}
+  - {key: partition_column, label: Partition column, type: column, scope: table}
+load_methods: [COPY_INTO, POLYBASE, BULK_INSERT]
+identifiers: {max_length: 128, case: preserve, quote: "["}
+type_mappings:
+  - {source: BYTEINT, target: SMALLINT, reason: "Synapse TINYINT is unsigned (0-255); widened to keep negatives"}
+  - {source: SMALLINT, target: SMALLINT}
+  - {source: INTEGER, target: INT}
+  - {source: BIGINT, target: BIGINT}
+  - {source: DECIMAL, target: "DECIMAL({precision},{scale})"}
+  - {source: NUMBER, target: "DECIMAL(38,15)", lossy: true, severity: warning, reason: "Unbounded NUMBER fixed to DECIMAL(38,15)"}
+  - {source: FLOAT, target: FLOAT}
+  - {source: CHAR, when: "charset == 'UNICODE'", target: "NCHAR({length})"}
+  - {source: CHAR, target: "CHAR({length})"}
+  - {source: VARCHAR, when: "charset == 'UNICODE' and length > 4000", target: "NVARCHAR(MAX)", lossy: true, severity: warning, reason: "> 4000 chars: NVARCHAR(MAX) not supported in CCI ordering / slower loads"}
+  - {source: VARCHAR, when: "charset == 'UNICODE'", target: "NVARCHAR({length})"}
+  - {source: VARCHAR, target: "VARCHAR({length})"}
+  - {source: DATE, target: DATE}
+  - {source: TIMESTAMP, target: "DATETIME2({fractional_seconds})"}
+  - {source: TIMESTAMP_TZ, target: "DATETIMEOFFSET({fractional_seconds})"}
+dq:
+  enforces_pk_fk: false
+governance:
+  encryption_at_rest: Transparent Data Encryption (TDE), service- or customer-managed key
+  encryption_in_transit: TLS 1.2 enforced (Encrypt=yes in ODBC connection string)
+  access_model: Database roles + GRANT SELECT on schema; optional Dynamic Data Masking on PII columns
+  role_script_template: ""

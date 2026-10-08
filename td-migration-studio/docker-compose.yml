@@ -1,0 +1,56 @@
+name: td-migration-studio
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: studio
+      POSTGRES_PASSWORD: studio
+      POSTGRES_DB: studio
+    command: ["postgres", "-c", "shared_buffers=512MB", "-c", "max_wal_size=4GB", "-c", "synchronous_commit=off"]
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./db/init:/docker-entrypoint-initdb.d:ro
+    ports: ["5432:5432"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U studio -d ctl"]
+      interval: 3s
+      timeout: 3s
+      retries: 40
+
+  # One-shot: builds the emulated Teradata (RETAIL_DW + DBC views) from Teradata DDL + Olist CSVs.
+  # Idempotent — skips work when the dataset is already loaded.
+  seed:
+    build: {context: ., dockerfile: backend/Dockerfile}
+    env_file: [{path: .env, required: false}]
+    environment: &api_env
+      TD_EMU_DSN: postgresql://studio:studio@postgres:5432/tdemu
+      CTL_DSN: postgresql://studio:studio@postgres:5432/ctl
+    command: ["python", "-m", "app.connectors.source.seed"]
+    volumes: ["studio-data:/data"]
+    depends_on:
+      postgres: {condition: service_healthy}
+
+  api:
+    build: {context: ., dockerfile: backend/Dockerfile}
+    env_file: [{path: .env, required: false}]
+    environment: *api_env
+    volumes: ["studio-data:/data"]
+    ports: ["8000:8000"]
+    depends_on:
+      seed: {condition: service_completed_successfully}
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fs http://localhost:8000/api/health"]
+      interval: 3s
+      timeout: 3s
+      retries: 40
+
+  web:
+    build: {context: ./frontend}
+    ports: ["3000:80"]
+    depends_on:
+      api: {condition: service_healthy}
+
+volumes:
+  pgdata:
+  studio-data:

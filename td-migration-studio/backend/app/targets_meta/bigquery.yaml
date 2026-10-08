@@ -1,0 +1,45 @@
+# SKELETON (scaffold). The targets workstream completes type_mappings, dq and governance.
+# Field `key`s below are a contract: the pipeline and UI rely on them.
+id: bigquery
+display_name: Google BigQuery
+vendor: Google Cloud
+dialect: bigquery
+container_label: dataset
+description: Serverless columnar warehouse. Partitioning + clustering instead of distribution keys.
+free_tier_note: >-
+  The BigQuery sandbox is free (no billing account): load jobs and queries work, DML does not,
+  tables expire after 60 days. This connector only uses load jobs (WRITE_TRUNCATE), so it runs there.
+real_mode_required_env: [BIGQUERY_PROJECT]
+connection_fields:
+  - {key: project, label: GCP project id, type: text, required: true, env: BIGQUERY_PROJECT}
+  - {key: credentials_path, label: Service-account JSON path (blank = ADC), type: file, env: GOOGLE_APPLICATION_CREDENTIALS}
+config_fields:
+  - {key: dataset, label: Dataset, type: text, default: retail_dw}
+  - {key: location, label: Location, type: select, options: [US, EU, southamerica-east1, us-central1, europe-west2], default: US}
+  - {key: load_method, label: Load method, type: select, options: [load_job_parquet, storage_write_api], default: load_job_parquet}
+  - {key: partition_column, label: Partition column, type: column, scope: table, help: DATE/TIMESTAMP column}
+  - {key: partition_granularity, label: Partition granularity, type: select, scope: table, options: [DAY, MONTH, YEAR], default: MONTH}
+  - {key: clustering_columns, label: Cluster by, type: columns, scope: table, max_items: 4}
+  - {key: require_partition_filter, label: Require partition filter, type: bool, scope: table, default: false}
+load_methods: [load_job_parquet, storage_write_api]
+identifiers: {max_length: 300, case: lower, quote: "`"}
+type_mappings:
+  - {source: BYTEINT, target: INT64}
+  - {source: SMALLINT, target: INT64}
+  - {source: INTEGER, target: INT64}
+  - {source: BIGINT, target: INT64}
+  - {source: DECIMAL, target: "NUMERIC({precision},{scale})"}
+  - {source: NUMBER, target: "NUMERIC", lossy: true, severity: warning, reason: "Unbounded NUMBER -> NUMERIC(38,9): scale > 9 is rounded"}
+  - {source: FLOAT, target: FLOAT64}
+  - {source: CHAR, target: STRING}
+  - {source: VARCHAR, target: STRING}
+  - {source: DATE, target: DATE}
+  - {source: TIMESTAMP, target: DATETIME}
+  - {source: TIMESTAMP_TZ, target: TIMESTAMP, lossy: true, severity: warning, reason: "Offset normalized to UTC", transform: tz_to_utc}
+dq:
+  enforces_pk_fk: false
+governance:
+  encryption_at_rest: Google-managed AES-256 by default; CMEK via Cloud KMS optional
+  encryption_in_transit: TLS 1.2+ for all API calls
+  access_model: IAM roles on the dataset (roles/bigquery.dataViewer, dataEditor); authorized views for masked access
+  role_script_template: ""
