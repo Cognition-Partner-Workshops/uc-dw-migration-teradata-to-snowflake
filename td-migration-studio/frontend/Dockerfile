@@ -1,4 +1,10 @@
-# Placeholder until the frontend workstream lands (multi-stage: node build -> nginx).
+FROM mirror.gcr.io/library/node:20-alpine AS build
+WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm ci --no-audit --no-fund
+COPY . .
+RUN npm run build
+
 FROM mirror.gcr.io/library/nginx:1.27-alpine
 COPY nginx.conf /etc/nginx/conf.d/default.conf
-RUN mkdir -p /usr/share/nginx/html && echo '<h1>TD Migration Studio - UI coming soon</h1>' > /usr/share/nginx/html/index.html
+COPY --from=build /app/dist /usr/share/nginx/html
