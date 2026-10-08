@@ -11,8 +11,9 @@ const CHIPS: { label: string; stages: Stage[] }[] = [
 export function StagePipeline({ o }: { o: ObjectState }) {
   const idx = ORDER.indexOf(o.stage);
   const failed = o.stage === "failed";
-  // For failed objects infer how far it got from the durable counters.
-  const reached = failed ? (o.rows_loaded > 0 ? 5 : o.rows_staged > 0 ? 3 : 1) : idx;
+  // A failed object stopped in the first chip whose stage never completed (stage_timings_s records completions).
+  const failedChip = failed ? CHIPS.findIndex((c) => !(c.stages[0] in (o.stage_timings_s ?? {}))) : -1;
+  const reached = failed ? ORDER.indexOf(CHIPS[failedChip < 0 ? CHIPS.length - 1 : failedChip].stages[0]) : idx;
   return (
     <div className="pipeline">
       {CHIPS.map((c, i) => {

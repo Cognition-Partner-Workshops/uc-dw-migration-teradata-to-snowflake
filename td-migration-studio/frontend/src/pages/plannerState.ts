@@ -28,5 +28,5 @@ export const initialPlannerState: PlannerState = {
   },
   governance: { pii_classification: true, masking: true, default_masking_strategy: "hash", encryption_at_rest: true, encryption_in_transit: true, access_roles: true },
   options: { batch_rows: 100_000, parallelism: 3, max_attempts: 3 },
-  inject: { enabled: true, table: "ORDER_PAYMENTS", stage: "loading", times: 3 },
+  inject: { enabled: false, table: "ORDER_PAYMENTS", stage: "loading", times: 3 },
 };
