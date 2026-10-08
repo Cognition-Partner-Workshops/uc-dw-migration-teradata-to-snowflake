@@ -16,8 +16,12 @@ This repository contains a sample **Teradata-based data warehouse** designed as 
 │   ├── seed/            # Sample CSV data for initial load
 │   └── validation/      # Expected row counts and checksums for validation
 ├── schemas/             # ER diagrams and schema documentation
-└── docs/                # Migration notes and reference material
+├── docs/                # Migration notes and reference material
+└── teradata-to-synapse/ # Rule-based Teradata -> Azure Synapse migration tool (FastAPI + React)
 ```
+
+> **Teradata → Azure Synapse tool:** [`teradata-to-synapse/`](teradata-to-synapse/README.md) scans this repo,
+> converts the tables and views to Synapse T-SQL, and flags macros, procedures and BTEQ scripts for manual review.
 
 ## Domain: Retail Banking Analytics
 
