@@ -2,7 +2,7 @@ name: td-migration-studio
 
 services:
   postgres:
-    image: postgres:16-alpine
+    image: mirror.gcr.io/library/postgres:16-alpine
     environment:
       POSTGRES_USER: studio
       POSTGRES_PASSWORD: studio
