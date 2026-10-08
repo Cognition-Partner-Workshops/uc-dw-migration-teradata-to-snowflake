@@ -205,6 +205,15 @@ class DQProfile(BaseModel):
     notes: str | None = None
 
 
+class NativeTypeSpec(BaseModel):
+    """Semantics of a native target type that sqlglot cannot know (keyed by upper-case type name)."""
+
+    arrow: str | None = Field(None, description="Arrow type when the type is written without parameters")
+    length_unit: Literal["chars", "bytes"] | None = None
+    default_length: int | None = Field(None, description="Length when none is given (None = unbounded)")
+    max_length: int | None = Field(None, description="Length meant by (MAX)")
+
+
 class TargetMeta(BaseModel):
     id: str
     display_name: str
@@ -221,6 +230,9 @@ class TargetMeta(BaseModel):
     governance: GovernanceProfile
     real_mode_required_env: list[str] = []
     free_tier_note: str | None = None
+    native_types: dict[str, NativeTypeSpec] = Field(
+        default_factory=dict, description="Optional per-type length/Arrow semantics used by typemap"
+    )
 
 
 class TargetSummary(BaseModel):
