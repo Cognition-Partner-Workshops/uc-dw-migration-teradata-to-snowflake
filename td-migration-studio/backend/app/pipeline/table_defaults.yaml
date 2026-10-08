@@ -1,0 +1,30 @@
+# Per-table defaults for scope=table config fields declared in targets_meta/*.yaml, keyed by the
+# config-field `key`. A rule only applies when the target exposes that field. Precedence:
+# PlanRequest.table_config > derived default (below) > FieldSpec.default. Derivations use source metadata
+# only (row counts, primary index, PPI columns, DATE/TIMESTAMP columns) — no target-specific code.
+#
+# derive:
+#   partition_column     first PPI column of type DATE/TIMESTAMP (optional min_rows)
+#   date_column          PPI column, else first DATE/TIMESTAMP column
+#   primary_index        PI columns (clipped to the field's max_items)
+#   primary_index_first  first PI column
+#   by_size              `small` when row_count <= small_table_rows, `no_key` when there is no PI, else `large`
+#   value                constant `value`
+# requires: <field key>  only applies when that field resolved to a non-empty value
+small_table_rows: 50000
+rules:
+  partition_column:      {derive: partition_column}
+  partition_granularity: {derive: value, value: MONTH, requires: partition_column}
+  clustering_columns:    {derive: primary_index}
+  distribution:          {derive: by_size, small: REPLICATE, large: HASH, no_key: ROUND_ROBIN}
+  distribution_column:   {derive: primary_index_first}
+  index_type:            {derive: value, value: CLUSTERED_COLUMNSTORE}
+  diststyle:             {derive: by_size, small: ALL, large: KEY, no_key: EVEN}
+  distkey:               {derive: primary_index_first}
+  sortkey_type:          {derive: value, value: COMPOUND, requires: sortkeys}
+  sortkeys:              {derive: date_column}
+# Rule tweaks for a single target, merged over `rules` (still data, not code).
+target_overrides:
+  synapse:
+    # Synapse splits every table into 60 distributions; partitions need ~1M rows per distribution.
+    partition_column: {derive: partition_column, min_rows: 60000000}

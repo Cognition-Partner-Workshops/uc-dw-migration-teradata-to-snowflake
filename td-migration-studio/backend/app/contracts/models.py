@@ -242,6 +242,9 @@ class DQThresholds(BaseModel):
     aggregate_tolerance_pct: float = 0.0001
     null_ratio_tolerance_pct: float = 0.0
     max_rejected_rows_pct: float = 1.0
+    max_orphan_rows_pct: float = Field(
+        1.0, description="Soft-RI (not enforced) orphan child rows tolerated, % of non-null FK rows"
+    )
 
 
 class DQOptions(BaseModel):
