@@ -46,6 +46,7 @@ select = ["E", "F", "I", "B", "UP"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+pythonpath = ["tests"]
 markers = [
   "integration: needs the docker compose Postgres (teradata-emu / ctl) running",
   "real: needs real cloud/Teradata credentials",
