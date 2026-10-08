@@ -45,6 +45,10 @@ Local dev: `docker compose up -d postgres` gives you Postgres on localhost:5432 
 - Seeder (`python -m app.connectors.source.seed`): idempotent; parses the Teradata DDL, creates physical
   tables, bulk loads the CSVs with COPY, fills DBC views, records row counts. ORDER_REVIEWS.review_answer_timestamp
   is loaded as timestamptz at offset -03:00 (manifest `timezone`).
+- Emulator details (source workstream): `dbc` additionally has `partitioningconstraintsv` (PPI ConstraintText),
+  `tablestatsv` (RowCount), `dbcinfov` (InfoKey 'VERSION') and `seed_marker` (input hash; `--force` re-seeds).
+  UPI/USI are backed by unique Postgres indexes. ORDER_REVIEWS has **99,224** records (104,720 physical CSV lines:
+  review texts contain quoted newlines). Unbounded NUMBER is DecimalTotalDigits=-128 -> Arrow decimal128(38,15).
 
 ## Targets
 - `TargetMeta` YAML drives everything: `config_fields` (UI forms, scope target|table), `type_mappings`
