@@ -79,6 +79,7 @@ def test_job_state_persisted_in_sqlite(client, sample_repo):
 
 def test_errors(client):
     assert client.post("/jobs", json={"repo_url": "ftp://example.com/x"}).status_code == 400
+    assert client.post("/jobs", json={"repo_url": "http://github.com/org/repo"}).status_code == 400
     assert client.post("/jobs", json={"repo_url": "--upload-pack=evil"}).status_code == 400
     assert client.post("/jobs", json={"repo_url": "file:///nonexistent/repo"}).status_code == 400
     assert client.get("/jobs/nope").status_code == 404

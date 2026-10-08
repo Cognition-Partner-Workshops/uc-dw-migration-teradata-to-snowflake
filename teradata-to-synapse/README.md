@@ -71,7 +71,7 @@ curl -s -o synapse.zip localhost:8000/jobs/$JOB/download
 | `output/{job_id}/manual_review/` | Annotated drafts of macros, procedures and BTEQ scripts | |
 | `output/{job_id}/SQL_TRANSLATION_NOTES.md` | Report: summary, manual-review items, per-object rules and warnings | |
 
-Only `http(s)` Git URLs are accepted. Set `TD2S_ALLOW_LOCAL_REPOS=1` to also allow local paths / `file://` URLs (used by the tests).
+Only `https://` Git URLs are accepted. Set `TD2S_ALLOW_LOCAL_REPOS=1` to also allow local paths / `file://` URLs (used by the tests).
 
 ## Translation rules
 

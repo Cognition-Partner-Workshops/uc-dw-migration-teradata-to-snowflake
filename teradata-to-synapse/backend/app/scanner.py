@@ -26,13 +26,13 @@ def validate_repo_url(repo_url: str) -> str:
     if url.startswith("-"):
         raise RepoError("repo_url must not start with '-'")
     parsed = urlparse(url)
-    if parsed.scheme in ("https", "http"):
+    if parsed.scheme == "https":
         if not parsed.netloc or not parsed.path.strip("/"):
             raise RepoError("repo_url must point to a repository, e.g. https://github.com/org/repo")
         return url
     if config.ALLOW_LOCAL_REPOS and (parsed.scheme == "file" or (not parsed.scheme and Path(url).is_dir())):
         return url
-    raise RepoError("repo_url must be an http(s) Git URL")
+    raise RepoError("repo_url must be an https:// Git URL")
 
 
 def clone_repo(repo_url: str, dest: Path) -> None:
