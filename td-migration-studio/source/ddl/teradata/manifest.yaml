@@ -1,0 +1,12 @@
+# Maps each Teradata table to its seed file (gzipped CSV under td-migration-studio/data/olist/).
+database: RETAIL_DW
+tables:
+  CUSTOMERS:                    {ddl: 01_customers.sql,                    seed: olist_customers_dataset.csv.gz}
+  SELLERS:                      {ddl: 02_sellers.sql,                      seed: olist_sellers_dataset.csv.gz}
+  PRODUCT_CATEGORY_TRANSLATION: {ddl: 03_product_category_translation.sql, seed: product_category_name_translation.csv.gz}
+  PRODUCTS:                     {ddl: 04_products.sql,                     seed: olist_products_dataset.csv.gz}
+  ORDERS:                       {ddl: 05_orders.sql,                       seed: olist_orders_dataset.csv.gz}
+  ORDER_ITEMS:                  {ddl: 06_order_items.sql,                  seed: olist_order_items_dataset.csv.gz}
+  ORDER_PAYMENTS:               {ddl: 07_order_payments.sql,               seed: olist_order_payments_dataset.csv.gz}
+  ORDER_REVIEWS:                {ddl: 08_order_reviews.sql,                seed: olist_order_reviews_dataset.csv.gz, timezone: "-03:00"}
+  GEOLOCATION:                  {ddl: 09_geolocation.sql,                  seed: olist_geolocation_dataset.csv.gz}

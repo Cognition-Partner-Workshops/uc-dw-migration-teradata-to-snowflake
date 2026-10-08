@@ -1,0 +1,116 @@
+# Google BigQuery. Field `key`s are a contract: the pipeline and UI rely on them.
+id: bigquery
+display_name: Google BigQuery
+vendor: Google Cloud
+dialect: bigquery
+container_label: dataset
+description: Serverless columnar warehouse. Partitioning + clustering instead of distribution keys.
+free_tier_note: >-
+  The BigQuery sandbox is free (no billing account): load jobs and queries work, DML does not,
+  tables expire after 60 days. This connector only uses load jobs (WRITE_TRUNCATE), so it runs there.
+real_mode_required_env: [BIGQUERY_PROJECT]
+connection_fields:
+  - {key: project, label: GCP project id, type: text, required: true, env: BIGQUERY_PROJECT, help: Project that owns the dataset and runs the jobs}
+  - {key: credentials_path, label: Service-account JSON path (blank = ADC), type: file, env: GOOGLE_APPLICATION_CREDENTIALS, help: "Needs roles/bigquery.dataEditor + roles/bigquery.jobUser; blank uses gcloud application-default credentials"}
+config_fields:
+  - {key: dataset, label: Dataset, type: text, default: retail_dw, help: Target dataset (created if missing)}
+  - {key: location, label: Location, type: select, options: [US, EU, southamerica-east1, us-central1, europe-west2], default: US, help: Dataset location; cannot be changed after creation}
+  - {key: load_method, label: Load method, type: select, options: [load_job_parquet, storage_write_api], default: load_job_parquet, help: "Load jobs are free and sandbox-compatible; the Storage Write API needs billing"}
+  - {key: partition_column, label: Partition column, type: column, scope: table, help: "DATE / DATETIME / TIMESTAMP (time-unit) or INT64 (needs partition_range)"}
+  - {key: partition_granularity, label: Partition granularity, type: select, scope: table, options: [DAY, MONTH, YEAR], default: MONTH, help: "Max 10,000 partitions per table; MONTH suits multi-year order history"}
+  - {key: clustering_columns, label: Cluster by, type: columns, scope: table, max_items: 4, help: "Up to 4 columns, most-filtered first; not FLOAT64/BYTES/JSON/TIME"}
+  - {key: require_partition_filter, label: Require partition filter, type: bool, scope: table, default: false, help: Reject queries that would scan every partition}
+  - {key: partition_range, label: Integer range (start,end,interval), type: text, scope: table, help: "Only for INT64 partition columns, e.g. 0,100000,1000"}
+load_methods: [load_job_parquet, storage_write_api]
+identifiers:
+  max_length: 300
+  case: lower
+  quote: "`"
+  reserved_words: [ALL, AND, ANY, ARRAY, AS, ASC, ASSERT_ROWS_MODIFIED, AT, BETWEEN, BY, CASE, CAST, COLLATE, CONTAINS, CREATE, CROSS, CUBE, CURRENT, DEFAULT, DEFINE, DESC, DISTINCT, ELSE, END, ENUM, ESCAPE, EXCEPT, EXCLUDE, EXISTS, EXTRACT, "FALSE", FETCH, FOLLOWING, FOR, FROM, FULL, GROUP, GROUPING, GROUPS, HASH, HAVING, IF, IGNORE, IN, INNER, INTERSECT, INTERVAL, INTO, IS, JOIN, LATERAL, LEFT, LIKE, LIMIT, LOOKUP, MERGE, NATURAL, NEW, "NO", NOT, "NULL", NULLS, OF, "ON", OR, ORDER, OUTER, OVER, PARTITION, PRECEDING, PROTO, QUALIFY, RANGE, RECURSIVE, RESPECT, RIGHT, ROLLUP, ROWS, SELECT, SET, SOME, STRUCT, TABLESAMPLE, THEN, TO, TREAT, "TRUE", UNBOUNDED, UNION, UNNEST, USING, WHEN, WHERE, WINDOW, WITH, WITHIN]
+native_types:
+  NUMERIC: {arrow: "decimal128(38, 9)"}
+  DECIMAL: {arrow: "decimal128(38, 9)"}
+  BIGNUMERIC: {arrow: "decimal256(76, 38)"}
+  BIGDECIMAL: {arrow: "decimal256(76, 38)"}
+  STRING: {length_unit: chars}
+  BYTES: {length_unit: bytes}
+type_mappings:
+  # ---- integers (BigQuery has a single 64-bit integer type) ----
+  - {source: BYTEINT, target: INT64, reason: "Only INT64 exists; widened (no loss)"}
+  - {source: SMALLINT, target: INT64, reason: "Only INT64 exists; widened (no loss)"}
+  - {source: INTEGER, target: INT64, reason: "Only INT64 exists; widened (no loss)"}
+  - {source: BIGINT, target: INT64}
+  # ---- exact numerics: NUMERIC = 29 integer + 9 fractional digits; BIGNUMERIC = 38 + 38 ----
+  - {source: DECIMAL, when: "scale <= 9 and precision - scale <= 29", target: "NUMERIC({precision},{scale})"}
+  - {source: DECIMAL, when: "precision - scale <= 38", target: "BIGNUMERIC({precision},{scale})", reason: "Exceeds NUMERIC (scale > 9 or > 29 integer digits): BIGNUMERIC keeps exact precision (slower, more storage)"}
+  - {source: DECIMAL, target: "BIGNUMERIC", lossy: true, severity: error, transform: round_scale, reason: "Beyond BIGNUMERIC(76,38) parameter limits"}
+  - {source: NUMBER, when: "precision is None and scale is None", target: "BIGNUMERIC(38,15)", lossy: true, severity: warning, transform: round_scale, reason: "Unbounded Teradata NUMBER is floating decimal; staged as DECIMAL(38,15) (digits beyond 15 decimals rounded, |v| >= 1e23 rejected). BIGNUMERIC because NUMERIC allows only 9 decimals"}
+  - {source: NUMBER, when: "precision is None and scale == 9", target: "NUMERIC(38,9)", reason: "NUMBER(*,9) fits NUMERIC exactly"}
+  - {source: NUMBER, when: "precision is None", target: "BIGNUMERIC(38,{scale})", reason: "NUMBER(*,s) = 38 digits with fixed scale"}
+  - {source: NUMBER, when: "coalesce(scale, 0) <= 9 and precision - coalesce(scale, 0) <= 29", target: "NUMERIC({precision},{coalesce(scale, 0)})"}
+  - {source: NUMBER, when: "precision - coalesce(scale, 0) <= 38", target: "BIGNUMERIC({precision},{coalesce(scale, 0)})", reason: "Exceeds NUMERIC (scale > 9 or > 29 integer digits)"}
+  - {source: NUMBER, target: "BIGNUMERIC", lossy: true, severity: error, transform: round_scale, reason: "Beyond BIGNUMERIC parameter limits"}
+  - {source: FLOAT, target: FLOAT64}
+  # ---- character: STRING(L) limits characters; no fixed-width type ----
+  - {source: CHAR, target: "STRING({length})", reason: "No fixed-width CHAR: values stored right-trimmed (Teradata blank-pads), so trailing spaces are not significant"}
+  - {source: VARCHAR, target: "STRING({length})", reason: "STRING lengths are characters (UTF-8); LATIN and UNICODE both fit"}
+  - {source: CLOB, target: STRING, severity: info, reason: "CLOB -> STRING (rows are limited to 100 MB)"}
+  # ---- binary ----
+  - {source: BYTE, target: "BYTES({length})", reason: "No fixed-width binary: zero padding is kept as data but not enforced"}
+  - {source: VARBYTE, target: "BYTES({length})"}
+  - {source: BLOB, target: BYTES, reason: "BLOB -> BYTES (rows are limited to 100 MB)"}
+  # ---- date/time ----
+  - {source: DATE, target: DATE}
+  - {source: TIME, target: TIME, reason: "Microsecond precision"}
+  - {source: TIME_TZ, target: TIME, lossy: true, severity: warning, transform: tz_to_utc, reason: "No TIME WITH TIME ZONE: normalized to UTC, offset dropped"}
+  - {source: TIMESTAMP, target: DATETIME, reason: "Teradata TIMESTAMP has no zone -> civil DATETIME (BigQuery TIMESTAMP is an absolute instant)"}
+  - {source: TIMESTAMP_TZ, target: TIMESTAMP, lossy: true, severity: warning, transform: tz_to_utc, reason: "TIMESTAMP is an absolute UTC instant: the instant is kept but the source offset (e.g. -03:00) is not stored"}
+  # ---- other ----
+  - {source: INTERVAL, target: STRING, lossy: true, severity: warning, transform: to_string, reason: "Parquet loads cannot target INTERVAL: stored as Teradata interval text; CAST/PARSE after load"}
+  - {source: PERIOD, target: STRING, lossy: true, severity: warning, transform: to_string, reason: "No PERIOD type: stored as text '(begin, end)'; model as two columns or RANGE<DATETIME> after load"}
+  - {source: JSON, target: STRING, transform: to_string, reason: "Loaded as JSON text; use PARSE_JSON(col) / JSON functions or ALTER to JSON after load"}
+  - {source: XML, target: STRING, lossy: true, severity: warning, transform: to_string, reason: "No XML type: stored as text"}
+dq:
+  enforces_pk_fk: false
+  notes: >-
+    PRIMARY KEY / FOREIGN KEY are NOT ENFORCED metadata; uniqueness and referential integrity are verified
+    by the studio's DQ checks. Profiling and checksum are read-only queries (sandbox-compatible).
+  # Canonical checksum (contracts/checksum.py). `-- @...:` lines define per-kind column expressions.
+  checksum_sql_template: |
+    -- @null: '\\N'
+    -- @sep: CODE_POINTS_TO_STRING([31])
+    -- @concat: ||
+    -- @canon.integer: CAST({col} AS STRING)
+    -- @canon.decimal: FORMAT('%.{scale}f', {col})
+    -- @canon.float: CAST(CAST(ROUND({col} * 1e6) AS INT64) AS STRING)
+    -- @canon.string: {col}
+    -- @canon.char: RTRIM({col})
+    -- @canon.date: FORMAT_DATE('%Y-%m-%d', {col})
+    -- @canon.timestamp: FORMAT_DATETIME('%Y-%m-%d %H:%M:%E6S', {col})
+    -- @canon.timestamp_tz: FORMAT_TIMESTAMP('%Y-%m-%d %H:%M:%E6S', {col}, 'UTC')
+    -- @canon.time: CAST({col} AS STRING)
+    -- @canon.bool: IF({col}, 'true', 'false')
+    -- @canon.binary: TO_HEX({col})
+    SELECT COUNT(*) AS row_count,
+           CAST(COALESCE(SUM(CAST(CONCAT('0x', SUBSTR(TO_HEX(MD5({row})), 1, 8)) AS INT64)), 0) AS STRING) AS checksum
+    FROM {relation}
+governance:
+  encryption_at_rest: Google-managed AES-256 by default; CMEK via Cloud KMS (dataset default_kms_key_name) optional
+  encryption_in_transit: TLS 1.2+ for all API calls (google-cloud-bigquery over HTTPS/gRPC)
+  access_model: IAM roles on the dataset/table (roles/bigquery.dataViewer, dataEditor) via SQL DCL; column-level security with policy tags; authorized views for masked access
+  native_masking: "Policy-tag data masking rules (SHA256, ALWAYS_NULL, DEFAULT_MASKING_VALUE, LAST_FOUR_CHARACTERS); or an authorized view using SELECT * REPLACE"
+  # Lines: `@set k = v` (variable), `@table` (per table), `@piitable` (per table with PII), `@pii` (per PII column).
+  role_script_template: |
+    @set mask.hash = TO_HEX(SHA256(CAST({q_column} AS STRING)))
+    @set mask.partial = CONCAT(LEFT(CAST({q_column} AS STRING), 2), '****')
+    @set mask.nullify = CAST(NULL AS {column_type})
+    -- BigQuery SQL DCL for dataset `{project}.{container}` (replace the example principals)
+    GRANT `roles/bigquery.dataViewer` ON SCHEMA `{project}.{container}` TO "group:{container}-pii-readers@example.com";
+    GRANT `roles/bigquery.dataEditor` ON SCHEMA `{project}.{container}` TO "serviceAccount:td-migration-loader@{project}.iam.gserviceaccount.com";
+    @table -- {fq_table}
+    -- Masked access: authorized views in `{project}.{container}_masked` for analysts without PII clearance
+    CREATE SCHEMA IF NOT EXISTS `{project}.{container}_masked`;
+    @piitable CREATE OR REPLACE VIEW `{project}.{container}_masked.{table}` AS SELECT * REPLACE ({masked_replace}) FROM {fq_table};
+    GRANT `roles/bigquery.dataViewer` ON SCHEMA `{project}.{container}_masked` TO "group:{container}-readers@example.com";
+    -- Authorize the views on the source dataset: bq update --source <(dataset ACL incl. view entries) {project}:{container}
+    @pii -- {fq_table}.{q_column}: {category}; optionally attach policy tag pii_{category} with a data masking rule (studio masking: {masking})

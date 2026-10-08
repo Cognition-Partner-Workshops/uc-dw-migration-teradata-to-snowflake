@@ -1,0 +1,136 @@
+# Amazon Redshift. Field `key`s are a contract: the pipeline and UI rely on them.
+id: redshift
+display_name: Amazon Redshift
+vendor: Amazon Web Services
+dialect: redshift
+container_label: schema
+description: MPP columnar warehouse (RA3). Distribution style + sort keys drive performance.
+free_tier_note: >-
+  Redshift Serverless offers a one-time trial credit; provisioned clusters bill per node-hour.
+  The simulated target needs no account.
+real_mode_required_env: [REDSHIFT_HOST, REDSHIFT_DATABASE, REDSHIFT_USER, REDSHIFT_PASSWORD]
+connection_fields:
+  - {key: host, label: Host, type: text, required: true, env: REDSHIFT_HOST, help: Cluster or serverless workgroup endpoint}
+  - {key: port, label: Port, type: number, default: 5439, env: REDSHIFT_PORT}
+  - {key: database, label: Database, type: text, required: true, env: REDSHIFT_DATABASE}
+  - {key: user, label: User, type: text, env: REDSHIFT_USER}
+  - {key: password, label: Password, type: password, env: REDSHIFT_PASSWORD}
+  - {key: s3_bucket, label: S3 staging bucket, type: text, env: REDSHIFT_S3_BUCKET, help: "Same region as the cluster; blank = INSERT batches (slow)"}
+  - {key: iam_role_arn, label: COPY IAM role ARN, type: text, env: REDSHIFT_IAM_ROLE_ARN, help: Role attached to the cluster with s3:GetObject/ListBucket on the bucket}
+  - {key: aws_region, label: AWS region, type: text, env: AWS_REGION}
+config_fields:
+  - {key: schema, label: Schema, type: text, default: retail_dw, help: Target schema (created if missing)}
+  - {key: node_type, label: Node type, type: select, options: [ra3.xlplus, ra3.4xlarge, ra3.16xlarge, dc2.large], default: ra3.xlplus, help: Informational sizing for the plan}
+  - {key: node_count, label: Nodes, type: number, default: 2, min: 1, max: 128, help: Informational sizing for the plan}
+  - {key: load_method, label: Load method, type: select, options: [COPY_S3_PARQUET, INSERT_BATCHES], default: COPY_S3_PARQUET, help: "COPY from S3 Parquet is parallel across slices; INSERT_BATCHES needs no S3"}
+  - {key: diststyle, label: Dist style, type: select, scope: table, options: [AUTO, KEY, EVEN, ALL], default: AUTO, help: "KEY on the most common join column of large tables; ALL for small dimensions"}
+  - {key: distkey, label: Dist key, type: column, scope: table, show_if: {diststyle: KEY}, help: Required for DISTSTYLE KEY}
+  - {key: sortkey_type, label: Sort key type, type: select, scope: table, options: [COMPOUND, INTERLEAVED], default: COMPOUND, help: "COMPOUND for range filters on the leading column (dates); INTERLEAVED for equal-weight filters"}
+  - {key: sortkeys, label: Sort keys, type: columns, scope: table, max_items: 8, help: "Blank = SORTKEY AUTO"}
+load_methods: [COPY_S3_PARQUET, INSERT_BATCHES]
+identifiers:
+  max_length: 127
+  case: lower
+  quote: "\""
+  reserved_words: [AES128, AES256, ALL, ALLOWOVERWRITE, ANALYSE, ANALYZE, AND, ANY, ARRAY, AS, ASC, AUTHORIZATION, AZ64, BACKUP, BETWEEN, BINARY, BLANKSASNULL, BOTH, BYTEDICT, BZIP2, CASE, CAST, CHECK, COLLATE, COLUMN, CONSTRAINT, CREATE, CREDENTIALS, CROSS, CURRENT_DATE, CURRENT_TIME, CURRENT_TIMESTAMP, CURRENT_USER, CURRENT_USER_ID, DEFAULT, DEFERRABLE, DEFLATE, DEFRAG, DELTA, DELTA32K, DESC, DISABLE, DISTINCT, DO, ELSE, EMPTYASNULL, ENABLE, ENCODE, ENCRYPT, ENCRYPTION, END, EXCEPT, EXPLICIT, "FALSE", FOR, FOREIGN, FREEZE, FROM, FULL, GLOBALDICT256, GLOBALDICT64K, GRANT, GROUP, GZIP, HAVING, IDENTITY, IGNORE, ILIKE, IN, INITIALLY, INNER, INTERSECT, INTERVAL, INTO, IS, ISNULL, JOIN, LEADING, LEFT, LIKE, LIMIT, LOCALTIME, LOCALTIMESTAMP, LUN, LUNS, LZO, LZOP, MINUS, MOSTLY16, MOSTLY32, MOSTLY8, NATURAL, NEW, NOT, NOTNULL, "NULL", NULLS, "OFF", OFFLINE, OFFSET, OID, OLD, "ON", ONLY, OPEN, OR, ORDER, OUTER, OVERLAPS, PARALLEL, PARTITION, PERCENT, PERMISSIONS, PIVOT, PLACING, PRIMARY, RAW, READRATIO, RECOVER, REFERENCES, RESPECT, REJECTLOG, RESORT, RESTORE, RIGHT, SELECT, SESSION_USER, SIMILAR, SNAPSHOT, SOME, SYSDATE, SYSTEM, TABLE, TAG, TDES, TEXT255, TEXT32K, THEN, TIMESTAMP, TO, TOP, TRAILING, "TRUE", TRUNCATECOLUMNS, UNION, UNIQUE, UNNEST, UNPIVOT, USER, USING, VERBOSE, WALLET, WHEN, WHERE, WITH, WITHOUT]
+native_types:
+  NUMERIC: {arrow: "decimal128(18, 0)"}
+  DECIMAL: {arrow: "decimal128(18, 0)"}
+  CHAR: {length_unit: bytes, default_length: 1, max_length: 4096}
+  BPCHAR: {length_unit: bytes, default_length: 256, max_length: 4096}
+  VARCHAR: {length_unit: bytes, default_length: 256, max_length: 65535}
+  TEXT: {length_unit: bytes, default_length: 256}
+  VARBYTE: {length_unit: bytes, default_length: 64000, max_length: 1024000}
+  SUPER: {length_unit: bytes, default_length: 16777216}
+type_mappings:
+  # ---- integers ----
+  - {source: BYTEINT, target: SMALLINT, reason: "No 1-byte integer type; widened (no loss)"}
+  - {source: SMALLINT, target: SMALLINT}
+  - {source: INTEGER, target: INTEGER}
+  - {source: BIGINT, target: BIGINT}
+  # ---- exact numerics ----
+  - {source: DECIMAL, when: "precision > 38", target: "DECIMAL(38,{min(scale, 37)})", lossy: true, severity: error, transform: round_scale, reason: "Redshift DECIMAL max precision is 38"}
+  - {source: DECIMAL, target: "DECIMAL({precision},{scale})", reason: "Precision <= 19 is stored as 8 bytes, higher as 16"}
+  - {source: NUMBER, when: "precision is None and scale is None", target: "DECIMAL(38,15)", lossy: true, severity: warning, transform: round_scale, reason: "Unbounded Teradata NUMBER is floating decimal (38 significant digits at any scale); fixed to DECIMAL(38,15): digits beyond 15 decimals are rounded, |v| >= 1e23 rejected"}
+  - {source: NUMBER, when: "precision is None", target: "DECIMAL(38,{min(scale, 37)})", reason: "NUMBER(*,s) = 38 digits with fixed scale"}
+  - {source: NUMBER, when: "precision > 38", target: "DECIMAL(38,{min(coalesce(scale, 0), 37)})", lossy: true, severity: error, transform: round_scale, reason: "Precision > 38 not supported"}
+  - {source: NUMBER, target: "DECIMAL({precision},{coalesce(scale, 0)})"}
+  - {source: FLOAT, target: "DOUBLE PRECISION"}
+  # ---- character: Redshift lengths are BYTES of UTF-8; CHAR holds single-byte characters only ----
+  - {source: CHAR, when: "charset == 'UNICODE' and length * 3 > 65535", target: "VARCHAR(65535)", lossy: true, severity: warning, transform: truncate, reason: "UNICODE CHAR(n) needs up to 3n UTF-8 bytes > 65535: values over 64 KB are truncated"}
+  - {source: CHAR, when: "charset == 'UNICODE'", target: "VARCHAR({length * 3})", reason: "Redshift CHAR is single-byte only: UNICODE needs VARCHAR sized in bytes (a Teradata UTF-16 char is at most 3 UTF-8 bytes); blank padding not kept"}
+  - {source: CHAR, when: "length > 4096", target: "VARCHAR({min(length * 2, 65535)})", reason: "CHAR max is 4096 bytes"}
+  - {source: CHAR, target: "CHAR({length})", reason: "Blank-padded like Teradata. CHAR accepts single-byte characters only: override to VARCHAR({length * 2}) if this LATIN column holds non-ASCII text"}
+  - {source: VARCHAR, when: "charset == 'UNICODE' and length * 3 > 65535", target: "VARCHAR(65535)", lossy: true, severity: warning, transform: truncate, reason: "UNICODE VARCHAR(n) can need 3n bytes > 65535 (Redshift max): longer values are truncated"}
+  - {source: VARCHAR, when: "charset == 'UNICODE'", target: "VARCHAR({length * 3})", reason: "Redshift VARCHAR lengths are bytes: a Teradata UNICODE (UTF-16) character needs at most 3 UTF-8 bytes"}
+  - {source: VARCHAR, when: "length * 2 > 65535", target: "VARCHAR(65535)", lossy: true, severity: warning, transform: truncate, reason: "LATIN VARCHAR(n) can need 2n bytes > 65535: longer values are truncated"}
+  - {source: VARCHAR, target: "VARCHAR({length * 2})", reason: "Redshift VARCHAR lengths are bytes: Latin-1 characters above 0x7F take 2 UTF-8 bytes"}
+  - {source: CLOB, when: "charset == 'UNICODE' and length * 3 <= 65535", target: "VARCHAR({length * 3})", reason: "No CLOB type; fits VARCHAR"}
+  - {source: CLOB, when: "charset != 'UNICODE' and length * 2 <= 65535", target: "VARCHAR({length * 2})", reason: "No CLOB type; fits VARCHAR"}
+  - {source: CLOB, target: "VARCHAR(65535)", lossy: true, severity: warning, transform: truncate, reason: "No CLOB type and VARCHAR max is 65535 bytes: longer values are truncated (consider SUPER or S3 + external table)"}
+  # ---- binary (VARBYTE max 1,024,000 bytes; COPY loads Parquet BINARY into VARBYTE) ----
+  - {source: BYTE, target: "VARBYTE({length})", reason: "No fixed-width binary; zero padding kept as data but not enforced"}
+  - {source: VARBYTE, target: "VARBYTE({min(length, 1024000)})"}
+  - {source: BLOB, when: "length <= 1024000", target: "VARBYTE({length})"}
+  - {source: BLOB, target: "VARBYTE(1024000)", lossy: true, severity: warning, transform: truncate, reason: "VARBYTE max is 1,024,000 bytes: larger objects are truncated (keep them in S3)"}
+  # ---- date/time (microsecond precision) ----
+  - {source: DATE, target: DATE}
+  - {source: TIME, target: TIME}
+  - {source: TIME_TZ, target: TIMETZ, lossy: true, severity: warning, transform: tz_to_utc, reason: "TIMETZ stores UTC; the original offset is not retained"}
+  - {source: TIMESTAMP, target: TIMESTAMP}
+  - {source: TIMESTAMP_TZ, target: TIMESTAMPTZ, lossy: true, severity: warning, transform: tz_to_utc, reason: "TIMESTAMPTZ stores UTC: the instant is kept but the original offset (e.g. -03:00) is not retained"}
+  # ---- other ----
+  - {source: INTERVAL, target: "VARCHAR(32)", lossy: true, severity: warning, transform: to_string, reason: "COPY cannot load Parquet into INTERVAL: stored as Teradata interval text"}
+  - {source: PERIOD, target: "VARCHAR(100)", lossy: true, severity: warning, transform: to_string, reason: "No PERIOD type: stored as text '(begin, end)'; split into two columns for range predicates"}
+  - {source: JSON, when: "length * 3 <= 65535", target: "VARCHAR({length * 3})", transform: to_string, reason: "Stored as JSON text; JSON_PARSE() into SUPER for semi-structured queries"}
+  - {source: JSON, target: "VARCHAR(65535)", lossy: true, severity: warning, transform: truncate, reason: "Documents over 65535 bytes are truncated; load into SUPER (16 MB) via JSON_PARSE for large documents"}
+  - {source: XML, target: "VARCHAR(65535)", lossy: true, severity: warning, transform: truncate, reason: "No XML type: stored as text, values over 65535 bytes truncated"}
+dq:
+  enforces_pk_fk: false
+  notes: >-
+    PRIMARY KEY / UNIQUE / FOREIGN KEY are informational (used by the planner, not enforced); uniqueness and
+    referential integrity are verified by the studio's DQ checks.
+  # Canonical checksum (contracts/checksum.py). `-- @...:` lines define per-kind column expressions.
+  checksum_sql_template: |
+    -- @null: CHR(92) || 'N'
+    -- @sep: CHR(31)
+    -- @concat: ||
+    -- @canon.integer: CAST({col} AS VARCHAR(20))
+    -- @canon.decimal: CAST({col} AS VARCHAR(48))
+    -- @canon.float: CAST(CAST(ROUND({col} * 1e6) AS BIGINT) AS VARCHAR(20))
+    -- @canon.string: {col}
+    -- @canon.char: RTRIM({col})
+    -- @canon.date: TO_CHAR({col}, 'YYYY-MM-DD')
+    -- @canon.timestamp: TO_CHAR({col}, 'YYYY-MM-DD HH24:MI:SS.US')
+    -- @canon.timestamp_tz: TO_CHAR(CONVERT_TIMEZONE('UTC', {col}), 'YYYY-MM-DD HH24:MI:SS.US')
+    -- @canon.time: CAST({col} AS VARCHAR(20))
+    -- @canon.bool: CASE WHEN {col} THEN 'true' ELSE 'false' END
+    -- @canon.binary: LOWER(TO_HEX({col}))
+    SELECT COUNT(*) AS row_count,
+           CAST(COALESCE(SUM(CAST(STRTOL(SUBSTRING(MD5({row}), 1, 8), 16) AS BIGINT)), 0) AS VARCHAR(30)) AS checksum
+    FROM {relation}
+governance:
+  encryption_at_rest: AWS KMS cluster encryption (AES-256), AWS-managed or customer-managed key
+  encryption_in_transit: require_ssl=true in the parameter group; the connector connects with ssl=True (sslmode verify-ca)
+  access_model: RBAC roles (CREATE ROLE, GRANT ... TO ROLE) on schema/tables; dynamic data masking policies attached to PII columns; IAM role for COPY from S3
+  native_masking: "Dynamic data masking: CREATE MASKING POLICY ... USING (SHA2(...)/NULL/partial) + ATTACH MASKING POLICY ON t(col) TO PUBLIC; unmasked access via a higher-priority policy for a role"
+  # Lines: `@set k = v` (variable), `@table` (per table), `@piitable` (per table with PII), `@pii` (per PII column).
+  role_script_template: |
+    @set mask.hash = CAST(SHA2(CAST(val AS VARCHAR(65535)), 256) AS {column_type})
+    @set mask.partial = CAST(LEFT(CAST(val AS VARCHAR(65535)), 2) || '****' AS {column_type})
+    @set mask.nullify = CAST(NULL AS {column_type})
+    -- Amazon Redshift RBAC for schema {container}
+    CREATE ROLE {container}_reader;
+    CREATE ROLE {container}_pii_reader;
+    CREATE ROLE {container}_loader;
+    GRANT USAGE ON SCHEMA "{container}" TO ROLE {container}_reader;
+    GRANT USAGE ON SCHEMA "{container}" TO ROLE {container}_pii_reader;
+    GRANT USAGE, CREATE ON SCHEMA "{container}" TO ROLE {container}_loader;
+    @table GRANT SELECT ON {fq_table} TO ROLE {container}_reader;
+    @table GRANT SELECT ON {fq_table} TO ROLE {container}_pii_reader;
+    @table GRANT SELECT, INSERT, DELETE, DROP, ALTER ON {fq_table} TO ROLE {container}_loader;
+    -- Dynamic data masking: everyone sees masked PII, {container}_pii_reader sees clear text
+    @pii CREATE MASKING POLICY mask_{table}_{column} WITH (val {column_type}) USING ({mask_expr});
+    @pii ATTACH MASKING POLICY mask_{table}_{column} ON {fq_table}({q_column}) TO PUBLIC;
+    @pii CREATE MASKING POLICY unmask_{table}_{column} WITH (val {column_type}) USING (val);
+    @pii ATTACH MASKING POLICY unmask_{table}_{column} ON {fq_table}({q_column}) TO ROLE {container}_pii_reader PRIORITY 10;

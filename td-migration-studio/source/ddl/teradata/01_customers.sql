@@ -1,0 +1,10 @@
+CREATE SET TABLE RETAIL_DW.CUSTOMERS, NO FALLBACK, NO BEFORE JOURNAL, NO AFTER JOURNAL, CHECKSUM = DEFAULT
+(
+    customer_id               CHAR(32)     CHARACTER SET LATIN   NOT CASESPECIFIC NOT NULL,
+    customer_unique_id        CHAR(32)     CHARACTER SET LATIN   NOT CASESPECIFIC NOT NULL,
+    customer_zip_code_prefix  CHAR(5)      CHARACTER SET LATIN   NOT CASESPECIFIC,
+    customer_city             VARCHAR(60)  CHARACTER SET UNICODE NOT CASESPECIFIC,
+    customer_state            CHAR(2)      CHARACTER SET LATIN   NOT CASESPECIFIC
+                                           COMPRESS ('SP','RJ','MG','RS','PR','SC','BA')
+)
+UNIQUE PRIMARY INDEX UPI_CUSTOMERS (customer_id);

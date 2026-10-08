@@ -1,0 +1,53 @@
+[project]
+name = "td-migration-studio"
+version = "0.1.0"
+description = "Teradata -> Azure Synapse / Google BigQuery / Amazon Redshift migration studio"
+requires-python = ">=3.10"
+dependencies = [
+  "fastapi>=0.110",
+  "uvicorn[standard]>=0.27",
+  "pydantic>=2.6",
+  "pydantic-settings>=2.2",
+  "pyyaml>=6.0",
+  "psycopg[binary,pool]>=3.1",
+  "pyarrow>=15",
+  "duckdb>=1.0",
+  "sqlglot>=23",
+  "sse-starlette>=2.0",
+]
+
+[project.optional-dependencies]
+real = [
+  "teradatasql>=20.0",
+  "google-cloud-bigquery>=3.17",
+  "redshift-connector>=2.1",
+  "boto3>=1.34",
+  "pyodbc>=5.1",
+  "azure-storage-file-datalake>=12.14",
+]
+dev = ["pytest>=8", "httpx>=0.27", "ruff>=0.4"]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["app*"]
+
+[tool.setuptools.package-data]
+app = ["targets_meta/*.yaml", "control/*.sql"]
+
+[tool.ruff]
+line-length = 110
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["tests"]
+markers = [
+  "integration: needs the docker compose Postgres (teradata-emu / ctl) running",
+  "real: needs real cloud/Teradata credentials",
+]
