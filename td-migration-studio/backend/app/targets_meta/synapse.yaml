@@ -1,49 +1,140 @@
-# SKELETON (scaffold). The targets workstream completes type_mappings, dq and governance.
+# Azure Synapse Analytics dedicated SQL pool. Field `key`s are a contract: the pipeline and UI rely on them.
 id: synapse
 display_name: Azure Synapse Analytics
 vendor: Microsoft Azure
 dialect: tsql
 container_label: schema
 description: Dedicated SQL pool (MPP). Tables are hash/round-robin/replicated across 60 distributions.
+free_tier_note: >-
+  Dedicated SQL pools are billed per DWU-hour (pause when idle); new Azure accounts get trial credit.
+  The simulated target needs no account.
 real_mode_required_env: [SYNAPSE_SERVER, SYNAPSE_DATABASE, SYNAPSE_USER, SYNAPSE_PASSWORD]
 connection_fields:
-  - {key: server, label: Server, type: text, required: true, env: SYNAPSE_SERVER}
-  - {key: database, label: Database, type: text, required: true, env: SYNAPSE_DATABASE}
-  - {key: user, label: User, type: text, env: SYNAPSE_USER}
+  - {key: server, label: Server, type: text, required: true, env: SYNAPSE_SERVER, help: "e.g. myws.sql.azuresynapse.net (dedicated SQL endpoint)"}
+  - {key: database, label: Database, type: text, required: true, env: SYNAPSE_DATABASE, help: Dedicated SQL pool name}
+  - {key: user, label: User, type: text, env: SYNAPSE_USER, help: SQL authentication login}
   - {key: password, label: Password, type: password, env: SYNAPSE_PASSWORD}
-  - {key: adls_account, label: ADLS Gen2 account (staging), type: text, env: SYNAPSE_ADLS_ACCOUNT}
+  - {key: adls_account, label: ADLS Gen2 account (staging), type: text, env: SYNAPSE_ADLS_ACCOUNT, help: "Storage account for COPY INTO staging; blank = INSERT batches over ODBC (slow)"}
   - {key: adls_container, label: ADLS container, type: text, env: SYNAPSE_ADLS_CONTAINER}
+  - {key: adls_sas, label: ADLS SAS token, type: password, env: SYNAPSE_ADLS_SAS, help: "SAS with read/write/list/delete; blank = workspace Managed Identity"}
 config_fields:
-  - {key: schema, label: Schema, type: text, default: retail_dw}
-  - {key: dwu, label: Performance level (DWU), type: select, options: [DW100c, DW200c, DW500c, DW1000c, DW3000c, DW6000c], default: DW500c}
-  - {key: resource_class, label: Load resource class, type: select, options: [smallrc, mediumrc, largerc, xlargerc], default: largerc}
-  - {key: load_method, label: Load method, type: select, options: [COPY_INTO, POLYBASE, BULK_INSERT], default: COPY_INTO}
-  - {key: distribution, label: Distribution, type: select, scope: table, options: [HASH, ROUND_ROBIN, REPLICATE], default: ROUND_ROBIN}
-  - {key: distribution_column, label: Hash column, type: column, scope: table, show_if: {distribution: HASH}}
-  - {key: index_type, label: Index, type: select, scope: table, options: [CLUSTERED_COLUMNSTORE, HEAP, CLUSTERED_INDEX], default: CLUSTERED_COLUMNSTORE}
-  - {key: partition_column, label: Partition column, type: column, scope: table}
+  - {key: schema, label: Schema, type: text, default: retail_dw, help: Target schema (created if missing)}
+  - {key: dwu, label: Performance level (DWU), type: select, options: [DW100c, DW200c, DW500c, DW1000c, DW3000c, DW6000c], default: DW500c, help: "Informational: scale the pool before the run; concurrency slots and load speed grow with DWU"}
+  - {key: resource_class, label: Load resource class, type: select, options: [smallrc, mediumrc, largerc, xlargerc], default: largerc, help: "Assign the load user to this role (EXEC sp_addrolemember) for more memory per COPY -> better columnstore row groups"}
+  - {key: load_method, label: Load method, type: select, options: [COPY_INTO, POLYBASE, BULK_INSERT], default: COPY_INTO, help: "COPY INTO from ADLS Gen2 Parquet is the recommended bulk path"}
+  - {key: distribution, label: Distribution, type: select, scope: table, options: [HASH, ROUND_ROBIN, REPLICATE], default: ROUND_ROBIN, help: "HASH on a high-cardinality join key for large facts; REPLICATE for small (< 2 GB) dimensions"}
+  - {key: distribution_column, label: Hash column, type: column, scope: table, show_if: {distribution: HASH}, help: "Avoid nullable/skewed columns; not a (MAX) type"}
+  - {key: index_type, label: Index, type: select, scope: table, options: [CLUSTERED_COLUMNSTORE, HEAP, CLUSTERED_INDEX], default: CLUSTERED_COLUMNSTORE, help: "CCI for tables > 60M rows; HEAP for staging/small tables; CLUSTERED_INDEX uses the primary key columns"}
+  - {key: partition_column, label: Partition column, type: column, scope: table, help: "RANGE RIGHT partitioning; boundaries come from partition_boundaries or the Teradata RANGE_N (yearly)"}
+  - {key: partition_boundaries, label: Partition boundaries, type: text, scope: table, help: "Optional comma-separated boundary values, e.g. 2017-01-01,2018-01-01"}
 load_methods: [COPY_INTO, POLYBASE, BULK_INSERT]
-identifiers: {max_length: 128, case: preserve, quote: "["}
+identifiers:
+  max_length: 128
+  case: preserve
+  quote: "["
+  reserved_words: [ADD, ALL, ALTER, AND, ANY, AS, ASC, AUTHORIZATION, BACKUP, BEGIN, BETWEEN, BREAK, BROWSE, BULK, BY, CASCADE, CASE, CHECK, CHECKPOINT, CLOSE, CLUSTERED, COALESCE, COLLATE, COLUMN, COMMIT, COMPUTE, CONSTRAINT, CONTAINS, CONTINUE, CONVERT, CREATE, CROSS, CURRENT, CURRENT_DATE, CURRENT_TIME, CURRENT_TIMESTAMP, CURRENT_USER, CURSOR, DATABASE, DBCC, DEALLOCATE, DECLARE, DEFAULT, DELETE, DENY, DESC, DISTINCT, DISTRIBUTED, DOUBLE, DROP, ELSE, END, ERRLVL, ESCAPE, EXCEPT, EXEC, EXECUTE, EXISTS, EXIT, EXTERNAL, FETCH, FILE, FILLFACTOR, FOR, FOREIGN, FREETEXT, FROM, FULL, FUNCTION, GOTO, GRANT, GROUP, HAVING, HOLDLOCK, IDENTITY, IF, IN, INDEX, INNER, INSERT, INTERSECT, INTO, IS, JOIN, KEY, KILL, LABEL, LEFT, LIKE, LINENO, MERGE, NATIONAL, NOCHECK, NONCLUSTERED, NOT, "NULL", NULLIF, OF, "OFF", OFFSETS, "ON", OPEN, OPTION, OR, ORDER, OUTER, OVER, PERCENT, PIVOT, PLAN, PRECISION, PRIMARY, PRINT, PROC, PROCEDURE, PUBLIC, RAISERROR, READ, RECONFIGURE, REFERENCES, REPLICATION, RESTORE, RESTRICT, RETURN, REVERT, REVOKE, RIGHT, ROLLBACK, ROWCOUNT, RULE, SAVE, SCHEMA, SELECT, SESSION_USER, SET, SETUSER, SHUTDOWN, SOME, STATISTICS, SYSTEM_USER, TABLE, TABLESAMPLE, THEN, TO, TOP, TRAN, TRANSACTION, TRIGGER, TRUNCATE, UNION, UNIQUE, UNPIVOT, UPDATE, USE, USER, VALUES, VARYING, VIEW, WAITFOR, WHEN, WHERE, WHILE, WITH]
+native_types:
+  FLOAT: {arrow: double}
+  REAL: {arrow: float}
+  DECIMAL: {arrow: "decimal128(18, 0)"}
+  NUMERIC: {arrow: "decimal128(18, 0)"}
+  CHAR: {length_unit: bytes, default_length: 1, max_length: 8000}
+  VARCHAR: {length_unit: bytes, default_length: 1, max_length: 2147483647}
+  NCHAR: {length_unit: chars, default_length: 1, max_length: 4000}
+  NVARCHAR: {length_unit: chars, default_length: 1, max_length: 1073741823}
+  BINARY: {length_unit: bytes, default_length: 1, max_length: 8000}
+  VARBINARY: {length_unit: bytes, default_length: 1, max_length: 2147483647}
+  TIME: {arrow: "time64[us]"}
 type_mappings:
-  - {source: BYTEINT, target: SMALLINT, reason: "Synapse TINYINT is unsigned (0-255); widened to keep negatives"}
+  # ---- integers ----
+  - {source: BYTEINT, target: SMALLINT, reason: "Synapse TINYINT is unsigned (0..255); widened to SMALLINT to keep BYTEINT's -128..127"}
   - {source: SMALLINT, target: SMALLINT}
   - {source: INTEGER, target: INT}
   - {source: BIGINT, target: BIGINT}
+  # ---- exact numerics ----
+  - {source: DECIMAL, when: "precision > 38", target: "DECIMAL(38,{min(scale, 38)})", lossy: true, severity: error, transform: round_scale, reason: "Synapse DECIMAL max precision is 38; values needing more digits are rejected"}
   - {source: DECIMAL, target: "DECIMAL({precision},{scale})"}
-  - {source: NUMBER, target: "DECIMAL(38,15)", lossy: true, severity: warning, reason: "Unbounded NUMBER fixed to DECIMAL(38,15)"}
-  - {source: FLOAT, target: FLOAT}
-  - {source: CHAR, when: "charset == 'UNICODE'", target: "NCHAR({length})"}
-  - {source: CHAR, target: "CHAR({length})"}
-  - {source: VARCHAR, when: "charset == 'UNICODE' and length > 4000", target: "NVARCHAR(MAX)", lossy: true, severity: warning, reason: "> 4000 chars: NVARCHAR(MAX) not supported in CCI ordering / slower loads"}
-  - {source: VARCHAR, when: "charset == 'UNICODE'", target: "NVARCHAR({length})"}
+  - {source: NUMBER, when: "precision is None and scale is None", target: "DECIMAL(38,15)", lossy: true, severity: warning, transform: round_scale, reason: "Unbounded Teradata NUMBER is floating decimal (38 significant digits at any scale); fixed to DECIMAL(38,15): digits beyond 15 decimals are rounded, |v| >= 1e23 rejected"}
+  - {source: NUMBER, when: "precision is None", target: "DECIMAL(38,{scale})", reason: "NUMBER(*,s) = 38 digits with fixed scale"}
+  - {source: NUMBER, when: "precision > 38", target: "DECIMAL(38,{min(coalesce(scale, 0), 38)})", lossy: true, severity: error, transform: round_scale, reason: "Precision > 38 not supported"}
+  - {source: NUMBER, target: "DECIMAL({precision},{coalesce(scale, 0)})"}
+  - {source: FLOAT, target: FLOAT, reason: "FLOAT = FLOAT(53), IEEE double like Teradata FLOAT"}
+  # ---- character ----
+  - {source: CHAR, when: "charset == 'UNICODE' and length > 4000", target: "NVARCHAR(MAX)", severity: warning, reason: "NCHAR max is 4000; stored as NVARCHAR(MAX): no blank padding, (MAX) columns cannot be ordered-CCI/hash keys and load slower"}
+  - {source: CHAR, when: "charset == 'UNICODE'", target: "NCHAR({length})", reason: "Blank-padded like Teradata CHAR (trailing spaces ignored in comparisons); N-types keep Unicode"}
+  - {source: CHAR, when: "length > 8000", target: "VARCHAR(MAX)", severity: warning, reason: "CHAR max is 8000 bytes; stored as VARCHAR(MAX) without blank padding"}
+  - {source: CHAR, target: "CHAR({length})", reason: "Blank-padded like Teradata CHAR; LATIN maps to the default Latin1 code page"}
+  - {source: VARCHAR, when: "charset == 'UNICODE' and length > 4000", target: "NVARCHAR(MAX)", severity: warning, reason: "NVARCHAR(n) is limited to 4000; NVARCHAR(MAX) keeps all data but cannot be a distribution/ordered-CCI key and loads slower"}
+  - {source: VARCHAR, when: "charset == 'UNICODE'", target: "NVARCHAR({length})", reason: "N-types store UTF-16 like Teradata UNICODE; lengths stay in characters"}
+  - {source: VARCHAR, when: "length > 8000", target: "VARCHAR(MAX)", severity: warning, reason: "VARCHAR(n) is limited to 8000 bytes"}
   - {source: VARCHAR, target: "VARCHAR({length})"}
+  - {source: CLOB, when: "charset == 'UNICODE'", target: "NVARCHAR(MAX)", severity: warning, reason: "No CLOB type; NVARCHAR(MAX) holds up to 1 G characters (LOB columns slow down columnstore loads)"}
+  - {source: CLOB, target: "VARCHAR(MAX)", severity: warning, reason: "No CLOB type; VARCHAR(MAX) holds up to 2 GB"}
+  # ---- binary ----
+  - {source: BYTE, when: "length > 8000", target: "VARBINARY(MAX)", severity: warning, reason: "BINARY max is 8000 bytes; stored as VARBINARY(MAX) without zero padding"}
+  - {source: BYTE, target: "BINARY({length})", reason: "Fixed-length, zero-padded like Teradata BYTE"}
+  - {source: VARBYTE, when: "length > 8000", target: "VARBINARY(MAX)"}
+  - {source: VARBYTE, target: "VARBINARY({length})"}
+  - {source: BLOB, target: "VARBINARY(MAX)", severity: warning, reason: "No BLOB type; VARBINARY(MAX) holds up to 2 GB"}
+  # ---- date/time ----
   - {source: DATE, target: DATE}
-  - {source: TIMESTAMP, target: "DATETIME2({fractional_seconds})"}
-  - {source: TIMESTAMP_TZ, target: "DATETIMEOFFSET({fractional_seconds})"}
+  - {source: TIME, target: "TIME({coalesce(fractional_seconds, 6)})"}
+  - {source: TIME_TZ, target: "TIME({coalesce(fractional_seconds, 6)})", lossy: true, severity: warning, transform: tz_to_utc, reason: "No TIME WITH TIME ZONE type: normalized to UTC, offset dropped"}
+  - {source: TIMESTAMP, target: "DATETIME2({coalesce(fractional_seconds, 6)})", reason: "DATETIME2 keeps Teradata's 0-6 fractional digits (DATETIME would round to 1/300 s)"}
+  - {source: TIMESTAMP_TZ, target: "DATETIMEOFFSET({coalesce(fractional_seconds, 6)})", lossy: true, severity: info, transform: tz_to_utc, reason: "Instant preserved, but values are staged in UTC so the original offset (e.g. -03:00) is stored as +00:00"}
+  # ---- other ----
+  - {source: INTERVAL, target: "VARCHAR(32)", lossy: true, severity: warning, transform: to_string, reason: "No INTERVAL type: stored as Teradata interval text (e.g. '3 04:05:06'); no interval arithmetic"}
+  - {source: PERIOD, target: "VARCHAR(100)", lossy: true, severity: warning, transform: to_string, reason: "No PERIOD type: stored as text '(begin, end)'; split into two DATETIME2 columns for range predicates"}
+  - {source: JSON, target: "NVARCHAR(MAX)", transform: to_string, reason: "No JSON type: stored as text; query with JSON_VALUE/OPENJSON/ISJSON"}
+  - {source: XML, target: "NVARCHAR(MAX)", lossy: true, severity: warning, transform: to_string, reason: "Dedicated SQL pools have no XML type/XQuery: stored as text"}
 dq:
   enforces_pk_fk: false
+  notes: >-
+    PRIMARY KEY / UNIQUE are NOT ENFORCED (optimizer hints only) and FOREIGN KEY is unsupported, so
+    uniqueness and referential integrity are verified by the studio's DQ checks. The checksum hashes the
+    UTF-8 bytes of each row (Latin1_General_100_BIN2_UTF8 collation) so it matches the DuckDB reference.
+  # Canonical checksum (contracts/checksum.py). `-- @...:` lines define per-kind column expressions
+  # ({col} = quoted column, {scale} = decimal scale); the body gets {row} and {relation}.
+  checksum_sql_template: |
+    -- @null: '\N'
+    -- @sep: CHAR(31)
+    -- @concat: +
+    -- @canon.integer: CAST({col} AS VARCHAR(20))
+    -- @canon.decimal: CAST({col} AS VARCHAR(48))
+    -- @canon.float: CAST(CAST(ROUND(CAST({col} AS FLOAT) * 1e6, 0) AS BIGINT) AS VARCHAR(20))
+    -- @canon.string: CAST({col} AS NVARCHAR(MAX))
+    -- @canon.char: CAST(RTRIM({col}) AS NVARCHAR(MAX))
+    -- @canon.date: CONVERT(VARCHAR(10), {col}, 23)
+    -- @canon.timestamp: CONVERT(VARCHAR(26), CAST({col} AS DATETIME2(6)), 121)
+    -- @canon.timestamp_tz: CONVERT(VARCHAR(26), CAST(SWITCHOFFSET({col}, '+00:00') AS DATETIME2(6)), 121)
+    -- @canon.time: CONVERT(VARCHAR(16), {col}, 114)
+    -- @canon.bool: CASE WHEN {col} = 1 THEN 'true' ELSE 'false' END
+    -- @canon.binary: LOWER(CONVERT(VARCHAR(MAX), {col}, 2))
+    SELECT COUNT_BIG(*) AS row_count,
+           CAST(COALESCE(SUM(CAST(CAST(SUBSTRING(HASHBYTES('MD5',
+                CAST({row} AS VARCHAR(MAX)) COLLATE Latin1_General_100_BIN2_UTF8), 1, 4) AS BINARY(4)) AS BIGINT)), 0)
+                AS VARCHAR(30)) AS checksum
+    FROM {relation}
 governance:
-  encryption_at_rest: Transparent Data Encryption (TDE), service- or customer-managed key
-  encryption_in_transit: TLS 1.2 enforced (Encrypt=yes in ODBC connection string)
-  access_model: Database roles + GRANT SELECT on schema; optional Dynamic Data Masking on PII columns
-  role_script_template: ""
+  encryption_at_rest: Transparent Data Encryption (TDE, AES-256) with service-managed or customer-managed key (Key Vault)
+  encryption_in_transit: TLS 1.2 enforced; the connector uses ODBC Driver 18 with Encrypt=yes;TrustServerCertificate=no
+  access_model: Database roles + GRANT on SCHEMA::/OBJECT::; Dynamic Data Masking on PII columns with GRANT UNMASK for privileged readers; Entra ID groups mapped to roles
+  native_masking: "Dynamic Data Masking: default(), email(), random(a,b), partial(prefix,'pad',suffix); UNMASK permission bypasses it"
+  # Lines: `@set k = v` (variable), `@table` (per table), `@piitable` (per table with PII), `@pii` (per PII column).
+  role_script_template: |
+    @set mask.hash = default()
+    @set mask.partial = partial(2,"XXXX",2)
+    @set mask.nullify = default()
+    -- Azure Synapse dedicated SQL pool: access roles for schema [{container}]
+    IF DATABASE_PRINCIPAL_ID('{container}_reader') IS NULL CREATE ROLE [{container}_reader];
+    IF DATABASE_PRINCIPAL_ID('{container}_pii_reader') IS NULL CREATE ROLE [{container}_pii_reader];
+    IF DATABASE_PRINCIPAL_ID('{container}_loader') IS NULL CREATE ROLE [{container}_loader];
+    GRANT SELECT ON SCHEMA::[{container}] TO [{container}_reader];
+    GRANT SELECT ON SCHEMA::[{container}] TO [{container}_pii_reader];
+    GRANT UNMASK TO [{container}_pii_reader];
+    GRANT ALTER, SELECT, INSERT, DELETE ON SCHEMA::[{container}] TO [{container}_loader];
+    GRANT CREATE TABLE, ADMINISTER DATABASE BULK OPERATIONS TO [{container}_loader];
+    EXEC sp_addrolemember '{resource_class}', '{container}_loader';
+    @table -- {fq_table}: readable by [{container}_reader]
+    -- Dynamic Data Masking for PII columns (values are additionally masked by the studio before load)
+    @pii ALTER TABLE {fq_table} ALTER COLUMN {q_column} ADD MASKED WITH (FUNCTION = '{mask_expr}');  -- {category}, studio masking: {masking}
