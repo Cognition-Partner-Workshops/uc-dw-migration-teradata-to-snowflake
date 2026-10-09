@@ -158,3 +158,8 @@ def test_zip_path_traversal_is_neutralised():
     with zipfile.ZipFile(buf, "w") as z:
         z.writestr("../../etc/evil.sql", "SELECT 1;")
     assert [f.path for f in expand([("x.zip", buf.getvalue())])] == ["etc/evil.sql"]
+
+
+def test_api_rejects_corrupt_zip_with_message():
+    r = client.post("/api/jobs", files=[("config_files", ("broken.zip", b"not a zip"))], data={"options": "{}"})
+    assert r.status_code == 422 and "not a valid ZIP archive" in r.json()["detail"]

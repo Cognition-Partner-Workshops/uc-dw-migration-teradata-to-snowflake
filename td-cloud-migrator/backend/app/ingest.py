@@ -61,7 +61,11 @@ def expand(files: list[tuple[str, bytes]]) -> list[UploadedFile]:
     total = 0
     for name, data in files:
         if name.lower().endswith(".zip"):
-            with zipfile.ZipFile(io.BytesIO(data)) as zf:
+            try:
+                zf = zipfile.ZipFile(io.BytesIO(data))
+            except zipfile.BadZipFile:
+                raise ValueError(f"{name}: not a valid ZIP archive") from None
+            with zf:
                 infos = [i for i in zf.infolist() if not i.is_dir()]
                 if len(infos) > MAX_ZIP_ENTRIES:
                     raise ValueError(f"{name}: too many entries")

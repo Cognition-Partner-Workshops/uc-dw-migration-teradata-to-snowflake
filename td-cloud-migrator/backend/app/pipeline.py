@@ -66,6 +66,7 @@ class JobStore:
 
 
 def create_job(store: JobStore, name: str, config: list[tuple[str, bytes]], data: list[tuple[str, bytes]], options: JobOptions) -> Job:
+    config_files, data_files = expand(config), expand(data)
     job = Job(
         id=uuid.uuid4().hex[:12],
         name=name or "Migration job",
@@ -74,8 +75,8 @@ def create_job(store: JobStore, name: str, config: list[tuple[str, bytes]], data
         options=options,
     )
     store.dir(job.id).mkdir(parents=True)
-    store.write_files(job.id, "config", expand(config))
-    store.write_files(job.id, "data", expand(data))
+    store.write_files(job.id, "config", config_files)
+    store.write_files(job.id, "data", data_files)
     store.save(job)
     return analyse(store, job)
 
