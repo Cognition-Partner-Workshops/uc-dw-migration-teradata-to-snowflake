@@ -113,6 +113,8 @@ def _sniff(sample: str) -> str:
 def read_data_file(f: UploadedFile, opts: DataOptions, table: TableMeta | None = None, entry: ManifestEntry | None = None) -> ParsedFile:
     fmt = detect_data(f, opts.data_format)
     a = DataFileAnalysis(path=f.path, format="unknown", compressed=f.name.lower().endswith(".gz"))
+    if opts.data_format in ("delimited", "parquet") and fmt in ("delimited", "parquet") and fmt != opts.data_format:
+        a.issues.append(f"Selected format is {opts.data_format} but the file content is {fmt}; analysed as {fmt}")
     if fmt == "parquet":
         tbl = pq.read_table(io.BytesIO(f.data))
         a.format, a.columns = "parquet", [c.upper() for c in tbl.column_names]

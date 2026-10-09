@@ -163,3 +163,12 @@ def test_zip_path_traversal_is_neutralised():
 def test_api_rejects_corrupt_zip_with_message():
     r = client.post("/api/jobs", files=[("config_files", ("broken.zip", b"not a zip"))], data={"options": "{}"})
     assert r.status_code == 422 and "not a valid ZIP archive" in r.json()["detail"]
+
+
+def test_selected_format_mismatch_is_reported(analysed):
+    _, objects, _, _ = analysed
+    tables = {o.id: o.table for o in objects if o.table}
+    f = UploadedFile("dim_branch.csv", b"BRANCH_ID|BRANCH_CODE\n1|B1\n")
+    _, data, _, _, _ = analyse_data([f], tables, DataOptions(data_format="parquet"))
+    assert data[0].format == "delimited"
+    assert any("Selected format is parquet" in i for i in data[0].issues)
