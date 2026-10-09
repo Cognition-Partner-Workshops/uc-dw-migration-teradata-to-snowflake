@@ -171,8 +171,9 @@ def _rows(f: UploadedFile, fmt: str) -> list[dict]:
     if fmt == "dbc_json":
         doc = json.loads(text)
         return doc if isinstance(doc, list) else next((v for v in doc.values() if isinstance(v, list)), [])
-    dialect = csv.Sniffer().sniff(text[:4096], delimiters=",|;\t")
-    return list(csv.DictReader(io.StringIO(text), dialect=dialect))
+    delimiter = csv.Sniffer().sniff(text[:4096], delimiters=",|;\t").delimiter
+    # DBC DefaultValue holds SQL literals such as 'NOK'; only '"' may act as the CSV quote character.
+    return list(csv.DictReader(io.StringIO(text), delimiter=delimiter, quotechar='"'))
 
 
 def _from_dbc(files: list[tuple[UploadedFile, str]], objects: list[SourceObject]) -> list[str]:

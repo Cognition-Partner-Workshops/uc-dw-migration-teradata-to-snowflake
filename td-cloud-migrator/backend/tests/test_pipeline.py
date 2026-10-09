@@ -51,6 +51,7 @@ def test_dbc_export_matches_ddl(analysed):
     assert set(dbc) == set(ddl)
     for name, t in dbc.items():
         assert [c.td_type for c in t.columns] == [c.td_type for c in ddl[name].columns], name
+        assert [c.default for c in t.columns] == [c.default for c in ddl[name].columns], name
         assert t.primary_index == ddl[name].primary_index
     assert sum(o.object_type == "view" for o in objects) == 3
 
