@@ -16,7 +16,12 @@ def numeric_columns(objects: list[SourceObject]) -> frozenset[str]:
 
 
 def convert_object(
-    obj: SourceObject, target: TargetId, schema_map: dict[str, str], project: str, numeric_cols: frozenset[str] = frozenset()
+    obj: SourceObject,
+    target: TargetId,
+    schema_map: dict[str, str],
+    project: str,
+    numeric_cols: frozenset[str] = frozenset(),
+    registry: dict[str, SourceObject] | None = None,
 ) -> Conversion:
     if obj.parse_error and obj.object_type in ("table", "view", "other"):
         return Conversion(

@@ -131,7 +131,7 @@ def td_casts(sql: str) -> tuple[str, list[str], list[str]]:
     """Teradata `expr (TYPE)` / `expr (FORMAT '...')` phrases -> ANSI CAST, plus a few Teradata date/time idioms."""
     rules: list[str] = []
     warnings: list[str] = []
-    s = sql
+    s = re.sub(r"\b(TIMESTAMP|DATE)\s+('[0-9: .-]+')", r"CAST(\2 AS \1)", sql, flags=re.IGNORECASE)
     s, k = re.subn(
         r"\bCAST\s*\(\s*CAST\s*\(\s*([\w.]+)\s+AS\s+DATE\s+FORMAT\s+'YYYYMMDD'\s*\)\s+AS\s+INT(?:EGER)?\s*\)",
         r"TD_YYYYMMDD(\1)",
@@ -435,6 +435,12 @@ def transpile_ex(
             node.replace(exp.DateDiff(this=left.copy(), expression=right.copy(), unit=exp.var("DAY")))
     _olap(tree, res)
     _hashes(tree, target, res)
+    if target == "synapse":
+        for sel in tree.find_all(exp.Select):
+            if sel.args.get("qualify"):
+                for i, e in enumerate(list(sel.expressions), 1):
+                    if not isinstance(e, (exp.Alias, exp.Column, exp.Star)):
+                        e.replace(exp.alias_(e.copy(), f"col_{i}"))
     out = tree.sql(dialect=DIALECT[target], pretty=True, unsupported_level=sqlglot.ErrorLevel.IGNORE)
     res.sql = render_placeholders(out, target)
     res.rules = list(dict.fromkeys(res.rules))
