@@ -16,7 +16,7 @@ from .conversion import convert_all
 from .data_analyser import TablePlan, analyse_data
 from .ingest import UploadedFile, expand
 from .loader import run_load
-from .models import Analysis, InputFile, Job, JobOptions, Progress, Stage, TargetId
+from .models import Analysis, Conversion, InputFile, Job, JobOptions, Progress, Stage, TargetId
 from .outputs import TARGET_LABEL, output_files
 
 DATA_DIR = Path(os.environ.get("TDCM_DATA_DIR", Path(__file__).resolve().parents[1] / "var"))
@@ -87,6 +87,15 @@ def _upload_summary(files: list[tuple[str, bytes]], kind: str) -> list[InputFile
         fmt = "zip" if n.endswith(".zip") else (PurePosixPath(n.removesuffix(".gz")).suffix.lstrip(".") or "file")
         out.append(InputFile(path=PurePosixPath(name).name, size=len(data), kind=kind, detected_format=fmt))
     return out
+
+
+def _conversion_summary(conversions: list[Conversion]) -> str:
+    n = {s: sum(c.status == s for c in conversions) for s in ("converted", "converted_with_warnings", "manual_review", "unsupported")}
+    msg = (
+        f"{len(conversions)} object(s) processed: {n['converted'] + n['converted_with_warnings']} converted automatically, "
+        f"{n['manual_review']} draft(s) need manual review"
+    )
+    return msg + (f", {n['unsupported']} unsupported" if n["unsupported"] else "")
 
 
 STAGES = [
@@ -237,8 +246,7 @@ def analyse(store: JobStore, job: Job, tracker: Tracker | None = None) -> Job:
             o.gcp_project,
             lambda d, n, obj: tr.step("convert", d, n, f"Converting {obj} ({d + 1}/{n})"),
         )
-        manual = sum(c.status in ("manual_review", "unsupported") for c in a.conversions)
-        tr.finish("convert", f"{len(a.conversions)} object(s) converted, {manual} need review")
+        tr.finish("convert", _conversion_summary(a.conversions))
 
         tr.start("data")
         _data_step(store, job, a)

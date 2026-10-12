@@ -148,6 +148,7 @@ def test_job_progress_stages_and_uploads():
     assert [s["key"] for s in p["stages"]] == ["upload", "config", "convert", "data", "outputs"]
     assert all(s["status"] == "done" and s["started_at"] <= s["finished_at"] for s in p["stages"])
     assert "Redshift" in p["stages"][2]["label"]
+    assert p["stages"][2]["detail"] == ("18 object(s) processed: 8 converted automatically, 10 draft(s) need manual review")
     assert {(u["path"], u["detected_format"]) for u in job["uploads"]} == {("config_dump.zip", "zip"), ("data_dump.zip", "zip")}
 
 
