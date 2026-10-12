@@ -6,6 +6,7 @@ from collections.abc import Callable
 
 from .ddl_render import column_mappings, render_table
 from .models import ColumnMapping, Conversion, SourceObject, TargetId
+from .routine_convert import convert_routine
 from .sql_convert import convert_view, draft_routine
 from .td_catalog import NUMERIC_TYPES
 
@@ -29,6 +30,11 @@ def convert_object(
         return render_table(obj, target, schema_map)
     if obj.object_type == "view":
         return convert_view(obj, target, schema_map, project if target == "bigquery" else "", numeric_cols)
+    if obj.object_type in ("macro", "procedure", "bteq_script") and registry is not None:
+        try:
+            return convert_routine(obj, target, schema_map, project if target == "bigquery" else "", registry)
+        except Exception:  # noqa: BLE001
+            pass
     return draft_routine(obj, target, schema_map, project if target == "bigquery" else "")
 
 
@@ -51,7 +57,7 @@ def convert_all(
             obj = by_id[oid]
             if on_progress:
                 on_progress(len(conversions), total, obj.name)
-            conversions.append(convert_object(obj, target, schema_map, project, numeric))
+            conversions.append(convert_object(obj, target, schema_map, project, numeric, by_id))
             if obj.table:
                 mappings[target][oid] = column_mappings(obj.table, target)
     return conversions, mappings
