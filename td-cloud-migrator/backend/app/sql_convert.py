@@ -75,6 +75,147 @@ def _strip_format(sql: str) -> tuple[str, int]:
     return sql, n + k
 
 
+
+_KEYWORDS = {
+    "SELECT", "AS", "WHERE", "AND", "OR", "ON", "THEN", "ELSE", "WHEN", "IN", "BY", "FROM", "NOT", "IS",
+    "BETWEEN", "CASE", "SET", "VALUES", "INTO", "USING", "HAVING", "QUALIFY", "JOIN", "RETURN", "EXISTS",
+}
+_TD_TYPES = r"BYTEINT|SMALLINT|INTEGER|INT|BIGINT|DECIMAL|NUMERIC|NUMBER|FLOAT|REAL|CHARACTER|CHAR|VARCHAR|DATE|TIME|TIMESTAMP"
+_TD_CAST = re.compile(
+    rf"\(\s*(?:(?P<type>(?:{_TD_TYPES})(?:\s*\(\s*\d+(?:\s*,\s*\d+)?\s*\))?)\s*(?:,\s*FORMAT\s*'[^']*')?|FORMAT\s*'(?P<fmt>[^']*)')\s*\)",
+    re.IGNORECASE,
+)
+
+
+def _matching_open(s: str, close: int) -> int:
+    depth, i = 0, close
+    while i >= 0:
+        if s[i] == "'":
+            i = s.rfind("'", 0, i)
+        elif s[i] == ")":
+            depth += 1
+        elif s[i] == "(":
+            depth -= 1
+            if depth == 0:
+                return i
+        i -= 1
+    return -1
+
+
+def _operand_start(s: str, end: int) -> int | None:
+    """Start index of the expression ending just before `end` (identifier chain, literal, call or parenthesised group)."""
+    j = end
+    while j > 0 and s[j - 1].isspace():
+        j -= 1
+    if j == 0:
+        return None
+    if s[j - 1] == ")":
+        k = _matching_open(s, j - 1)
+        if k < 0:
+            return None
+        m = re.search(r"[\w.]+\s*$", s[:k])
+        if m and m.group(0).strip().upper() not in _KEYWORDS:
+            return m.start()
+        return k
+    if s[j - 1] == "'":
+        k = s.rfind("'", 0, j - 1)
+        return k if k >= 0 else None
+    m = re.search(r"[\w.$#]+$", s[:j])
+    if not m or m.group(0).upper() in _KEYWORDS:
+        return None
+    return m.start()
+
+
+def td_casts(sql: str) -> tuple[str, list[str], list[str]]:
+    """Teradata `expr (TYPE)` / `expr (FORMAT '...')` phrases -> ANSI CAST, plus a few Teradata date/time idioms."""
+    rules: list[str] = []
+    warnings: list[str] = []
+    s = sql
+    s, k = re.subn(
+        r"\bCAST\s*\(\s*CAST\s*\(\s*([\w.]+)\s+AS\s+DATE\s+FORMAT\s+'YYYYMMDD'\s*\)\s+AS\s+INT(?:EGER)?\s*\)",
+        r"TD_YYYYMMDD(\1)",
+        s,
+        flags=re.IGNORECASE,
+    )
+    if k:
+        rules.append("CAST(CAST(d AS DATE FORMAT 'YYYYMMDD') AS INTEGER) -> integer date key YYYYMMDD")
+        warnings.append("Date key cast read as YYYYMMDD; confirm it matches the Teradata value for your DATEFORM setting")
+    for m in reversed(list(re.finditer(r"\bCAST\s*\(", s, re.IGNORECASE))):
+        e = _find_call(s, "CAST", m.start())
+        if e and e[0] == m.start() and len(e[2]) == 1:
+            inner = re.match(r"(?is)^(.*)\s+AS\s+DATE\s+FORMAT\s+'YYYY-MM-DD'\s*$", e[2][0])
+            if inner:
+                s = s[: e[0]] + f"CAST({inner.group(1)} AS DATE)" + s[e[1] :]
+    casts = trims = 0
+    for m in reversed(list(_TD_CAST.finditer(s))):
+        start = _operand_start(s, m.start())
+        if start is None:
+            continue
+        op = s[start : m.start()].rstrip()
+        if m.group("type"):
+            new = f"CAST({op} AS {m.group('type').upper()})"
+            casts += 1
+        elif re.search(r"\bTRIM\s*\(\s*$", s[:start], re.IGNORECASE) and s[m.end() :].lstrip().startswith(")"):
+            fmt = m.group("fmt")
+            n = len(fmt)
+            new = f"TD_LPAD0(CAST({op} AS VARCHAR({n})), {n})" if n > 1 and set(fmt) == {"9"} else f"CAST({op} AS VARCHAR(64))"
+            trims += 1
+        else:
+            continue
+        s = s[:start] + new + s[m.end() :]
+    if casts:
+        rules.append(f"Teradata cast phrase x (TYPE) -> CAST(x AS TYPE) ({casts}x)")
+    if trims:
+        rules.append(f"TRIM(x (FORMAT ...)) -> CAST to string, zero-padded for 9-digit formats ({trims}x)")
+    s, k = re.subn(
+        r"\bCAST\s*\(\s*([\w.]+)\s+AS\s+TIMESTAMP(?:\s*\(\s*\d\s*\))?\s*\)\s*\+\s*\(\s*([\w.]+)\s*-\s*TIME\s*'00:00:00'\s*HOUR\s+TO\s+SECOND\s*\)",
+        r"TD_DATE_TIME_TS(\1, \2)",
+        s,
+        flags=re.IGNORECASE,
+    )
+    if k:
+        rules.append("DATE (TIMESTAMP) + (TIME - TIME '00:00:00' HOUR TO SECOND) -> combined date + time timestamp")
+    s, k = re.subn(
+        r"\(\s*(CURRENT_TIMESTAMP(?:\s*\(\s*\d\s*\))?|[\w.]+)\s*-\s*([\w.]+)\s*\)\s*SECOND(?:\s*\(\s*\d+\s*\))?",
+        r"TD_SECONDS_BETWEEN(\2, \1)",
+        s,
+        flags=re.IGNORECASE,
+    )
+    if k:
+        rules.append("(ts1 - ts2) SECOND -> seconds between timestamps")
+    return s, rules, warnings
+
+
+_PLACEHOLDERS: dict[str, dict[str, Callable[[list[str]], str]]] = {
+    "TD_LPAD0": {
+        "synapse": lambda a: f"RIGHT(REPLICATE('0', {a[1]}) + {a[0]}, {a[1]})",
+        "*": lambda a: f"LPAD({a[0]}, {a[1]}, '0')",
+    },
+    "TD_DATE_TIME_TS": {
+        "bigquery": lambda a: f"DATETIME({a[0]}, {a[1]})",
+        "synapse": lambda a: f"DATEADD(SECOND, DATEDIFF(SECOND, 0, CAST({a[1]} AS DATETIME)), CAST({a[0]} AS DATETIME2))",
+        "*": lambda a: f"({a[0]} + {a[1]})",
+    },
+    "TD_SECONDS_BETWEEN": {
+        "bigquery": lambda a: f"DATETIME_DIFF({a[1]}, {a[0]}, SECOND)",
+        "duckdb": lambda a: f"DATE_DIFF('second', {a[0]}, {a[1]})",
+        "*": lambda a: f"DATEDIFF(SECOND, {a[0]}, {a[1]})",
+    },
+    "TD_YYYYMMDD": {
+        "bigquery": lambda a: f"CAST(FORMAT_DATE('%Y%m%d', {a[0]}) AS INT64)",
+        "redshift": lambda a: f"CAST(TO_CHAR({a[0]}, 'YYYYMMDD') AS INTEGER)",
+        "synapse": lambda a: f"CAST(CONVERT(VARCHAR(8), {a[0]}, 112) AS INT)",
+        "*": lambda a: f"CAST(STRFTIME({a[0]}, '%Y%m%d') AS INTEGER)",
+    },
+}
+
+
+def render_placeholders(sql: str, target: str) -> str:
+    for name, by_target in _PLACEHOLDERS.items():
+        sql, _ = _rewrite_calls(sql, name, by_target.get(target, by_target["*"]))
+    return sql
+
+
 def preprocess(sql: str) -> tuple[str, list[str], list[str]]:
     """Apply Teradata-specific rewrites sqlglot doesn't handle. Returns (sql, rules, warnings)."""
     rules: list[str] = []
@@ -86,6 +227,9 @@ def preprocess(sql: str) -> tuple[str, list[str], list[str]]:
     s, k = re.subn(r"\bSEL\b", "SELECT", s, flags=re.IGNORECASE)
     if k:
         rules.append("SEL -> SELECT")
+    s, r2, w2 = td_casts(s)
+    rules += r2
+    warnings += w2
     s, k = _strip_format(s)
     if k:
         rules.append(f"FORMAT phrase removed ({k}x); presentation must move to the BI layer")
@@ -148,8 +292,10 @@ def transpile_query(
             if len(args) == 2:
                 fn.replace(exp.DateAdd(this=args[0].copy(), expression=args[1].copy(), unit=exp.var("MONTH")))
     for fn in tree.find_all(exp.Anonymous):
-        problems.append(f"Unknown function {fn.name}() passed through unchanged")
+        if not fn.name.upper().startswith("TD_"):
+            problems.append(f"Unknown function {fn.name}() passed through unchanged")
     out = tree.sql(dialect=DIALECT[target], pretty=True, unsupported_level=sqlglot.ErrorLevel.IGNORE)
+    out = render_placeholders(out, target)
     return out, problems
 
 
