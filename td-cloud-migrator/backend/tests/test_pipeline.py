@@ -160,9 +160,10 @@ def test_job_history_is_capped_at_ten():
     assert h["jobs"][0]["objects"] == 18 and h["jobs"][0]["targets"] == ["bigquery"]
 
 
-def test_api_requires_exactly_one_target():
+@pytest.mark.parametrize("targets", ["[]", '["bigquery", "redshift"]', '["bigquery", "bigquery"]'])
+def test_api_requires_exactly_one_target(targets):
     cfg = (EXAMPLE / "config_dump.zip").read_bytes()
-    r = client.post("/api/jobs", files=[("config_files", ("cfg.zip", cfg))], data={"options": '{"targets": ["bigquery", "redshift"]}'})
+    r = client.post("/api/jobs", files=[("config_files", ("cfg.zip", cfg))], data={"options": f'{{"targets": {targets}}}'})
     assert r.status_code == 422 and "exactly one target" in r.json()["detail"]
 
 

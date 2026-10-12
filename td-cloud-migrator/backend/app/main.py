@@ -55,7 +55,7 @@ def _ready(job: Job) -> Job:
 
 
 def _one_target(opts: JobOptions) -> None:
-    if len(set(opts.targets)) != 1:
+    if len(opts.targets) != 1:
         raise HTTPException(422, "choose exactly one target: bigquery, redshift or synapse")
 
 

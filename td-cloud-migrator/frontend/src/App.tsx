@@ -20,7 +20,21 @@ export default function App() {
 
   useEffect(() => {
     api.formats().then(setFormats).catch((e: Error) => setError(e.message))
+    const id = new URLSearchParams(window.location.hash.slice(1)).get('job')
+    if (id)
+      api
+        .job(id)
+        .then((j) => {
+          setJob(j)
+          setStep(1)
+        })
+        .catch(() => window.history.replaceState(null, '', window.location.pathname))
   }, [])
+
+  const jobId = job?.id
+  useEffect(() => {
+    if (jobId) window.history.replaceState(null, '', `#job=${jobId}`)
+  }, [jobId])
 
   const running = job?.status === 'running'
   useEffect(() => {
