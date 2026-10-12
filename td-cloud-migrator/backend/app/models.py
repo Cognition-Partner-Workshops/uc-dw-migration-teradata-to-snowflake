@@ -209,7 +209,7 @@ class DataOptions(BaseModel):
 
 
 class JobOptions(BaseModel):
-    targets: list[TargetId] = list(TARGETS)
+    targets: list[TargetId] = ["bigquery"]
     config_format: str = "auto"
     data: DataOptions = DataOptions()
     schema_map: dict[str, str] = {}
@@ -252,12 +252,33 @@ class LoadResult(BaseModel):
     finished_at: str
 
 
+class Stage(BaseModel):
+    key: str
+    label: str
+    weight: int
+    status: Literal["pending", "running", "done", "failed"] = "pending"
+    percent: int = 0
+    started_at: str | None = None
+    finished_at: str | None = None
+    detail: str | None = None
+
+
+class Progress(BaseModel):
+    percent: int = 0
+    current: str | None = None
+    started_at: str
+    finished_at: str | None = None
+    stages: list[Stage] = []
+
+
 class Job(BaseModel):
     id: str
     name: str
     created_at: str
-    status: Literal["uploaded", "analysed", "loaded", "failed"]
+    status: Literal["uploaded", "running", "analysed", "loaded", "failed"]
     options: JobOptions
+    uploads: list[InputFile] = []
+    progress: Progress | None = None
     analysis: Analysis | None = None
     loads: dict[str, LoadResult] = {}
     error: str | None = None

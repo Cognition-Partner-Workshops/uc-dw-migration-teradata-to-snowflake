@@ -1,5 +1,6 @@
 import gzip
 import io
+import time
 import zipfile
 from collections import Counter
 from pathlib import Path
@@ -17,6 +18,14 @@ from app.sql_convert import preprocess, transpile_query
 
 EXAMPLE = Path(__file__).resolve().parents[2] / "examples" / "banking_dw"
 client = TestClient(app)
+
+
+def _wait(job: dict, timeout: float = 30) -> dict:
+    end = time.monotonic() + timeout
+    while job["status"] == "running" and time.monotonic() < end:
+        time.sleep(0.05)
+        job = client.get(f"/api/jobs/{job['id']}").json()
+    return job
 
 
 def _example_config(name: str = "config_dump.zip") -> list[UploadedFile]:
@@ -107,32 +116,54 @@ def test_data_mapping_header_and_rejects(analysed):
     assert r.total_rows == 4 and r.rejected_rows == 2
 
 
-def test_api_example_end_to_end():
-    job = client.post("/api/examples/banking_dw/run").json()
+@pytest.mark.parametrize("target", ["bigquery", "synapse"])
+def test_api_example_end_to_end(target):
+    job = _wait(client.post(f"/api/examples/banking_dw/run?target={target}").json())
     assert job["status"] == "analysed", job.get("error")
+    assert job["options"]["targets"] == [target]
+    assert {c["target"] for c in job["analysis"]["conversions"]} == {target}
     readiness = {r["table_id"]: r for r in job["analysis"]["readiness"]}
     assert readiness["TABLE:BANKING_DW.FACT_TRANSACTION"]["rejected_rows"] == 3
     assert readiness["TABLE:BANKING_DW.DIM_DATE"]["total_rows"] == 731
-    job = client.post(f"/api/jobs/{job['id']}/load", json={"targets": ["bigquery", "synapse"]}).json()
-    for target in ("bigquery", "synapse"):
-        res = job["loads"][target]
-        assert res["status"] != "failed"
-        tables = {t["table_id"]: t for t in res["tables"]}
-        assert tables["TABLE:BANKING_DW.DIM_CUSTOMER"]["loaded_rows"] == 15
-        assert tables["TABLE:BANKING_DW.FACT_TRANSACTION"]["loaded_rows"] == 597
-        assert all(t["checks_passed"] == t["checks_total"] for t in res["tables"])
-        assert all(v["created"] for v in res["views"])
+    job = client.post(f"/api/jobs/{job['id']}/load", json={}).json()
+    assert list(job["loads"]) == [target]
+    res = job["loads"][target]
+    assert res["status"] != "failed"
+    tables = {t["table_id"]: t for t in res["tables"]}
+    assert tables["TABLE:BANKING_DW.DIM_CUSTOMER"]["loaded_rows"] == 15
+    assert tables["TABLE:BANKING_DW.FACT_TRANSACTION"]["loaded_rows"] == 597
+    assert all(t["checks_passed"] == t["checks_total"] for t in res["tables"])
+    assert all(v["created"] for v in res["views"])
     bundle = client.get(f"/api/jobs/{job['id']}/bundle.zip")
     names = zipfile.ZipFile(io.BytesIO(bundle.content)).namelist()
-    for f in (
-        "conversion_report.md",
-        "mapping_report.csv",
-        "data_loading_instructions.md",
-        "bigquery/load/load_data.sh",
-        "redshift/load/copy.sql",
-        "synapse/load/copy_into.sql",
-    ):
+    for f in ("conversion_report.md", "mapping_report.csv", "data_loading_instructions.md"):
         assert f"migration_output/{f}" in names
+    assert {n.split("/")[1] for n in names if n.count("/") > 1} == {target}
+
+
+def test_job_progress_stages_and_uploads():
+    job = _wait(client.post("/api/examples/banking_dw/run?target=redshift").json())
+    p = job["progress"]
+    assert p["percent"] == 100 and p["finished_at"]
+    assert [s["key"] for s in p["stages"]] == ["upload", "config", "convert", "data", "outputs"]
+    assert all(s["status"] == "done" and s["started_at"] <= s["finished_at"] for s in p["stages"])
+    assert "Redshift" in p["stages"][2]["label"]
+    assert {(u["path"], u["detected_format"]) for u in job["uploads"]} == {("config_dump.zip", "zip"), ("data_dump.zip", "zip")}
+
+
+def test_job_history_is_capped_at_ten():
+    for _ in range(11):
+        _wait(client.post("/api/examples/banking_dw/run").json())
+    h = client.get("/api/jobs").json()
+    assert h["limit"] == 10 and len(h["jobs"]) == 10 and h["total"] >= 11
+    assert [j["created_at"] for j in h["jobs"]] == sorted((j["created_at"] for j in h["jobs"]), reverse=True)
+    assert h["jobs"][0]["objects"] == 18 and h["jobs"][0]["targets"] == ["bigquery"]
+
+
+def test_api_requires_exactly_one_target():
+    cfg = (EXAMPLE / "config_dump.zip").read_bytes()
+    r = client.post("/api/jobs", files=[("config_files", ("cfg.zip", cfg))], data={"options": '{"targets": ["bigquery", "redshift"]}'})
+    assert r.status_code == 422 and "exactly one target" in r.json()["detail"]
 
 
 def test_api_upload_and_override():
@@ -143,8 +174,9 @@ def test_api_upload_and_override():
         files=[("config_files", ("cfg.zip", cfg)), ("data_files", ("offices.txt", data))],
         data={"options": '{"targets": ["redshift"]}'},
     )
-    job = r.json()
-    assert r.status_code == 200 and job["options"]["targets"] == ["redshift"]
+    assert r.status_code == 200
+    job = _wait(r.json())
+    assert job["options"]["targets"] == ["redshift"]
     f = next(d for d in job["analysis"]["data"] if d["path"] == "offices.txt")
     assert f["table_id"] == "TABLE:BANKING_DW.DIM_BRANCH" and f["match_method"] == "fuzzy"
     job = client.post(f"/api/jobs/{job['id']}/mappings", json={"overrides": {"offices.txt": "TABLE:BANKING_DW.DIM_PRODUCT"}}).json()

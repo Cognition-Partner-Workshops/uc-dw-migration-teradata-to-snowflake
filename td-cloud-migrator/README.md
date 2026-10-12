@@ -6,10 +6,10 @@ outputs and runs a simulated load with validation.
 
 | Step | What happens |
 | --- | --- |
-| 1. Upload | Two separate upload panels, each with a format dropdown and a list of accepted formats. Both accept multiple files or a `.zip`. |
-| 2. Analyse & validate | Object inventory, dependencies and create order from the configuration dump; per-file format/delimiter/header/row/column detection, table mapping and type/NOT NULL validation for the data dump. |
-| 3. Outputs | Converted SQL per target with rules applied and warnings, type mapping, conversion report, mapping report and data-loading instructions/scripts. Downloadable as one ZIP. |
-| 4. Load & validate | Creates the destination tables in a local DuckDB warehouse per target, loads the validated rows, reconciles row counts, NULL counts, numeric sums and string-length checksums, and creates the converted views. |
+| 1. Upload | Three columns, left to right: configuration dump, data dump, then target and run. Each upload panel has a format dropdown and a list of accepted formats and accepts multiple files or a `.zip`. One target (BigQuery, Redshift or Synapse) is chosen per job. |
+| 2. Analyse & validate | The job runs in the background; the screen shows % complete, the current stage, elapsed time and ETA, then the results in pipeline order: stage timeline, an upload summary (file count, format and size per dump), object inventory, dependencies and create order from the configuration dump; per-file format/delimiter/header/row/column detection, table mapping and type/NOT NULL validation for the data dump. |
+| 3. Outputs | Converted SQL for the chosen target with rules applied and warnings, type mapping, conversion report, mapping report and data-loading instructions/scripts. Downloadable as one ZIP. |
+| 4. Load & validate | Creates the destination tables in a local DuckDB warehouse that mirrors the chosen target, loads the validated rows, reconciles row counts, NULL counts, numeric sums and string-length checksums, and creates the converted views. |
 
 ## Accepted formats
 
@@ -75,17 +75,21 @@ Jobs and simulated warehouses are stored under `backend/var/` (override with `TD
   headerless `.csv.gz`, and `manifest.yaml`. The fact files contain 3 deliberately bad rows (invalid date, NULL in a
   NOT NULL key, invalid decimal), and the seed files omit identity and SCD columns, so validation has something to report.
 
-Click **Run example** on the upload page, or call `POST /api/examples/banking_dw/run`.
+Click **Run example** on the upload page, or call `POST /api/examples/banking_dw/run?target=bigquery`. With **Presentation pace** ticked
+(`&pace=1.5`), each stage takes at least 1.5 seconds so the progress bar can be followed in a live demo; uploads always run at full speed.
+
+**Job history** (header button) lists the last 10 jobs, newest first, with target, uploads, counts, duration and status; **Open** reloads a job.
 
 ## API
 
 | Method | Path | Purpose |
 | --- | --- | --- |
 | GET | `/api/formats` | Accepted formats, delimiters and targets |
-| POST | `/api/jobs` | Multipart upload: `config_files`, `data_files`, `options` (JSON), `name` |
-| GET | `/api/jobs/{id}` | Job with analysis, conversions and load results |
+| POST | `/api/jobs` | Multipart upload: `config_files`, `data_files`, `options` (JSON, `targets` must hold exactly one target), `name`. Returns immediately with `status: "running"` |
+| GET | `/api/jobs` | Last 10 jobs (`{"jobs": [...], "total": n, "limit": 10}`) |
+| GET | `/api/jobs/{id}` | Job with `progress` (stages, %), upload summary, analysis, conversions and load results; poll while `running` |
 | POST | `/api/jobs/{id}/mappings` | `{"overrides": {"<file path>": "TABLE:DB.NAME"}}` |
-| POST | `/api/jobs/{id}/load` | `{"targets": ["bigquery", ...]}` simulated load and validation |
+| POST | `/api/jobs/{id}/load` | Simulated load and validation into the job's target |
 | GET | `/api/jobs/{id}/outputs`, `/bundle.zip` | Generated files |
 
 ## Checks

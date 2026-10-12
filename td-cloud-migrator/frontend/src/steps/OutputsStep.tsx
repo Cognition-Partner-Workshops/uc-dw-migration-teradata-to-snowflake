@@ -6,16 +6,15 @@ import { short } from './format'
 
 interface Props {
   job: Job
-  targets: TargetId[]
+  target: TargetId
   formats: Formats | null
   onNext: () => void
 }
 
 const REPORTS = ['conversion_report.md', 'mapping_report.md', 'mapping_report.csv', 'data_loading_instructions.md']
 
-export default function OutputsStep({ job, targets, formats, onNext }: Props) {
+export default function OutputsStep({ job, target, formats, onNext }: Props) {
   const a = job.analysis!
-  const [target, setTarget] = useState<TargetId>(targets[0])
   const [view, setView] = useState<'sql' | 'reports' | 'scripts'>('sql')
   const [selected, setSelected] = useState<string>(a.create_order[0])
   const [files, setFiles] = useState<Record<string, string>>({})
@@ -33,11 +32,7 @@ export default function OutputsStep({ job, targets, formats, onNext }: Props) {
   return (
     <>
       <div className="tabs">
-        {targets.map((t) => (
-          <button key={t} className={t === target ? 'active' : ''} onClick={() => setTarget(t)}>
-            {formats?.targets[t] ?? t}
-          </button>
-        ))}
+        <span className="target-label">Target: {formats?.targets[target] ?? target}</span>
         <span className="spacer" />
         <a className="button primary" href={api.bundleUrl(job.id)}>
           Download output bundle (.zip)

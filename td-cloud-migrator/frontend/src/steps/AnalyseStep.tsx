@@ -2,6 +2,8 @@ import { Fragment, useMemo, useState } from 'react'
 import type { Formats, Job, TargetId } from '../api'
 import { Badge, Card, Stat } from './common'
 import { short } from './format'
+import ProgressPanel from './ProgressPanel'
+import UploadSummary from './UploadSummary'
 
 interface Props {
   job: Job
@@ -10,9 +12,14 @@ interface Props {
   onNext: () => void
 }
 
+const EMPTY = { config_files: [], data_files: [], objects: [], create_order: [], conversions: [], type_mappings: {}, data: [], readiness: [], manifest: null, messages: [] }
+
 export default function AnalyseStep({ job, formats, onOverride, onNext }: Props) {
-  const a = job.analysis!
+  const a = job.analysis ?? EMPTY
   const targets = job.options.targets
+  const running = job.status === 'running'
+  const done = (key: string) => (job.progress ? job.progress.stages.some((s) => s.key === key && s.status === 'done') : !!job.analysis)
+  const label = targets.map((t) => formats?.targets[t] ?? t).join(', ')
   const [open, setOpen] = useState<string | null>(null)
   const [openTable, setOpenTable] = useState<string | null>(null)
   const status = useMemo(() => {
@@ -27,41 +34,22 @@ export default function AnalyseStep({ job, formats, onOverride, onNext }: Props)
 
   return (
     <>
+      <ProgressPanel job={job} />
+      <UploadSummary job={job} />
+      {done('data') && (
+        <>
       <div className="stats">
-        {Object.entries(byType).map(([k, v]) => (
-          <Stat key={k} label={k.replace('_', ' ') + (v > 1 ? 's' : '')} value={v} />
-        ))}
-        <Stat label="data files" value={a.data.length} />
-        <Stat label="rows in data dump" value={a.readiness.reduce((s, r) => s + r.total_rows, 0).toLocaleString()} />
-      </div>
-      <Card title="Conversion status by target">
-        <table>
-          <thead>
-            <tr>
-              <th>Target</th>
-              <th>Converted</th>
-              <th>Converted with warnings</th>
-              <th>Manual review</th>
-              <th>Unsupported</th>
-            </tr>
-          </thead>
-          <tbody>
-            {targets.map((t) => {
-              const c = counts(t)
-              return (
-                <tr key={t}>
-                  <td>{formats?.targets[t] ?? t}</td>
-                  <td><Badge status="converted">{c.converted ?? 0}</Badge></td>
-                  <td><Badge status="converted_with_warnings">{c.converted_with_warnings ?? 0}</Badge></td>
-                  <td><Badge status="manual_review">{c.manual_review ?? 0}</Badge></td>
-                  <td><Badge status="unsupported">{c.unsupported ?? 0}</Badge></td>
-                </tr>
-              )
-            })}
-          </tbody>
-        </table>
-      </Card>
-      <Card title="Configuration analysis: objects in create order" extra={<span className="muted">{a.config_files.length} file(s) analysed · click a row for details</span>}>
+          {Object.entries(byType).map(([k, v]) => (
+            <Stat key={k} label={k.replace('_', ' ') + (v > 1 ? 's' : '')} value={v} />
+          ))}
+          <Stat label="data files" value={a.data.length} />
+          <Stat label="rows in data dump" value={a.readiness.reduce((s, r) => s + r.total_rows, 0).toLocaleString()} />
+        </div>
+          </>
+      )}
+      {done('config') && (
+        <>
+      <Card title="3 · Configuration analysis: objects in create order" extra={<span className="muted">{a.config_files.length} file(s) analysed · click a row for details</span>}>
         <table>
           <thead>
             <tr>
@@ -89,7 +77,7 @@ export default function AnalyseStep({ job, formats, onOverride, onNext }: Props)
                     <td className="small">{o.dependencies.map((d) => d.split('.').pop()).join(', ') || '—'}</td>
                     <td className="small">{o.table ? `${o.table.kind}, ${o.table.columns.length} cols, PI(${o.table.primary_index.join(', ')})` : o.features.join(', ') || '—'}</td>
                     {targets.map((t) => (
-                      <td key={t}>{status[id]?.[t] && <Badge status={status[id][t]!} />}</td>
+                      <td key={t}>{status[id]?.[t] ? <Badge status={status[id][t]!} /> : <span className="muted small">{running ? 'converting…' : '—'}</span>}</td>
                     ))}
                   </tr>
                   {open === id && (
@@ -111,7 +99,42 @@ export default function AnalyseStep({ job, formats, onOverride, onNext }: Props)
           </tbody>
         </table>
       </Card>
-      <Card title="Data analysis: files → destination tables" extra={a.manifest && <span className="muted">Manifest: {a.manifest}</span>}>
+        </>
+      )}
+      {done('convert') && (
+        <>
+      <Card title={`4 · Conversion to ${label}: status`}>
+        <table>
+          <thead>
+            <tr>
+              <th>Target</th>
+              <th>Converted</th>
+              <th>Converted with warnings</th>
+              <th>Manual review</th>
+              <th>Unsupported</th>
+            </tr>
+          </thead>
+          <tbody>
+            {targets.map((t) => {
+              const c = counts(t)
+              return (
+                <tr key={t}>
+                  <td>{formats?.targets[t] ?? t}</td>
+                  <td><Badge status="converted">{c.converted ?? 0}</Badge></td>
+                  <td><Badge status="converted_with_warnings">{c.converted_with_warnings ?? 0}</Badge></td>
+                  <td><Badge status="manual_review">{c.manual_review ?? 0}</Badge></td>
+                  <td><Badge status="unsupported">{c.unsupported ?? 0}</Badge></td>
+                </tr>
+              )
+            })}
+          </tbody>
+        </table>
+      </Card>
+        </>
+      )}
+      {done('data') && (
+        <>
+      <Card title="5 · Data analysis: files → destination tables" extra={a.manifest && <span className="muted">Manifest: {a.manifest}</span>}>
         <table>
           <thead>
             <tr>
@@ -136,7 +159,7 @@ export default function AnalyseStep({ job, formats, onOverride, onNext }: Props)
                 <td>{d.row_count.toLocaleString()}</td>
                 <td>{d.column_count}</td>
                 <td>
-                  <select value={d.table_id ?? ''} onChange={(e) => onOverride(d.path, e.target.value)}>
+                  <select disabled={running} value={d.table_id ?? ''} onChange={(e) => onOverride(d.path, e.target.value)}>
                     <option value="">— not mapped —</option>
                     {tables.map((t) => (
                       <option key={t.id} value={t.id}>
@@ -156,7 +179,7 @@ export default function AnalyseStep({ job, formats, onOverride, onNext }: Props)
           </tbody>
         </table>
       </Card>
-      <Card title="Data preparation: table readiness" extra={<span className="muted">click a row for column sourcing and validation</span>}>
+      <Card title="6 · Data preparation: table readiness" extra={<span className="muted">click a row for column sourcing and validation</span>}>
         <table>
           <thead>
             <tr>
@@ -208,8 +231,11 @@ export default function AnalyseStep({ job, formats, onOverride, onNext }: Props)
           </ul>
         )}
       </Card>
+        </>
+      )}
+      {running && <div className="alert info">The remaining sections appear here as each stage finishes.</div>}
       <div className="actions">
-        <button className="primary" onClick={onNext}>
+        <button className="primary" disabled={running || job.status === 'failed'} onClick={onNext}>
           View migration outputs →
         </button>
       </div>

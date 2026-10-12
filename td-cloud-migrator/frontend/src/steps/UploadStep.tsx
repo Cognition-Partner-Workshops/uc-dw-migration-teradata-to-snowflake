@@ -9,7 +9,7 @@ interface Props {
   formats: Formats
   busy: boolean
   onSubmit: (config: File[], data: File[], options: Partial<JobOptions>, name: string) => void
-  onExample: () => void
+  onExample: (target: TargetId, pace: number) => void
 }
 
 function DropZone({ files, setFiles, accept, label }: { files: File[]; setFiles: (f: File[]) => void; accept: string; label: string }) {
@@ -75,13 +75,13 @@ export default function UploadStep({ formats, busy, onSubmit, onExample }: Props
   const [data, setData] = useState<File[]>([])
   const [configFormat, setConfigFormat] = useState('auto')
   const [dataOpts, setDataOpts] = useState<DataOptions>({ data_format: 'auto', delimiter: 'auto', header: 'auto', encoding: 'utf-8', empty_as_null: true })
-  const [targets, setTargets] = useState<TargetId[]>(['bigquery', 'redshift', 'synapse'])
+  const [target, setTarget] = useState<TargetId>('bigquery')
   const [name, setName] = useState('')
-  const toggle = (t: TargetId) => setTargets(targets.includes(t) ? targets.filter((x) => x !== t) : [...targets, t])
+  const [pace, setPace] = useState(true)
 
   return (
     <>
-      <div className="grid2">
+      <div className="grid3">
         <Card title="1 · Configuration / metadata dump">
           <p className="muted">Describes how the Teradata system is structured: databases, tables, column types, primary indexes, partitioning, constraints, views, macros, stored procedures and scripts.</p>
           <label className="field">
@@ -138,43 +138,46 @@ export default function UploadStep({ formats, busy, onSubmit, onExample }: Props
           </div>
           <DropZone files={data} setFiles={setData} accept={formats.data.extensions.join(',')} label={formats.data.extensions.join('  ')} />
         </Card>
-      </div>
-      <Card title="Targets and run">
-        <div className="run-row">
-          <div className="targets">
+        <Card title="3 · Target and run">
+          <p className="muted">Choose the one cloud platform to migrate to. All converted SQL, reports, load scripts and the simulated load are produced for this target only.</p>
+          <div className="target-pick">
             {(Object.entries(formats.targets) as [TargetId, string][]).map(([k, v]) => (
-              <label key={k} className="check">
-                <input type="checkbox" checked={targets.includes(k)} onChange={() => toggle(k)} /> {v}
+              <label key={k} className={`radio ${target === k ? 'on' : ''}`}>
+                <input type="radio" name="target" checked={target === k} onChange={() => setTarget(k)} /> {v}
               </label>
             ))}
           </div>
-          <input className="name" placeholder="Job name (optional)" value={name} onChange={(e) => setName(e.target.value)} />
+          <label className="field">
+            Job name (optional)
+            <input className="name" placeholder="e.g. Client A – wave 1" value={name} onChange={(e) => setName(e.target.value)} />
+          </label>
           <button
-            className="primary"
-            disabled={busy || config.length === 0 || targets.length === 0}
-            onClick={() => onSubmit(config, data, { targets, config_format: configFormat, data: dataOpts }, name)}
+            className="primary wide"
+            disabled={busy || config.length === 0}
+            onClick={() => onSubmit(config, data, { targets: [target], config_format: configFormat, data: dataOpts }, name)}
           >
             Analyse &amp; convert
           </button>
-        </div>
-        <div className="example">
-          <div>
+          {config.length === 0 && <p className="muted small">Add at least one configuration file to start.</p>}
+          <div className="example">
             <strong>Worked example: BANKING_DW</strong>
-            <span className="muted">
-              {' '}
+            <span className="muted small">
               7 tables, 3 views, 3 macros, 3 procedures and 2 BTEQ scripts, plus pipe-delimited, Parquet and split/gzipped fact files with a YAML manifest.
             </span>
-          </div>
-          <div className="example-actions">
-            <a href={api.exampleUrl('config_dump.zip')}>config_dump.zip</a>
-            <a href={api.exampleUrl('config_dump_dbc.zip')}>config_dump_dbc.zip (DBC export)</a>
-            <a href={api.exampleUrl('data_dump.zip')}>data_dump.zip</a>
-            <button disabled={busy} onClick={onExample}>
-              Run example
+            <div className="example-actions">
+              <a href={api.exampleUrl('config_dump.zip')}>config_dump.zip</a>
+              <a href={api.exampleUrl('config_dump_dbc.zip')}>config_dump_dbc.zip (DBC)</a>
+              <a href={api.exampleUrl('data_dump.zip')}>data_dump.zip</a>
+            </div>
+            <label className="check small" title="Each stage takes at least about 1.5 seconds so the audience can follow the progress bar. Real uploads always run at full speed.">
+              <input type="checkbox" checked={pace} onChange={(e) => setPace(e.target.checked)} /> Presentation pace (show each stage, ~8s)
+            </label>
+            <button className="wide" disabled={busy} onClick={() => onExample(target, pace ? 1.5 : 0)}>
+              Run example on {formats.targets[target].split(' (')[0]}
             </button>
           </div>
-        </div>
-      </Card>
+        </Card>
+      </div>
     </>
   )
 }

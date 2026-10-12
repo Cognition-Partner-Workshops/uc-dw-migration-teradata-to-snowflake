@@ -1,37 +1,30 @@
-import { useState } from 'react'
 import type { Formats, Job, TargetId } from '../api'
 import { Badge, Card, Stat } from './common'
 import { short } from './format'
 
 interface Props {
   job: Job
-  targets: TargetId[]
+  target: TargetId
   formats: Formats | null
   busy: boolean
-  onLoad: (targets: TargetId[]) => void
+  onLoad: () => void
 }
 
-export default function LoadStep({ job, targets, formats, busy, onLoad }: Props) {
-  const [chosen, setChosen] = useState<TargetId[]>(targets)
-  const loads = Object.values(job.loads)
+export default function LoadStep({ job, target, formats, busy, onLoad }: Props) {
+  const loads = Object.values(job.loads).filter((l) => l.target === target)
+  const label = formats?.targets[target] ?? target
   return (
     <>
       <Card title="Create destination tables and load data">
         <p className="muted">
-          Each target is simulated by a local DuckDB warehouse using that target&apos;s converted column types. Tables are created in dependency order, validated rows are loaded, and
+          The target is simulated by a local DuckDB warehouse using its converted column types. Tables are created in dependency order, validated rows are loaded, and
           the result is reconciled against the source files (row counts, NULL counts, numeric sums and string-length checksums). Converted views are then created on the loaded data.
         </p>
         <div className="run-row">
-          <div className="targets">
-            {targets.map((t) => (
-              <label key={t} className="check">
-                <input type="checkbox" checked={chosen.includes(t)} onChange={() => setChosen(chosen.includes(t) ? chosen.filter((x) => x !== t) : [...chosen, t])} />{' '}
-                {formats?.targets[t] ?? t}
-              </label>
-            ))}
-          </div>
-          <button className="primary" disabled={busy || !chosen.length} onClick={() => onLoad(chosen)}>
-            {loads.length ? 'Re-run load' : 'Run simulated load'}
+          <span className="target-label">Target: {label}</span>
+          <span className="spacer" />
+          <button className="primary" disabled={busy} onClick={onLoad}>
+            {loads.length ? 'Re-run load' : `Run simulated load into ${label.split(' (')[0]}`}
           </button>
         </div>
       </Card>

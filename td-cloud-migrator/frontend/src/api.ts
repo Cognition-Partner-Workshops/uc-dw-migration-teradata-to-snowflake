@@ -39,10 +39,20 @@ export interface ViewLoad { object_id: string; target_view: string; created: boo
 export interface LoadResult { target: TargetId; tables: TableLoad[]; views: ViewLoad[]; status: string; finished_at: string }
 export interface DataOptions { data_format: string; delimiter: string; header: 'auto' | 'yes' | 'no'; encoding: string; empty_as_null: boolean }
 export interface JobOptions { targets: TargetId[]; config_format: string; data: DataOptions }
-export interface Job {
-  id: string; name: string; created_at: string; status: string; options: JobOptions; analysis: Analysis | null
-  loads: Partial<Record<TargetId, LoadResult>>; error: string | null
+export interface Stage {
+  key: string; label: string; weight: number; status: 'pending' | 'running' | 'done' | 'failed'; percent: number
+  started_at: string | null; finished_at: string | null; detail: string | null
 }
+export interface Progress { percent: number; current: string | null; started_at: string; finished_at: string | null; stages: Stage[] }
+export interface Job {
+  id: string; name: string; created_at: string; status: 'uploaded' | 'running' | 'analysed' | 'loaded' | 'failed'; options: JobOptions
+  uploads: InputFile[]; progress: Progress | null; analysis: Analysis | null; loads: Partial<Record<TargetId, LoadResult>>; error: string | null
+}
+export interface HistoryItem {
+  id: string; name: string; created_at: string; status: Job['status']; targets: TargetId[]; uploads: string[]; objects: number
+  data_files: number; rows: number; manual_review: number; loaded_rows: number; duration_seconds: number | null; error: string | null
+}
+export interface History { jobs: HistoryItem[]; total: number; limit: number }
 
 async function call<T>(url: string, init?: RequestInit): Promise<T> {
   const r = await fetch(url, init)
@@ -65,7 +75,9 @@ export const api = {
     fd.append('name', name)
     return call<Job>('/api/jobs', { method: 'POST', body: fd })
   },
-  runExample: () => call<Job>('/api/examples/banking_dw/run', { method: 'POST' }),
+  runExample: (target: TargetId, pace: number) => call<Job>(`/api/examples/banking_dw/run?target=${target}&pace=${pace}`, { method: 'POST' }),
+  job: (id: string) => call<Job>(`/api/jobs/${id}`),
+  history: () => call<History>('/api/jobs'),
   setMappings: (id: string, overrides: Record<string, string>) => call<Job>(`/api/jobs/${id}/mappings`, json({ overrides })),
   load: (id: string, targets: TargetId[]) => call<Job>(`/api/jobs/${id}/load`, json({ targets })),
   outputs: (id: string) => call<Record<string, string>>(`/api/jobs/${id}/outputs`),

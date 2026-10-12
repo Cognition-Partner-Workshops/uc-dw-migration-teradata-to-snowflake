@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from datetime import datetime
 from pathlib import Path
 from typing import Annotated
 
@@ -33,6 +34,9 @@ app.add_middleware(
     CORSMiddleware, allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"], allow_methods=["*"], allow_headers=["*"]
 )
 store = pipeline.JobStore()
+store.recover_interrupted()
+HISTORY_LIMIT = 10
+MAX_PACE_SECONDS = 3.0
 
 
 def _job(job_id: str) -> Job:
@@ -40,6 +44,19 @@ def _job(job_id: str) -> Job:
         return store.get(job_id)
     except KeyError:
         raise HTTPException(404, "job not found") from None
+
+
+def _ready(job: Job) -> Job:
+    if job.status == "running":
+        raise HTTPException(409, "job is still running")
+    if job.analysis is None:
+        raise HTTPException(409, "job not analysed")
+    return job
+
+
+def _one_target(opts: JobOptions) -> None:
+    if len(set(opts.targets)) != 1:
+        raise HTTPException(422, "choose exactly one target: bigquery, redshift or synapse")
 
 
 @app.get("/api/health")
@@ -79,18 +96,43 @@ async def create_job(
         opts = JobOptions.model_validate(json.loads(options or "{}"))
     except (ValueError, ValidationError) as exc:
         raise HTTPException(422, f"invalid options: {exc}") from None
+    _one_target(opts)
     config, data = await _read(config_files), await _read(data_files)
     if not config:
         raise HTTPException(422, "at least one configuration file is required")
     try:
-        return pipeline.create_job(store, name, config, data, opts)
+        return pipeline.create_job(store, name, config, data, opts, background=True)
     except ValueError as exc:
         raise HTTPException(422, str(exc)) from None
 
 
+def _summary(j: Job) -> dict:
+    a, p = j.analysis, j.progress
+    duration = None
+    if p and p.finished_at:
+        duration = round((datetime.fromisoformat(p.finished_at) - datetime.fromisoformat(p.started_at)).total_seconds(), 1)
+    return {
+        "id": j.id,
+        "name": j.name,
+        "created_at": j.created_at,
+        "status": j.status,
+        "targets": j.options.targets,
+        "uploads": [u.path for u in j.uploads],
+        "objects": len(a.objects) if a else 0,
+        "data_files": len(a.data) if a else 0,
+        "rows": sum(r.total_rows for r in a.readiness) if a else 0,
+        "manual_review": sum(c.status in ("manual_review", "unsupported") for c in a.conversions) if a else 0,
+        "loaded_rows": sum(t.loaded_rows for r in j.loads.values() for t in r.tables),
+        "duration_seconds": duration,
+        "error": j.error,
+    }
+
+
 @app.get("/api/jobs")
-def list_jobs() -> list[dict]:
-    return [{"id": j.id, "name": j.name, "created_at": j.created_at, "status": j.status} for j in store.list()]
+def list_jobs(limit: int = HISTORY_LIMIT) -> dict:
+    jobs = store.list()
+    limit = max(1, min(limit, HISTORY_LIMIT))
+    return {"jobs": [_summary(j) for j in jobs[:limit]], "total": len(jobs), "limit": limit}
 
 
 @app.get("/api/jobs/{job_id}")
@@ -111,9 +153,8 @@ class MappingUpdate(BaseModel):
 
 @app.post("/api/jobs/{job_id}/mappings")
 def update_mappings(job_id: str, body: MappingUpdate) -> Job:
-    job = _job(job_id)
-    if job.analysis is None:
-        raise HTTPException(409, "job not analysed")
+    job = _ready(_job(job_id))
+    assert job.analysis is not None
     valid = {o.id for o in job.analysis.objects if o.table} | {""}
     bad = [v for v in body.overrides.values() if v not in valid]
     if bad:
@@ -127,9 +168,7 @@ class LoadRequest(BaseModel):
 
 @app.post("/api/jobs/{job_id}/load")
 def load(job_id: str, body: LoadRequest) -> Job:
-    job = _job(job_id)
-    if job.analysis is None:
-        raise HTTPException(409, "job not analysed")
+    job = _ready(_job(job_id))
     return pipeline.load(store, job, body.targets or job.options.targets)
 
 
@@ -191,9 +230,10 @@ def example_file(name: str, file: str) -> FileResponse:
 
 
 @app.post("/api/examples/{name}/run")
-def run_example(name: str) -> Job:
+def run_example(name: str, target: TargetId = "bigquery", pace: float = 0.0) -> Job:
     config, data = _example_files(name)
-    return pipeline.create_job(store, f"Example: {name}", config, data, JobOptions())
+    opts = JobOptions(targets=[target])
+    return pipeline.create_job(store, f"Example: {name}", config, data, opts, background=True, pace=max(0.0, min(pace, MAX_PACE_SECONDS)))
 
 
 if FRONTEND_DIST.exists():
