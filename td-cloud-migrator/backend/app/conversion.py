@@ -56,7 +56,7 @@ def convert_object(
 ) -> Conversion:
     conv = _convert(obj, target, schema_map, project, numeric_cols, registry)
     conv.checklist = build_checklist(obj, conv)
-    if conv.checklist and obj.object_type != "table":
+    if conv.checklist:
         conv.sql = checklist_header(conv.checklist) + conv.sql
     return conv
 

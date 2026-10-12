@@ -118,7 +118,8 @@ tr.current td { background: #eef4ff; }
 .badge.running { background: #eff8ff; color: #175cd3; }
 
 .badge.review { background: #fff4ed; color: #c4320a; border: 1px solid #f9dbaf; }
-.objbadges { display: inline-flex; gap: 4px; align-items: center; }
+.objbadges { display: inline-flex; flex-wrap: wrap; justify-content: flex-end; gap: 4px; align-items: center; flex-shrink: 0; max-width: 60%; }
+.objlist li > .mono { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .checklist { border: 1px solid #f9dbaf; background: #fffcf5; border-radius: 8px; padding: 10px 12px; margin: 12px 0; }
 .checklist-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
 .checklist-group { margin-top: 6px; }
