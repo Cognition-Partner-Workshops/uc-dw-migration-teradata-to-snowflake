@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 
+from .checklist import build_checklist, checklist_header
 from .ddl_render import column_mappings, render_table
 from .models import ColumnMapping, Conversion, SourceObject, TargetId
 from .routine_convert import convert_routine
@@ -15,7 +16,7 @@ def numeric_columns(objects: list[SourceObject]) -> frozenset[str]:
     return frozenset(c.name for o in objects if o.table for c in o.table.columns if c.base_type in NUMERIC_TYPES)
 
 
-def convert_object(
+def _convert(
     obj: SourceObject,
     target: TargetId,
     schema_map: dict[str, str],
@@ -38,9 +39,26 @@ def convert_object(
     if obj.object_type in ("macro", "procedure", "bteq_script") and registry is not None:
         try:
             return convert_routine(obj, target, schema_map, project if target == "bigquery" else "", registry)
-        except Exception:  # noqa: BLE001
-            pass
+        except Exception as exc:  # noqa: BLE001
+            conv = draft_routine(obj, target, schema_map, project if target == "bigquery" else "")
+            conv.reason = f"Automatic routine conversion failed ({exc}); {conv.reason or 'draft only'}"
+            return conv
     return draft_routine(obj, target, schema_map, project if target == "bigquery" else "")
+
+
+def convert_object(
+    obj: SourceObject,
+    target: TargetId,
+    schema_map: dict[str, str],
+    project: str,
+    numeric_cols: frozenset[str] = frozenset(),
+    registry: dict[str, SourceObject] | None = None,
+) -> Conversion:
+    conv = _convert(obj, target, schema_map, project, numeric_cols, registry)
+    conv.checklist = build_checklist(obj, conv)
+    if conv.checklist and obj.object_type != "table":
+        conv.sql = checklist_header(conv.checklist) + conv.sql
+    return conv
 
 
 def convert_all(

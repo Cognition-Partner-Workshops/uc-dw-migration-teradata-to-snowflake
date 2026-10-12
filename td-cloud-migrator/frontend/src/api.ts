@@ -16,7 +16,8 @@ export interface SourceObject {
   id: string; object_type: string; database: string; name: string; source_file: string; source_format: string; sql: string
   table: TableMeta | null; dependencies: string[]; features: string[]; parse_error: string | null
 }
-export interface Conversion { object_id: string; target: TargetId; status: Status; sql: string; rules: string[]; warnings: string[]; reason: string | null }
+export interface ChecklistItem { category: 'verify' | 'complete' | 'test' | 'deploy'; text: string }
+export interface Conversion { object_id: string; target: TargetId; status: Status; sql: string; rules: string[]; warnings: string[]; reason: string | null; checklist?: ChecklistItem[] }
 export interface ColumnMapping { column: string; td_type: string; target_type: string; nullable: boolean; lossy: boolean; note: string | null }
 export interface DataFile {
   path: string; format: string; delimiter: string | null; has_header: boolean | null; compressed: boolean; row_count: number

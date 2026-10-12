@@ -54,6 +54,7 @@ def output_files(a: Analysis, opts: JobOptions) -> dict[str, str]:
     files["mapping_report.md"] = mapping_report_md(a, opts)
     files["mapping_report.csv"] = mapping_report_csv(a)
     files["conversion_report.md"] = conversion_report_md(a)
+    files["review_checklist.md"] = review_checklist_md(a)
     files["data_loading_instructions.md"] = load_instructions_md(a, opts)
     return files
 
@@ -149,9 +150,25 @@ def conversion_report_md(a: Analysis) -> str:
             out += [f"- Rule: {r}" for r in c.rules] + [f"- Warning: {w}" for w in c.warnings]
             if o.features:
                 out.append(f"- Teradata features: {', '.join(o.features)}")
+            out += [f"- Review ({i.category}): {i.text}" for i in c.checklist]
             out.append("")
     if a.messages:
         out += ["## Analyser messages", ""] + [f"- {m}" for m in a.messages]
+    return "\n".join(out) + "\n"
+
+
+def review_checklist_md(a: Analysis) -> str:
+    objs = _objects(a)
+    out = ["# Review checklist", "", "Tick each item before deploying the object. Objects not listed converted cleanly.", ""]
+    for t in dict.fromkeys(c.target for c in a.conversions):
+        todo = [c for c in a.conversions if c.target == t and c.checklist]
+        out += [f"## {TARGET_LABEL[t]}: {len(todo)} object(s) to review", ""]
+        for c in todo:
+            o = objs[c.object_id]
+            out += [f"### {o.fqn} ({o.object_type}) - {c.status}", ""]
+            for cat in ("complete", "verify", "deploy", "test"):
+                out += [f"- [ ] **{cat.title()}:** {i.text}" for i in c.checklist if i.category == cat]
+            out.append("")
     return "\n".join(out) + "\n"
 
 

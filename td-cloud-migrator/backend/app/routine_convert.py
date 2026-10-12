@@ -152,6 +152,11 @@ class Ctx:
         return None
 
 
+def _outside_strings(sql: str, fn) -> str:
+    parts = re.split(r"('(?:[^']|'')*')", sql)
+    return "".join(fn(x) if i % 2 == 0 else x for i, x in enumerate(parts))
+
+
 def _prefix(sql: str, ctx: Ctx) -> str:
     names = sorted(ctx.vars, key=len, reverse=True)
     temps = sorted(ctx.temps, key=len, reverse=True)
@@ -171,8 +176,7 @@ def tx(ctx: Ctx, td: str) -> str | None:
         s = s[: m.start()] + f"LIMIT {m.group(1)}"
         ctx.rules.append("SAMPLE n -> LIMIT n")
         ctx.warnings.append("SAMPLE n returned n random rows on Teradata; LIMIT n returns the first n rows of the ORDER BY")
-    s = re.sub(r"\bSQLCODE\b", "TD_SQLCODE()", s, flags=re.IGNORECASE)
-    s = re.sub(r"\bERRORCODE\b", "TD_ERRORCODE()", s, flags=re.IGNORECASE)
+    s = _outside_strings(s, lambda t: re.sub(r"\b(SQLCODE|ERRORCODE)\b", r"TD_\1()", t, flags=re.IGNORECASE))
     pre, rules, warnings = preprocess(s)
     try:
         res = transpile_ex(pre, ctx.target, ctx.schema_map, ctx.project, var_types=ctx.vars)
@@ -189,9 +193,10 @@ def tx(ctx: Ctx, td: str) -> str | None:
     out, _ = _rewrite_calls(
         out, "TD_ERRORCODE", lambda a: {"bigquery": "@@error.message", "redshift": "SQLERRM", "synapse": "ERROR_NUMBER()"}[ctx.target]
     )
-    if ctx.target == "bigquery" and re.search(r"\bCURRENT_TIMESTAMP\(\)", out):
-        out = re.sub(r"\bCURRENT_TIMESTAMP\(\)", "CURRENT_DATETIME()", out)
-        ctx.rules.append("CURRENT_TIMESTAMP -> CURRENT_DATETIME() (Teradata TIMESTAMP columns map to DATETIME)")
+    now = {"bigquery": "CURRENT_DATETIME()", "redshift": "GETDATE()", "synapse": "CAST(SYSDATETIME() AS DATETIME2(0))"}[ctx.target]
+    out, n = re.subn(r"\b(?:CURRENT_TIMESTAMP|GETDATE)\s*\(\s*\d*\s*\)", now, out, flags=re.IGNORECASE)
+    if n:
+        ctx.rules.append(f"CURRENT_TIMESTAMP(n) -> {now}")
     if ctx.target == "synapse":
         out = _prefix(out, ctx)
     elif ctx.target == "redshift" and ctx.temps:

@@ -112,6 +112,7 @@ export default function AnalyseStep({ job, formats, onOverride, onNext }: Props)
               <th>Converted with warnings</th>
               <th>Manual review</th>
               <th>Unsupported</th>
+              <th>Need review</th>
             </tr>
           </thead>
           <tbody>
@@ -124,6 +125,11 @@ export default function AnalyseStep({ job, formats, onOverride, onNext }: Props)
                   <td><Badge status="converted_with_warnings">{c.converted_with_warnings ?? 0}</Badge></td>
                   <td><Badge status="manual_review">{c.manual_review ?? 0}</Badge></td>
                   <td><Badge status="unsupported">{c.unsupported ?? 0}</Badge></td>
+                  <td>
+                    <span className="badge review">
+                      {a.conversions.filter((x) => x.target === t && x.checklist?.length).length}
+                    </span>
+                  </td>
                 </tr>
               )
             })}

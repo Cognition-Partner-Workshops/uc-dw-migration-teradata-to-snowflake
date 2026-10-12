@@ -95,7 +95,9 @@ def _conversion_summary(conversions: list[Conversion]) -> str:
         f"{len(conversions)} object(s) processed: {n['converted'] + n['converted_with_warnings']} converted automatically, "
         f"{n['manual_review']} draft(s) need manual review"
     )
-    return msg + (f", {n['unsupported']} unsupported" if n["unsupported"] else "")
+    msg += f", {n['unsupported']} unsupported" if n["unsupported"] else ""
+    review = sum(bool(c.checklist) for c in conversions)
+    return msg + (f"; {review} have a review checklist" if review else "")
 
 
 STAGES = [

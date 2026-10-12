@@ -121,6 +121,11 @@ class SourceObject(BaseModel):
         return f"{self.database}.{self.name}" if self.database else self.name
 
 
+class ChecklistItem(BaseModel):
+    category: Literal["verify", "complete", "test", "deploy"]
+    text: str
+
+
 class Conversion(BaseModel):
     object_id: str
     target: TargetId
@@ -129,6 +134,7 @@ class Conversion(BaseModel):
     rules: list[str] = []
     warnings: list[str] = []
     reason: str | None = None
+    checklist: list[ChecklistItem] = []
 
 
 class ColumnMapping(BaseModel):

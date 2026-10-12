@@ -72,8 +72,8 @@ def test_conversion_statuses(analysed):
     for t in ("bigquery", "redshift", "synapse"):
         assert by[("TABLE:BANKING_DW.FACT_TRANSACTION", t)].status.startswith("converted")
         assert by[("VIEW:BANKING_DW.VW_CUSTOMER_360", t)].status.startswith("converted")
-        assert by[("VIEW:BANKING_DW.VW_BRANCH_PERFORMANCE", t)].status == "manual_review"
-        assert by[("PROCEDURE:BANKING_DW.SP_MONTHLY_SNAPSHOT", t)].status == "manual_review"
+        assert all(c.status == "converted_with_warnings" for c in convs if c.target == t)
+        assert all(c.checklist for c in convs if c.target == t)
         assert mappings[t]["TABLE:BANKING_DW.DIM_DATE"]
     assert "CLUSTER BY ACCOUNT_KEY" in by[("TABLE:BANKING_DW.FACT_TRANSACTION", "bigquery")].sql
     assert "DISTKEY (account_key)" in by[("TABLE:BANKING_DW.FACT_TRANSACTION", "redshift")].sql
@@ -148,7 +148,9 @@ def test_job_progress_stages_and_uploads():
     assert [s["key"] for s in p["stages"]] == ["upload", "config", "convert", "data", "outputs"]
     assert all(s["status"] == "done" and s["started_at"] <= s["finished_at"] for s in p["stages"])
     assert "Redshift" in p["stages"][2]["label"]
-    assert p["stages"][2]["detail"] == ("18 object(s) processed: 8 converted automatically, 10 draft(s) need manual review")
+    assert p["stages"][2]["detail"] == (
+        "18 object(s) processed: 18 converted automatically, 0 draft(s) need manual review; 18 have a review checklist"
+    )
     assert {(u["path"], u["detected_format"]) for u in job["uploads"]} == {("config_dump.zip", "zip"), ("data_dump.zip", "zip")}
 
 
