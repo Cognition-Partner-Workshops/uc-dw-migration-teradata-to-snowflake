@@ -23,7 +23,7 @@ from .models import (
     TargetId,
     ViewLoadResult,
 )
-from .sql_convert import _draft, preprocess, split_view, view_ddl
+from .sql_convert import _draft, preprocess, split_view, transpile_ex, view_ddl
 from .typemap import duckdb_type, map_type
 
 DIALECT = {"bigquery": "bigquery", "redshift": "redshift", "synapse": "tsql"}
@@ -185,7 +185,8 @@ def run_load(
         try:
             _, _, body = split_view(o.sql)
             pre, _, _ = preprocess(body)
-            sql, _ = _draft(pre, "duckdb", schema_map, "", numeric_columns(objects))
+            res = transpile_ex(pre, "duckdb", schema_map, "", numeric_columns(objects))
+            sql = res.sql if not res.manual else _draft(pre, "duckdb", schema_map, "", numeric_columns(objects))[0]
             con.execute(view_ddl(o, "duckdb", sql, schema_map, ""))
             vr.created = True
             vr.row_count = con.execute(f'SELECT COUNT(*) FROM "{schema}"."{o.name}"').fetchone()[0]

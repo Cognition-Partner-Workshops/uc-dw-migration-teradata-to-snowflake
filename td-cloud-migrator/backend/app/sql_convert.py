@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import re
 from collections.abc import Callable
+from dataclasses import dataclass, field
 
 import sqlglot
 from sqlglot import exp
@@ -267,36 +268,186 @@ def _retarget_tables(tree: exp.Expression, target: str, schema_map: dict[str, st
             t.set("this", exp.to_identifier(t.name.lower()))
 
 
-def transpile_query(
-    sql: str, target: str, schema_map: dict[str, str], project: str = "", numeric_cols: frozenset[str] = frozenset()
-) -> tuple[str, list[str]]:
-    """Rewritten Teradata SELECT -> target SQL. Raises on parse failure."""
-    problems: list[str] = []
+@dataclass
+class Transpiled:
+    sql: str
+    rules: list[str] = field(default_factory=list)
+    warnings: list[str] = field(default_factory=list)
+    manual: list[str] = field(default_factory=list)
+
+
+_TIME_COL = re.compile(r"DATE|MONTH|YEAR|QUARTER|WEEK|DAY|PERIOD|TIME|_TS$|_DT$", re.IGNORECASE)
+_INT_TYPES = ("BYTEINT", "SMALLINT", "INTEGER", "INT", "BIGINT")
+
+
+def _var_kind(var_types: dict[str, str], col: exp.Expression) -> str | None:
+    if not isinstance(col, exp.Column) or col.table:
+        return None
+    t = var_types.get(col.name.upper(), "").upper()
+    if not t:
+        return None
+    if t.startswith("TIMESTAMP"):
+        return "ts"
+    if t.startswith("DATE"):
+        return "date"
+    if t.split("(")[0].strip() in _INT_TYPES:
+        return "int"
+    return "other"
+
+
+def _is_date(e: exp.Expression, vt: dict[str, str]) -> bool:
+    e = e.unnest()
+    if isinstance(e, (exp.CurrentDate, exp.DateAdd, exp.DateSub)):
+        return True
+    if isinstance(e, exp.Cast):
+        return e.to.this == exp.DataType.Type.DATE
+    if isinstance(e, exp.Coalesce):
+        return _is_date(e.this, vt)
+    if isinstance(e, exp.Column):
+        k = _var_kind(vt, e)
+        return k == "date" if k else bool(re.search(r"DATE$|_DT$", e.name, re.IGNORECASE))
+    return False
+
+
+def _is_int(e: exp.Expression, vt: dict[str, str]) -> bool:
+    e = e.unnest()
+    if isinstance(e, exp.Neg):
+        return _is_int(e.this, vt)
+    if isinstance(e, exp.Literal):
+        return not e.is_string and e.this.lstrip("-").isdigit()
+    return _var_kind(vt, e) == "int"
+
+
+def _hash_sql(args: list[str], target: str) -> str:
+    if target == "bigquery":
+        return "FARM_FINGERPRINT(CONCAT(" + ", '|', ".join(f"COALESCE(CAST({a} AS STRING), '')" for a in args) + "))"
+    if target == "redshift":
+        out = f"FNV_HASH({args[0]})"
+        for a in args[1:]:
+            out = f"FNV_HASH({a}, {out})"
+        return out
+    if target == "synapse":
+        return "HASHBYTES('SHA2_256', CONCAT_WS('|', " + ", ".join(args) + "))"
+    return "HASH(" + ", ".join(args) + ")"
+
+
+_HASH_LABEL = {
+    "bigquery": "FARM_FINGERPRINT",
+    "redshift": "FNV_HASH",
+    "synapse": "HASHBYTES('SHA2_256', ...)",
+    "duckdb": "HASH",
+}
+
+
+def _olap(tree: exp.Expression, out: Transpiled) -> None:
+    for fn in list(tree.find_all(exp.Anonymous)):
+        name = fn.name.upper()
+        if name not in ("CSUM", "MAVG", "MSUM"):
+            continue
+        args = fn.expressions
+        width = None
+        if name != "CSUM":
+            if len(args) < 3 or not (isinstance(args[1], exp.Literal) and args[1].this.isdigit()):
+                out.manual.append(f"{name} without a constant window width")
+                continue
+            width = int(args[1].this)
+        value, sort = args[0], args[1:] if name == "CSUM" else args[2:]
+        if not sort:
+            out.manual.append(f"{name} without a sort expression")
+            continue
+        sel = fn.find_ancestor(exp.Select)
+        group = sel.args.get("group") if sel else None
+        part: list[exp.Expression] = []
+        if group:
+            if not value.find(exp.AggFunc):
+                out.manual.append(f"{name} over a GROUP BY query without an aggregate argument (Teradata reset semantics)")
+                continue
+            sort_sql = {s.sql("teradata") for s in sort}
+            part = [
+                g
+                for g in group.expressions
+                if g.sql("teradata") not in sort_sql and not (isinstance(g, exp.Column) and _TIME_COL.search(g.name))
+            ]
+        agg = "AVG" if name == "MAVG" else "SUM"
+        frame = "ROWS UNBOUNDED PRECEDING" if width is None else f"ROWS BETWEEN {max(width - 1, 0)} PRECEDING AND CURRENT ROW"
+        part_sql = ", ".join(p.sql("teradata") for p in part)
+        order_sql = ", ".join(s.sql("teradata") for s in sort)
+        over = (f"PARTITION BY {part_sql} " if part else "") + f"ORDER BY {order_sql} {frame}"
+        fn.replace(sqlglot.parse_one(f"{agg}({value.sql('teradata')}) OVER ({over})", read="teradata"))
+        out.rules.append(f"{name} -> {agg}(...) OVER ({over})")
+        if part:
+            out.warnings.append(
+                f"{name}: running window restarts for each {part_sql} (the non-time GROUP BY columns); "
+                "confirm this matches the Teradata result"
+            )
+
+
+def _hashes(tree: exp.Expression, target: str, out: Transpiled) -> None:
+    for fn in list(tree.find_all(exp.Anonymous)):
+        name = fn.name.upper()
+        if name in ("HASHBUCKET", "HASHAMP"):
+            out.manual.append(f"{name} (AMP / bucket distribution has no target equivalent)")
+        if name != "HASHROW":
+            continue
+        if fn.find_ancestor(exp.Where, exp.Join, exp.Group, exp.Order, exp.Having):
+            out.manual.append("HASHROW used in a filter, join or grouping (hash values differ on the target)")
+            continue
+        dialect = DIALECT[target]
+        args = [a.sql(dialect) for a in fn.expressions]
+        fn.replace(sqlglot.parse_one(_hash_sql(args, target), read=dialect))
+        out.rules.append(f"HASHROW(...) -> {_HASH_LABEL[target]}(...)")
+        out.warnings.append("Row hash values differ from Teradata HASHROW; do not compare or join them with hashes made on Teradata")
+
+
+def transpile_ex(
+    sql: str,
+    target: str,
+    schema_map: dict[str, str],
+    project: str = "",
+    numeric_cols: frozenset[str] = frozenset(),
+    var_types: dict[str, str] | None = None,
+) -> Transpiled:
+    """Rewritten Teradata SQL -> target SQL with rules applied. Raises on parse failure."""
+    vt = var_types or {}
+    res = Transpiled(sql="")
     tree = sqlglot.parse_one(sql, read="teradata")
+    for fn in tree.find_all(exp.Anonymous):
+        if not re.match(r"TD_|CSUM$|MAVG$|MSUM$|HASH(ROW|BUCKET|AMP)$", fn.name.upper()):
+            res.warnings.append(f"Unknown function {fn.name}() passed through unchanged")
     for trim in list(tree.find_all(exp.Trim)):
-        if isinstance(trim.this, exp.Column) and trim.this.name.upper() in numeric_cols:
+        if isinstance(trim.this, exp.Column) and (trim.this.name.upper() in numeric_cols or _var_kind(vt, trim.this) == "int"):
             trim.this.replace(exp.cast(trim.this.copy(), "VARCHAR"))
-            problems.append(f"TRIM({trim.this.sql('teradata')}): numeric -> explicit CAST to string (Teradata casts implicitly)")
+            res.warnings.append(f"TRIM({trim.this.sql('teradata')}): numeric -> explicit CAST to string (Teradata casts implicitly)")
     _retarget_tables(tree, target, schema_map, project)
-    for sub in list(tree.find_all(exp.Sub)):
-        if (
-            isinstance(sub.this, (exp.CurrentDate, exp.Column))
-            and isinstance(sub.expression, exp.Column)
-            and (isinstance(sub.this, exp.CurrentDate) or re.search(r"DATE|_DT$", sub.this.name, re.IGNORECASE))
-        ):
-            sub.replace(exp.DateDiff(this=sub.this.copy(), expression=sub.expression.copy(), unit=exp.var("DAY")))
-            problems.append(f"Date subtraction {sub.sql('teradata')} -> DATEDIFF in days (assumes DATE operands)")
     for fn in list(tree.find_all(exp.Func)):
         if fn.sql_name() == "ADD_MONTHS" or (isinstance(fn, exp.Anonymous) and fn.name.upper() == "ADD_MONTHS"):
             args = fn.expressions if isinstance(fn, exp.Anonymous) else [fn.this, fn.expression]
             if len(args) == 2:
                 fn.replace(exp.DateAdd(this=args[0].copy(), expression=args[1].copy(), unit=exp.var("MONTH")))
-    for fn in tree.find_all(exp.Anonymous):
-        if not fn.name.upper().startswith("TD_"):
-            problems.append(f"Unknown function {fn.name}() passed through unchanged")
+    for node in reversed(list(tree.find_all(exp.Add, exp.Sub))):
+        left, right = node.this, node.expression
+        if _is_date(left, vt) and _is_int(right, vt):
+            amount = right.copy() if isinstance(node, exp.Add) else exp.Neg(this=right.copy())
+            node.replace(exp.DateAdd(this=left.copy(), expression=amount, unit=exp.var("DAY")))
+            res.rules.append("DATE +/- n -> date add of n days")
+        elif isinstance(node, exp.Sub) and _is_date(left, vt) and _is_date(right, vt):
+            res.warnings.append(f"Date subtraction {node.sql('teradata')} -> DATEDIFF in days (assumes DATE operands)")
+            node.replace(exp.DateDiff(this=left.copy(), expression=right.copy(), unit=exp.var("DAY")))
+    _olap(tree, res)
+    _hashes(tree, target, res)
     out = tree.sql(dialect=DIALECT[target], pretty=True, unsupported_level=sqlglot.ErrorLevel.IGNORE)
-    out = render_placeholders(out, target)
-    return out, problems
+    res.sql = render_placeholders(out, target)
+    res.rules = list(dict.fromkeys(res.rules))
+    res.warnings = list(dict.fromkeys(res.warnings))
+    return res
+
+
+def transpile_query(
+    sql: str, target: str, schema_map: dict[str, str], project: str = "", numeric_cols: frozenset[str] = frozenset()
+) -> tuple[str, list[str]]:
+    """Rewritten Teradata SELECT -> target SQL. Raises on parse failure."""
+    res = transpile_ex(sql, target, schema_map, project, numeric_cols)
+    return res.sql, res.warnings
 
 
 _VIEW_HEAD = re.compile(
@@ -335,7 +486,10 @@ def convert_view(
         pre, rules, warnings = preprocess(body)
         if cols:
             warnings.append("View column list given separately; verify column aliases")
-        manual = _manual_constructs(pre)
+        manual = [m for m in _manual_constructs(pre) if m in ("SAMPLE", "Macro parameters")]
+        res = None if manual else transpile_ex(pre, target, schema_map, project, numeric_cols)
+        if res is not None and res.manual:
+            manual = res.manual
         if manual:
             draft, _ = _draft(pre, target, schema_map, project, numeric_cols)
             return Conversion(
@@ -350,7 +504,9 @@ def convert_view(
                 warnings=warnings,
                 reason=f"Uses {', '.join(manual)} (no automatic equivalent)",
             )
-        out, problems = transpile_query(pre, target, schema_map, project, numeric_cols)
+        assert res is not None
+        out, problems = res.sql, res.warnings
+        rules += res.rules
         if re.search(r"\bQUALIFY\b", body, re.IGNORECASE):
             rules.append("QUALIFY " + ("kept (native)" if target in ("bigquery", "redshift") else "-> derived table + WHERE"))
         if re.search(r"\bADD_MONTHS\b", body, re.IGNORECASE):
