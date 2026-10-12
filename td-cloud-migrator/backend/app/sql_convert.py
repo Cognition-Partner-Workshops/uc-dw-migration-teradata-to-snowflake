@@ -76,10 +76,32 @@ def _strip_format(sql: str) -> tuple[str, int]:
     return sql, n + k
 
 
-
 _KEYWORDS = {
-    "SELECT", "AS", "WHERE", "AND", "OR", "ON", "THEN", "ELSE", "WHEN", "IN", "BY", "FROM", "NOT", "IS",
-    "BETWEEN", "CASE", "SET", "VALUES", "INTO", "USING", "HAVING", "QUALIFY", "JOIN", "RETURN", "EXISTS",
+    "SELECT",
+    "AS",
+    "WHERE",
+    "AND",
+    "OR",
+    "ON",
+    "THEN",
+    "ELSE",
+    "WHEN",
+    "IN",
+    "BY",
+    "FROM",
+    "NOT",
+    "IS",
+    "BETWEEN",
+    "CASE",
+    "SET",
+    "VALUES",
+    "INTO",
+    "USING",
+    "HAVING",
+    "QUALIFY",
+    "JOIN",
+    "RETURN",
+    "EXISTS",
 }
 _TD_TYPES = r"BYTEINT|SMALLINT|INTEGER|INT|BIGINT|DECIMAL|NUMERIC|NUMBER|FLOAT|REAL|CHARACTER|CHAR|VARCHAR|DATE|TIME|TIMESTAMP"
 _TD_CAST = re.compile(

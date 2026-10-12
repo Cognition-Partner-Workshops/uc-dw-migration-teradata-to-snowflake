@@ -87,7 +87,9 @@ def parse_params(text: str | None) -> list[Param]:
     return out
 
 
-_PROC = re.compile(r"(?:CREATE|REPLACE)\s+PROCEDURE\s+([\w.\"]+)\s*\((.*?)\)\s*(?:SQL\s+SECURITY\s+\w+\s*)?BEGIN\b(.*)\bEND\s*;?\s*$", FLAGS)
+_PROC = re.compile(
+    r"(?:CREATE|REPLACE)\s+PROCEDURE\s+([\w.\"]+)\s*\((.*?)\)\s*(?:SQL\s+SECURITY\s+\w+\s*)?BEGIN\b(.*)\bEND\s*;?\s*$", FLAGS
+)
 _MACRO = re.compile(r"(?:CREATE|REPLACE)\s+MACRO\s+([\w.\"]+)\s*(?:\((.*?)\))?\s*AS\s*\((.*)\)\s*;?\s*$", FLAGS)
 
 
@@ -122,7 +124,9 @@ class Ctx:
         self.vars[var.upper()] = td_type
         tt = target_type(td_type, self.target)
         d = {"bigquery": " DEFAULT ", "redshift": " := ", "synapse": " = "}[self.target] + default if default else ""
-        self.decls.append(f"DECLARE @{var} {tt}{d};" if self.target == "synapse" else f"{'DECLARE ' if self.target == 'bigquery' else ''}{var} {tt}{d};")
+        self.decls.append(
+            f"DECLARE @{var} {tt}{d};" if self.target == "synapse" else f"{'DECLARE ' if self.target == 'bigquery' else ''}{var} {tt}{d};"
+        )
 
     def assign(self, var: str, expr: str) -> str:
         if self.target == "redshift":
@@ -131,7 +135,8 @@ class Ctx:
 
     def rowcount(self, var: str) -> str:
         self.rules.append(
-            "ACTIVITY_COUNT -> " + {"bigquery": "@@row_count", "redshift": "GET DIAGNOSTICS ... ROW_COUNT", "synapse": "@@ROWCOUNT"}[self.target]
+            "ACTIVITY_COUNT -> "
+            + {"bigquery": "@@row_count", "redshift": "GET DIAGNOSTICS ... ROW_COUNT", "synapse": "@@ROWCOUNT"}[self.target]
         )
         if self.target == "redshift":
             return f"GET DIAGNOSTICS {var} := ROW_COUNT;"
@@ -246,7 +251,9 @@ def stmt(ctx: Ctx, td: str) -> list[str]:
         n = m.group(1)
         return [f"DROP TABLE {'#' + n if ctx.target == 'synapse' else n.lower() if ctx.target == 'redshift' else n};"]
     if m := re.match(r"COLLECT\s+STAT(?:ISTICS)?\b(.*?)\bON\s+([\w.]+)(.*)$", s, FLAGS):
-        cols = [c for c in re.findall(r"COLUMN\s*\(\s*([\w\s,]+?)\s*\)", m.group(1) + m.group(3), re.IGNORECASE) if c.upper() != "PARTITION"]
+        cols = [
+            c for c in re.findall(r"COLUMN\s*\(\s*([\w\s,]+?)\s*\)", m.group(1) + m.group(3), re.IGNORECASE) if c.upper() != "PARTITION"
+        ]
         tbl = _qualified(ctx, m.group(2))
         ctx.rules.append(
             "COLLECT STATISTICS -> "
@@ -301,31 +308,39 @@ def call(ctx: Ctx, s: str) -> list[str]:
             ctx.declare(v, p.td_type)
             lines.append(ctx.assign(v, e))
             rendered.append(ctx.ref(v))
-    ctx.rules.append("CALL -> " + ("EXEC" if ctx.target == "synapse" else "CALL") + " of the converted procedure (expressions passed via variables)")
+    ctx.rules.append(
+        "CALL -> " + ("EXEC" if ctx.target == "synapse" else "CALL") + " of the converted procedure (expressions passed via variables)"
+    )
     if ctx.target == "redshift" and any(p.mode != "IN" for p in params):
         ctx.warnings.append("Redshift: check that nested CALLs return OUT parameters into the caller's variables")
     name = ctx.name(callee.database, callee.name)
     if ctx.target == "synapse":
-        return lines + [f"EXEC {name} {', '.join(rendered)};"]
-    return lines + [f"CALL {name}({', '.join(rendered)});"]
+        return [*lines, f"EXEC {name} {', '.join(rendered)};"]
+    return [*lines, f"CALL {name}({', '.join(rendered)});"]
 
 
 def _handler(ctx: Ctx, body: list[str], handler: list[str]) -> list[str]:
     if ctx.target == "synapse":
         return ["BEGIN TRY", *_indent(body), "END TRY", "BEGIN CATCH", *_indent(handler or ["THROW;"]), "END CATCH;"]
     kw = "EXCEPTION WHEN ERROR THEN" if ctx.target == "bigquery" else "EXCEPTION WHEN OTHERS THEN"
-    return ["BEGIN", *_indent(body), kw, *_indent(handler or ["RAISE;" if ctx.target == "redshift" else "RAISE;"]), "END;"]
+    return ["BEGIN", *_indent(body), kw, *_indent(handler or ["RAISE;"]), "END;"]
 
 
 def routine_sql(ctx: Ctx, name: str, params: list[str], body: list[str], kind: str = "PROCEDURE") -> str:
     if ctx.target == "bigquery":
-        return "\n".join(
-            [f"CREATE OR REPLACE {kind} {name}({', '.join(params)})", "BEGIN", *_indent(ctx.decls), *_indent(body), "END;"]
-        )
+        return "\n".join([f"CREATE OR REPLACE {kind} {name}({', '.join(params)})", "BEGIN", *_indent(ctx.decls), *_indent(body), "END;"])
     if ctx.target == "redshift":
         decl = ["DECLARE", *_indent(ctx.decls)] if ctx.decls else []
         return "\n".join(
-            [f"CREATE OR REPLACE PROCEDURE {name}({', '.join(params)})", "AS $$", *decl, "BEGIN", *_indent(body), "END;", "$$ LANGUAGE plpgsql;"]
+            [
+                f"CREATE OR REPLACE PROCEDURE {name}({', '.join(params)})",
+                "AS $$",
+                *decl,
+                "BEGIN",
+                *_indent(body),
+                "END;",
+                "$$ LANGUAGE plpgsql;",
+            ]
         )
     plist = ["", *_indent([",\n".join(params)])] if params else []
     return "\n".join(
@@ -398,7 +413,9 @@ def convert_macro(ctx: Ctx) -> tuple[str, int]:
     if ctx.target == "bigquery" and len(stmts) == 1 and selects:
         out = tx(ctx, selects[0])
         ctx.rules.append("Macro -> table function")
-        sql = f"CREATE OR REPLACE TABLE FUNCTION {name}({', '.join(psql)})\nAS (\n" + "\n".join(_indent([out or "-- not converted"])) + "\n);"
+        sql = (
+            f"CREATE OR REPLACE TABLE FUNCTION {name}({', '.join(psql)})\nAS (\n" + "\n".join(_indent([out or "-- not converted"])) + "\n);"
+        )
         usage = f"-- Usage: SELECT * FROM {name}({', '.join(p.name for p in params)});"
         return usage + "\n" + sql, len(selects)
     body_lines: list[str] = []
@@ -418,9 +435,11 @@ def convert_macro(ctx: Ctx) -> tuple[str, int]:
             body_lines += stmt(ctx, s)
     ctx.rules.append(
         "Macro -> "
-        + {"bigquery": "procedure (each SELECT returns a result set)", "redshift": "procedure returning one REFCURSOR per SELECT", "synapse": "procedure"}[
-            ctx.target
-        ]
+        + {
+            "bigquery": "procedure (each SELECT returns a result set)",
+            "redshift": "procedure returning one REFCURSOR per SELECT",
+            "synapse": "procedure",
+        }[ctx.target]
     )
     names = ", ".join(p.name for p in params)
     cursors = [f"'rs{i}'" for i in range(1, k + 1)]
@@ -454,7 +473,9 @@ def convert_procedure(ctx: Ctx) -> str:
                     block.append(stmts[i])
                     i += 1
             if h.group(1).upper() != "EXIT" or h.group(2).upper() != "SQLEXCEPTION":
-                ctx.manual.append(f"{h.group(1).upper()} HANDLER FOR {h.group(2).upper()} (only EXIT HANDLER FOR SQLEXCEPTION is converted)")
+                ctx.manual.append(
+                    f"{h.group(1).upper()} HANDLER FOR {h.group(2).upper()} (only EXIT HANDLER FOR SQLEXCEPTION is converted)"
+                )
             handler_src = block
         else:
             main.append(st)
@@ -471,7 +492,10 @@ def convert_procedure(ctx: Ctx) -> str:
             + {"bigquery": "EXCEPTION WHEN ERROR", "redshift": "EXCEPTION WHEN OTHERS", "synapse": "BEGIN TRY / BEGIN CATCH"}[ctx.target]
         )
         body = _handler(ctx, body, handler)
-    ctx.rules.append("Stored procedure -> " + {"bigquery": "BigQuery scripting procedure", "redshift": "PL/pgSQL procedure", "synapse": "T-SQL procedure"}[ctx.target])
+    ctx.rules.append(
+        "Stored procedure -> "
+        + {"bigquery": "BigQuery scripting procedure", "redshift": "PL/pgSQL procedure", "synapse": "T-SQL procedure"}[ctx.target]
+    )
     return routine_sql(ctx, ctx.name(ctx.obj.database, ctx.obj.name), [_param_sql(ctx, p) for p in params], body)
 
 
@@ -513,7 +537,9 @@ class _Bteq:
 def _quit(ctx: Ctx, code: str, last: bool) -> list[str]:
     code = code or "0"
     if code != "0" and ctx.target != "synapse":
-        ctx.warnings.append(f".QUIT {code}: procedures on this target have no exit code; the run ends successfully. Map it in {_ORCHESTRATOR[ctx.target]}")
+        ctx.warnings.append(
+            f".QUIT {code}: procedures on this target have no exit code; the run ends successfully. Map it in {_ORCHESTRATOR[ctx.target]}"
+        )
     if last:
         return []
     return [f"RETURN {code};" if ctx.target == "synapse" else "RETURN;"]
@@ -539,11 +565,14 @@ def _export(ctx: Ctx, st: _Bteq, sel: str, part: str = "") -> list[str]:
     folder, stem, ext = str(p.parent).strip("/"), p.stem + part, p.suffix or ".txt"
     report = mode == "REPORT"
     ctx.rules.append(
-        ".EXPORT FILE -> " + {"bigquery": "EXPORT DATA to Cloud Storage", "redshift": "UNLOAD to S3", "synapse": "CETAS external table"}[ctx.target]
+        ".EXPORT FILE -> "
+        + {"bigquery": "EXPORT DATA to Cloud Storage", "redshift": "UNLOAD to S3", "synapse": "CETAS external table"}[ctx.target]
     )
     ctx.warnings.append(
         "Export destination placeholders ("
-        + {"bigquery": "EXPORT_BUCKET", "redshift": "EXPORT_BUCKET, IAM role ARN", "synapse": "export_data_source, export_delimited_text"}[ctx.target]
+        + {"bigquery": "EXPORT_BUCKET", "redshift": "EXPORT_BUCKET, IAM role ARN", "synapse": "export_data_source, export_delimited_text"}[
+            ctx.target
+        ]
         + ") must be set before running"
     )
     if ctx.target == "synapse":
@@ -608,8 +637,13 @@ def _exec(ctx: Ctx, st: _Bteq, s: str) -> list[str]:
     name = ctx.name(macro.database, macro.name)
     ctx.rules.append("EXEC macro -> call of the converted macro routine")
     if ctx.target == "redshift":
-        ctx.warnings.append("Redshift: macro result sets are cursors and are not shown in the script log; run the macro separately to see them")
-        return [f"-- EXEC {macro.name}: result sets are returned as cursors; run separately:", f"-- CALL {name}({', '.join(rendered)}, 'rs1');"]
+        ctx.warnings.append(
+            "Redshift: macro result sets are cursors and are not shown in the script log; run the macro separately to see them"
+        )
+        return [
+            f"-- EXEC {macro.name}: result sets are returned as cursors; run separately:",
+            f"-- CALL {name}({', '.join(rendered)}, 'rs1');",
+        ]
     if ctx.target == "synapse":
         return [f"EXEC {name} {', '.join(rendered)};"]
     single = len([x for x in split_statements(hdr.group(3))]) == 1
@@ -622,7 +656,9 @@ def _emit(ctx: Ctx, st: _Bteq, ops: list[tuple[str, str, str]], top: bool, in_ha
         last = top and idx == len(ops) - 1
         if kind == "dot":
             if a == "LOGON":
-                ctx.rules.append(".LOGON removed: connection and credentials come from the scheduler, not the script (credentials not copied)")
+                ctx.rules.append(
+                    ".LOGON removed: connection and credentials come from the scheduler, not the script (credentials not copied)"
+                )
             elif a in ("LOGOFF", "EXIT") and not b:
                 pass
             elif a == "SET":
