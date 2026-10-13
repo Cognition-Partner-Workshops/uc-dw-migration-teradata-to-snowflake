@@ -165,7 +165,8 @@ def review_checklist_md(a: Analysis) -> str:
         out += [f"## {TARGET_LABEL[t]}: {len(todo)} object(s) to review", ""]
         for c in todo:
             o = objs[c.object_id]
-            out += [f"### {o.fqn} ({o.object_type}) - {c.status}", ""]
+            effort = {"table": "Light", "view": "Medium"}.get(o.object_type, "Heavy")
+            out += [f"### {o.fqn} ({o.object_type}) - {c.status} - {effort} review", ""]
             for cat in ("complete", "verify", "deploy", "test"):
                 out += [f"- [ ] **{cat.title()}:** {i.text}" for i in c.checklist if i.category == cat]
             out.append("")

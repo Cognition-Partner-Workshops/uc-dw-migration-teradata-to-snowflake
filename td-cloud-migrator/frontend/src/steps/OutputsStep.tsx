@@ -20,49 +20,104 @@ const CATEGORY: Record<ChecklistItem['category'], string> = {
   test: 'Test',
 }
 
-function useTicks(key: string): [Set<number>, (i: number) => void] {
-  const [ticks, setTicks] = useState<Set<number>>(new Set())
-  useEffect(() => {
-    try {
-      setTicks(new Set(JSON.parse(localStorage.getItem(key) ?? '[]') as number[]))
-    } catch {
-      setTicks(new Set())
-    }
-  }, [key])
-  const toggle = (i: number) => {
-    const next = new Set(ticks)
-    if (next.has(i)) next.delete(i)
-    else next.add(i)
-    setTicks(next)
-    localStorage.setItem(key, JSON.stringify([...next]))
-  }
-  return [ticks, toggle]
+type Answer = 'accept' | 'fix' | 'done'
+interface ReviewState { a: Record<number, Answer>; n: Record<number, string> }
+
+const SIM_CHECK = 'Load a sample and check nulls'
+
+type Effort = 'Light' | 'Medium' | 'Heavy'
+function effortOf(objectType: string | undefined): Effort {
+  if (objectType === 'table') return 'Light'
+  if (objectType === 'view') return 'Medium'
+  return 'Heavy'
+}
+const EFFORT_HINT: Record<Effort, string> = {
+  Light: 'Light review: a few notes to accept or fix. The data checks are covered by Load & validate.',
+  Medium: 'Medium review: check the query logic, then compare its results with Teradata.',
+  Heavy: 'Heavy review: procedural logic. Check each step and test it in a cloud sandbox before use.',
 }
 
-function ReviewChecklist({ jobId, conv }: { jobId: string; conv: Conversion }) {
+function useReview(key: string): [ReviewState, (i: number, v: Answer | null) => void, (i: number, note: string) => void] {
+  const [st, setSt] = useState<ReviewState>({ a: {}, n: {} })
+  useEffect(() => {
+    try {
+      const raw = JSON.parse(localStorage.getItem(key) ?? 'null') as ReviewState | number[] | null
+      if (Array.isArray(raw)) setSt({ a: Object.fromEntries(raw.map((i) => [i, 'done' as Answer])), n: {} })
+      else setSt(raw && raw.a ? { a: raw.a, n: raw.n ?? {} } : { a: {}, n: {} })
+    } catch {
+      setSt({ a: {}, n: {} })
+    }
+  }, [key])
+  const save = (next: ReviewState) => {
+    setSt(next)
+    localStorage.setItem(key, JSON.stringify(next))
+  }
+  const answer = (i: number, v: Answer | null) => {
+    const a = { ...st.a }
+    if (v) a[i] = v
+    else delete a[i]
+    save({ ...st, a })
+  }
+  const note = (i: number, text: string) => save({ ...st, n: { ...st.n, [i]: text } })
+  return [st, answer, note]
+}
+
+function ReviewChecklist({ job, conv, objectType }: { job: Job; conv: Conversion; objectType?: string }) {
   const items = conv.checklist ?? []
-  const [ticks, toggle] = useTicks(`review:${jobId}:${conv.target}:${conv.object_id}`)
+  const [st, answer, note] = useReview(`review:${job.id}:${conv.target}:${conv.object_id}`)
   if (!items.length) return null
-  const done = items.filter((_, i) => ticks.has(i)).length
+  const load = job.loads?.[conv.target]?.tables.find((t) => t.table_id === conv.object_id)
+  const simPassed = !!load && load.created && load.checks_total > 0 && load.checks_passed === load.checks_total
+  const auto = (i: number) => simPassed && items[i].text.startsWith(SIM_CHECK)
+  const decisions = items.filter((it) => it.category === 'verify').length
+  const answered = items.filter((_, i) => st.a[i] || auto(i)).length
+  const fixes = items.filter((_, i) => st.a[i] === 'fix').length
+  const effort = effortOf(objectType)
   return (
     <div className="checklist">
       <div className="checklist-head">
-        <strong>What needs review</strong>
-        <span className={`badge ${done === items.length ? 'passed' : 'manual_review'}`}>
-          {done} of {items.length} checked
+        <strong>
+          What needs review: {decisions} decision{decisions === 1 ? '' : 's'} to answer, {items.length - decisions} check
+          {items.length - decisions === 1 ? '' : 's'} to tick
+        </strong>
+        <span className="objbadges">
+          {fixes > 0 && <span className="badge failed">{fixes} need{fixes === 1 ? 's' : ''} fix</span>}
+          <span className={`badge ${answered === items.length ? 'passed' : 'manual_review'}`}>
+            {answered} of {items.length} done
+          </span>
         </span>
       </div>
+      <div className={`effort-line effort-${effort.toLowerCase()}`}>{EFFORT_HINT[effort]}</div>
       {(['complete', 'verify', 'deploy', 'test'] as const).map((cat) => {
         const rows = items.map((it, i) => ({ it, i })).filter(({ it }) => it.category === cat)
         if (!rows.length) return null
         return (
           <div key={cat} className="checklist-group">
-            <div className="checklist-cat">{CATEGORY[cat]}</div>
-            {rows.map(({ it, i }) => (
-              <label key={i} className={ticks.has(i) ? 'done' : ''}>
-                <input type="checkbox" checked={ticks.has(i)} onChange={() => toggle(i)} /> {it.text}
-              </label>
-            ))}
+            <div className="checklist-cat">{cat === 'verify' ? 'Decide: accept or needs fix' : CATEGORY[cat]}</div>
+            {rows.map(({ it, i }) =>
+              cat === 'verify' ? (
+                <div key={i} className={`decision ${st.a[i] ?? ''}`}>
+                  <div className="decision-text">{it.text}</div>
+                  <div className="decision-actions">
+                    <button className={st.a[i] === 'accept' ? 'on accept' : ''} onClick={() => answer(i, st.a[i] === 'accept' ? null : 'accept')}>
+                      Accept
+                    </button>
+                    <button className={st.a[i] === 'fix' ? 'on fix' : ''} onClick={() => answer(i, st.a[i] === 'fix' ? null : 'fix')}>
+                      Needs fix
+                    </button>
+                    <input placeholder="Note (optional)" value={st.n[i] ?? ''} onChange={(e) => note(i, e.target.value)} />
+                  </div>
+                </div>
+              ) : auto(i) ? (
+                <label key={i} className="done auto">
+                  <input type="checkbox" checked disabled /> {it.text} <span className="badge passed">Passed in simulated load</span>
+                </label>
+              ) : (
+                <label key={i} className={st.a[i] ? 'done' : ''}>
+                  <input type="checkbox" checked={!!st.a[i]} onChange={() => answer(i, st.a[i] ? null : 'done')} /> {it.text}
+                </label>
+              ),
+            )}
           </div>
         )
       })}
@@ -86,6 +141,10 @@ export default function OutputsStep({ job, target, formats, onNext }: Props) {
   const scripts = Object.keys(files).filter((f) => f.startsWith(`${target}/load/`) || f === `${target}/deploy_all.sql`)
   const mapping = a.type_mappings[target]?.[selected]
   const toReview = convs.filter((c) => c.checklist?.length).length
+  const typeOf = useMemo(() => Object.fromEntries(a.objects.map((o) => [o.id, o.object_type])), [a])
+  const efforts = (['Light', 'Medium', 'Heavy'] as const)
+    .map((e) => [e, convs.filter((c) => c.checklist?.length && effortOf(typeOf[c.object_id]) === e).length] as const)
+    .filter(([, n]) => n)
 
   return (
     <>
@@ -103,13 +162,25 @@ export default function OutputsStep({ job, target, formats, onNext }: Props) {
       </div>
       {view === 'sql' && (
         <div className="split">
-          <Card title="Objects" extra={<span className="small muted">{toReview} of {convs.length} need review</span>}>
+          <Card
+            title="Objects"
+            extra={
+              <span className="small muted" title="Review effort: Light = tables, Medium = views, Heavy = macros, procedures and BTEQ">
+                {toReview} of {convs.length} need review{efforts.length ? ': ' : ''}
+                {efforts.map(([e, n]) => `${e} ${n}`).join(' · ')}
+              </span>
+            }
+          >
             <ul className="objlist">
               {convs.map((c) => (
                 <li key={c.object_id} className={c.object_id === selected ? 'active' : ''} onClick={() => setSelected(c.object_id)}>
                   <span className="mono">{short(c.object_id)}</span>
                   <span className="objbadges">
-                    {!!c.checklist?.length && <span className="badge review" title={`${c.checklist.length} item(s) to review`}>Review · {c.checklist.length}</span>}
+                    {!!c.checklist?.length && (
+                      <span className={`badge review effort-${effortOf(typeOf[c.object_id]).toLowerCase()}`} title={`${c.checklist.length} item(s) to review`}>
+                        {effortOf(typeOf[c.object_id])} review · {c.checklist.length}
+                      </span>
+                    )}
                     <Badge status={c.status} />
                   </span>
                 </li>
@@ -129,7 +200,7 @@ export default function OutputsStep({ job, target, formats, onNext }: Props) {
                   <ul className="small">{conv.warnings.length ? conv.warnings.map((w) => <li key={w}>{w}</li>) : <li className="muted">none</li>}</ul>
                 </div>
               </div>
-              <ReviewChecklist jobId={job.id} conv={conv} />
+              <ReviewChecklist job={job} conv={conv} objectType={typeOf[conv.object_id]} />
               <pre className="code">{conv.sql}</pre>
               {mapping && (
                 <details>
