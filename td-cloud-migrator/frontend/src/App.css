@@ -127,3 +127,6 @@ tr.current td { background: #eef4ff; }
 .checklist label { display: flex; gap: 8px; align-items: flex-start; font-size: 13px; padding: 2px 0; cursor: pointer; }
 .checklist label input { margin-top: 3px; }
 .checklist label.done { color: #667085; text-decoration: line-through; }
+
+.hint { color: #667085; font-size: 12px; margin: -4px 0 10px; }
+.field select:disabled { background: #f2f4f7; color: #98a2b3; cursor: not-allowed; }

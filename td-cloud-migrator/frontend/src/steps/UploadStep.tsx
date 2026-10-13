@@ -75,6 +75,7 @@ export default function UploadStep({ formats, busy, onSubmit, onExample }: Props
   const [data, setData] = useState<File[]>([])
   const [configFormat, setConfigFormat] = useState('auto')
   const [dataOpts, setDataOpts] = useState<DataOptions>({ data_format: 'auto', delimiter: 'auto', header: 'auto', encoding: 'utf-8', empty_as_null: true })
+  const noTextOpts = dataOpts.data_format === 'parquet' || dataOpts.data_format === 'manifest'
   const [target, setTarget] = useState<TargetId>('bigquery')
   const [name, setName] = useState('')
   const [pace, setPace] = useState(true)
@@ -114,8 +115,8 @@ export default function UploadStep({ formats, busy, onSubmit, onExample }: Props
               </select>
             </label>
             <label className="field">
-              Delimiter
-              <select value={dataOpts.delimiter} onChange={(e) => setDataOpts({ ...dataOpts, delimiter: e.target.value })}>
+              Delimiter (text files only)
+              <select disabled={noTextOpts} value={dataOpts.delimiter} onChange={(e) => setDataOpts({ ...dataOpts, delimiter: e.target.value })}>
                 {Object.entries(formats.data.delimiters).map(([k, v]) => (
                   <option key={k} value={k}>
                     {v}
@@ -124,14 +125,15 @@ export default function UploadStep({ formats, busy, onSubmit, onExample }: Props
               </select>
             </label>
             <label className="field">
-              Header row
-              <select value={dataOpts.header} onChange={(e) => setDataOpts({ ...dataOpts, header: e.target.value as DataOptions['header'] })}>
+              Header row (text files only)
+              <select disabled={noTextOpts} value={dataOpts.header} onChange={(e) => setDataOpts({ ...dataOpts, header: e.target.value as DataOptions['header'] })}>
                 <option value="auto">Auto-detect</option>
                 <option value="yes">First row is a header</option>
                 <option value="no">No header</option>
               </select>
             </label>
           </div>
+          <p className="hint">Parquet files and the manifest carry their own structure and ignore these settings.</p>
           <div className="accepted">
             <strong>Accepted formats</strong>
             <FormatList formats={formats.data.formats} />
