@@ -10,6 +10,7 @@ from .models import ColumnMapping, Conversion, SourceObject, TargetId
 from .routine_convert import convert_routine
 from .sql_convert import convert_view, draft_routine
 from .td_catalog import NUMERIC_TYPES
+from .testpack import test_queries
 
 
 def numeric_columns(objects: list[SourceObject]) -> frozenset[str]:
@@ -58,6 +59,7 @@ def convert_object(
     conv.checklist = build_checklist(obj, conv)
     if conv.checklist:
         conv.sql = checklist_header(conv.checklist) + conv.sql
+    conv.test_source, conv.test_target = test_queries(obj, conv, target, schema_map, project)
     return conv
 
 

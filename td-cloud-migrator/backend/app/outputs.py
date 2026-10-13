@@ -17,6 +17,11 @@ TARGET_LABEL = {
     "synapse": "Azure Synapse Analytics (dedicated SQL pool)",
 }
 FOLDER = {"table": "ddl", "view": "views"}
+TEST_HEAD = (
+    "-- Test pack: run on {side}. Run the matching file on the other system and compare the results line by line.\n"
+    "-- Tables return (object_name, metric, metric_value): row count, NULLs per column, sums of number columns,\n"
+    "-- total text length and distinct date counts. Any metric that differs points to a load or conversion issue.\n\n"
+)
 
 
 def _objects(a: Analysis) -> dict[str, SourceObject]:
@@ -51,6 +56,12 @@ def output_files(a: Analysis, opts: JobOptions) -> dict[str, str]:
                 body.append("\n" + c.sql.strip())
         files[f"{target}/deploy_all.sql"] = "\n".join(body) + "\n"
         files.update(load_scripts(a, opts, target))
+    objs_by_id = _objects(a)
+    for t in dict.fromkeys(c.target for c in a.conversions):
+        pairs = sorted((c for c in a.conversions if c.target == t and c.test_target), key=lambda c: order.get(c.object_id, 0))
+        for side, attr in (("teradata", "test_source"), (t, "test_target")):
+            body = [f"-- {objs_by_id[c.object_id].fqn} ({objs_by_id[c.object_id].object_type})\n{getattr(c, attr)}\n" for c in pairs]
+            files[f"{t}/test_pack/{side}_tests.sql"] = TEST_HEAD.format(side=TARGET_LABEL.get(side, "Teradata")) + "\n".join(body)
     files["mapping_report.md"] = mapping_report_md(a, opts)
     files["mapping_report.csv"] = mapping_report_csv(a)
     files["conversion_report.md"] = conversion_report_md(a)

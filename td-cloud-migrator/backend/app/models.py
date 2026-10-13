@@ -134,6 +134,8 @@ class Conversion(BaseModel):
     rules: list[str] = []
     warnings: list[str] = []
     reason: str | None = None
+    test_source: str = ""
+    test_target: str = ""
     checklist: list[ChecklistItem] = []
 
 

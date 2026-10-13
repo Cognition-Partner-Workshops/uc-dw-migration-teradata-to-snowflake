@@ -77,9 +77,14 @@ def build_checklist(obj: SourceObject, conv: Conversion) -> list[ChecklistItem]:
         items.append(("deploy", "Credentials and connections are configured in the target / orchestrator, not in the SQL"))
 
     if obj.object_type in ("macro", "procedure", "bteq_script"):
-        items.append(("test", f"Run it on {tgt} with the same inputs as on Teradata and compare row counts and output values"))
+        items.append(
+            (
+                "test",
+                f"Run it on {tgt} with the same inputs as on Teradata and compare row counts and output values (queries in the Test pack)",
+            )
+        )
     else:
-        items.append(("test", f"Run the SQL on {tgt} and compare row counts and a sample of rows with Teradata"))
+        items.append(("test", f"Run the SQL on {tgt} and compare row counts and a sample of rows with Teradata (queries in the Test pack)"))
     if obj.object_type == "table":
         items.append(("test", "Load a sample and check nulls, dates, decimals and text lengths survived the type mapping"))
 

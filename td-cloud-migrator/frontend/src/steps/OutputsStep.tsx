@@ -127,7 +127,7 @@ function ReviewChecklist({ job, conv, objectType }: { job: Job; conv: Conversion
 
 export default function OutputsStep({ job, target, formats, onNext }: Props) {
   const a = job.analysis!
-  const [view, setView] = useState<'sql' | 'reports' | 'scripts'>('sql')
+  const [view, setView] = useState<'sql' | 'reports' | 'scripts' | 'tests'>('sql')
   const [selected, setSelected] = useState<string>(a.create_order[0])
   const [files, setFiles] = useState<Record<string, string>>({})
   const [doc, setDoc] = useState(REPORTS[0])
@@ -158,6 +158,7 @@ export default function OutputsStep({ job, target, formats, onNext }: Props) {
       <div className="tabs secondary">
         <button className={view === 'sql' ? 'active' : ''} onClick={() => setView('sql')}>Converted SQL</button>
         <button className={view === 'scripts' ? 'active' : ''} onClick={() => setView('scripts')}>Deploy &amp; load scripts</button>
+        <button className={view === 'tests' ? 'active' : ''} onClick={() => setView('tests')}>Test pack</button>
         <button className={view === 'reports' ? 'active' : ''} onClick={() => setView('reports')}>Reports</button>
       </div>
       {view === 'sql' && (
@@ -234,6 +235,39 @@ export default function OutputsStep({ job, target, formats, onNext }: Props) {
             </Card>
           ))}
         </>
+      )}
+      {view === 'tests' && (
+        <Card
+          title="Test pack: run both queries and compare the results"
+          extra={
+            <select value={selected} onChange={(e) => setSelected(e.target.value)}>
+              {convs.filter((c) => c.test_target).map((c) => (
+                <option key={c.object_id} value={c.object_id}>{short(c.object_id)}</option>
+              ))}
+            </select>
+          }
+        >
+          <p className="small muted">
+            Run the left query on Teradata and the right query on {formats?.targets[target] ?? target}, on the same data. Every line should match: row
+            count, NULLs per column, sums of number columns, total text length and distinct dates. For views, compare the row count and sample rows;
+            for macros, procedures and scripts, run both with the same inputs. When they match, tick the Test item in the review checklist. All
+            objects are also in the bundle under <span className="mono">{target}/test_pack/</span>.
+          </p>
+          {conv?.test_target ? (
+            <div className="grid2 tight">
+              <div>
+                <strong>Teradata</strong>
+                <pre className="code">{conv.test_source}</pre>
+              </div>
+              <div>
+                <strong>{formats?.targets[target] ?? target}</strong>
+                <pre className="code">{conv.test_target}</pre>
+              </div>
+            </div>
+          ) : (
+            <p className="muted">This job was created before the test pack existed. Run the example again to generate it.</p>
+          )}
+        </Card>
       )}
       {view === 'reports' && (
         <Card title="Reports" extra={
