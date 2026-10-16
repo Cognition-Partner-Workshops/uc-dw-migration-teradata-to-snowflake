@@ -1,0 +1,26 @@
+{
+  "keys": {
+    "BANKING_DW.VW_CUSTOMER_360": ["CUSTOMER_ID"],
+    "BANKING_DW.VW_REGULATORY_LARGE_TRANSACTIONS": ["TRANSACTION_ID"],
+    "BANKING_DW.VW_BRANCH_PERFORMANCE": ["BRANCH_ID", "SNAPSHOT_MONTH_KEY"]
+  },
+  "critical_data_elements": {
+    "BANKING_DW.VW_REGULATORY_LARGE_TRANSACTIONS": [
+      {"label": "Reportable amount (NOK) by reporting category", "group_by": "REPORTING_CATEGORY", "measure": "BASE_CURRENCY_AMOUNT"}
+    ],
+    "BANKING_DW.VW_BRANCH_PERFORMANCE": [
+      {"label": "Total deposits by region", "group_by": "REGION", "measure": "TOTAL_DEPOSITS"}
+    ],
+    "BANKING_DW.FACT_TRANSACTION": [
+      {"label": "Base-currency amount by transaction type", "group_by": "TRANSACTION_TYPE", "measure": "BASE_CURRENCY_AMOUNT"}
+    ]
+  },
+  "waivers": [
+    {
+      "object": "BANKING_DW.VW_REGULATORY_LARGE_TRANSACTIONS",
+      "column": "ROW_HASH",
+      "reason": "Teradata HASHROW is an AMP-distribution hash with no portable equivalent. ROW_HASH is a technical column, not a critical data element; consumers must re-baseline on the target HASH() value.",
+      "approver_role": "Data Owner, Regulatory Reporting"
+    }
+  ]
+}
