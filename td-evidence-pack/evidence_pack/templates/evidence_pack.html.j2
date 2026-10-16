@@ -1,0 +1,77 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Migration evidence pack: {{ r.candidate.name }}</title>{% include "_style.html.j2" %}</head><body><main>
+<div class="mute">Teradata &rarr; Snowflake migration &middot; dual-run reconciliation evidence pack</div>
+<h1>{{ r.candidate.name }}</h1>
+<div class="mono mute">candidate {{ r.candidate.origin }} &middot; legacy {{ r.legacy.origin }} &middot; manifest {{ r.manifest.manifest_sha256 | short(16) }}</div>
+
+<div class="verdict {{ r.verdict }}"><h2>Verdict: {{ r.verdict | replace("_", " ") }}</h2>
+<div>{{ r.counts.PASS }} passed &middot; {{ r.counts.PASS_WITH_WAIVERS }} passed with approved waivers &middot; {{ r.counts.FAIL }} failed &middot; {{ r.counts.ERROR }} errors &middot; {{ r.schema_breaks }} schema conformance breaks</div></div>
+
+<div class="cards">
+<div class="card"><span class="mute">Business date (pinned)</span><b>{{ r.as_of }}</b></div>
+<div class="card"><span class="mute">Objects reconciled</span><b>{{ r.objects | length }}</b></div>
+<div class="card"><span class="mute">Rows dual-run</span><b>{{ "{:,}".format(r.coverage.rows_loaded.values() | sum) }}</b></div>
+<div class="card"><span class="mute">Run duration</span><b>{{ r.duration_s }} s</b></div>
+</div>
+
+<h2>Results by object</h2>
+<table><tr><th>Object</th><th>Type</th><th>Status</th><th>Rows legacy / target</th><th>Fingerprint legacy / target</th><th>Key findings</th></tr>
+{% for o in r.objects %}<tr><td class="mono"><a href="#{{ o.name }}">{{ o.name }}</a></td><td>{{ o.kind }}</td><td><span class="pill {{ o.status }}">{{ o.status | replace("_"," ") }}</span></td>
+<td>{{ "{:,}".format(o.legacy_rows) }} / {{ "{:,}".format(o.target_rows) }}</td>
+<td class="mono">{{ o.legacy_fingerprint | short(10) }} / <span class="{{ 'ok' if o.legacy_fingerprint == o.target_fingerprint else 'bad' }}">{{ o.target_fingerprint | short(10) }}</span></td>
+<td>{% if o.error %}<span class="bad">{{ o.error }}</span>{% elif o.findings %}{{ o.findings[0] }}{% if o.findings | length > 1 %} <span class="mute">(+{{ o.findings | length - 1 }} more)</span>{% endif %}{% else %}<span class="ok">Identical</span>{% endif %}</td></tr>{% endfor %}
+</table>
+{% if r.load_errors %}<div class="note"><b>Converted SQL that failed to load:</b><ul class="findings">{% for f, e in r.load_errors.items() %}<li class="mono">{{ f }}: {{ e }}</li>{% endfor %}</ul></div>{% endif %}
+
+<h2>BCBS 239 principle mapping</h2>
+<table><tr><th>Principle</th><th>What this pack evidences</th><th>Outcome</th></tr>
+{% for code, title, text in r.bcbs239 %}<tr><td><b>{{ code }}</b> {{ title }}</td><td>{{ text }}</td><td>
+{% if code in ("P3","P4","P7") %}{% set ns = namespace(bad=0) %}{% for o in r.objects %}
+{% if code == "P4" and (o.error or o.legacy_rows != o.target_rows or o.missing_in_target or o.extra_in_target) %}{% set ns.bad = ns.bad + 1 %}
+{% elif code == "P3" and o.kind == "TABLE" and o.status in ("FAIL","ERROR") %}{% set ns.bad = ns.bad + 1 %}
+{% elif code == "P7" and o.kind == "VIEW" and o.status in ("FAIL","ERROR") %}{% set ns.bad = ns.bad + 1 %}{% endif %}{% endfor %}
+<span class="{{ 'ok' if ns.bad == 0 else 'bad' }}">{{ "Evidenced" if ns.bad == 0 else ns.bad ~ " object(s) with exceptions" }}</span>
+{% elif code == "P2" %}{% set ns = namespace(bad=0) %}{% for v in r.lineage.values() %}{% for c in v %}{% if not c.match %}{% set ns.bad = ns.bad + 1 %}{% endif %}{% endfor %}{% endfor %}<span class="{{ 'ok' if ns.bad == 0 else 'warn' }}">{{ "Lineage parity" if ns.bad == 0 else ns.bad ~ " column(s) to review" }}</span>
+{% else %}<span class="ok">Evidenced</span>{% endif %}</td></tr>{% endfor %}
+</table>
+<p class="mute">This pack supports, but does not by itself certify, BCBS 239 compliance. Sign-off by the accountable owners below is required.</p>
+
+<h2>Object detail</h2>
+{% for o in r.objects %}<details id="{{ o.name }}" {% if o.status in ("FAIL","ERROR") %}open{% endif %}><summary><span class="pill {{ o.status }}">{{ o.status | replace("_"," ") }}</span> <span class="mono">{{ o.name }}</span></summary>
+{% if o.error %}<p class="bad">{{ o.error }}</p>{% endif %}
+{% if o.findings %}<h3>Findings</h3><ul class="findings">{% for f in o.findings %}<li>{{ f }}</li>{% endfor %}</ul>{% endif %}
+{% if o.assumptions %}<div class="note"><b>Legacy semantics assumption (needs SME confirmation):</b><ul class="findings">{% for a in o.assumptions %}<li>{{ a }}</li>{% endfor %}</ul></div>{% endif %}
+{% if o.key %}<p class="mute">Business key: <span class="mono">{{ o.key | join(", ") }}</span> &middot; missing in target {{ o.missing_in_target }} &middot; unexpected {{ o.extra_in_target }} &middot; changed {{ o.changed_rows }}</p>{% endif %}
+{% for ct in o.control_totals %}<h3>Critical data element control: {{ ct.label }}</h3>
+<table><tr><th>Group</th><th>Count legacy / target</th><th>Sum legacy</th><th>Sum target</th><th></th></tr>
+{% for row in ct.rows %}<tr><td>{{ row.group }}</td><td>{{ row.legacy_count }} / {{ row.target_count }}</td><td class="mono">{{ row.legacy_sum }}</td><td class="mono">{{ row.target_sum }}</td><td class="{{ 'ok' if row.ok else 'bad' }}">{{ "match" if row.ok else "BREAK" }}</td></tr>{% endfor %}</table>{% endfor %}
+{% if o.samples %}<h3>Sample exceptions</h3><table><tr><th>Type</th><th>Key / row</th><th>Differences (legacy &rarr; target)</th></tr>
+{% for s in o.samples %}<tr><td>{{ s.type }}</td><td class="mono">{{ (s.key or s.row) | tojson }}</td><td class="mono">{% for c, d in (s.diffs or {}).items() %}{{ c }}: {{ d.legacy }} &rarr; <span class="bad">{{ d.target }}</span><br>{% endfor %}</td></tr>{% endfor %}</table>{% endif %}
+{% if o.columns %}<h3>Column checks</h3><table><tr><th>Column</th><th>Type legacy / target</th><th>Nulls</th><th>Distinct</th><th>Control total legacy / target</th><th>Rows differing</th><th></th></tr>
+{% for c in o.columns %}<tr><td class="mono">{{ c.column }}</td><td class="mono {{ 'bad' if c.type_drift }}">{{ c.legacy_type }} / {{ c.target_type }}</td><td>{{ c.legacy_nulls }} / {{ c.target_nulls }}</td><td>{{ c.legacy_distinct }} / {{ c.target_distinct }}</td><td class="mono">{{ c.legacy_sum or "" }}{% if c.legacy_sum or c.target_sum %} / {{ c.target_sum or "&mdash;" | safe }}{% endif %}</td><td>{{ c.mismatched_rows }}</td>
+<td>{% if c.waived %}<span class="warn">waived</span>{% elif c.type_drift or c.mismatched_rows or c.legacy_nulls != c.target_nulls or c.legacy_distinct != c.target_distinct or c.legacy_sum != c.target_sum %}<span class="bad">&#10007;</span>{% else %}<span class="ok">&#10003;</span>{% endif %}</td></tr>{% endfor %}</table>{% endif %}
+{% if o.name in r.lineage %}<h3>Column lineage parity</h3><table><tr><th>Report column</th><th>Legacy sources</th><th>Target sources</th><th></th></tr>
+{% for l in r.lineage[o.name] %}<tr><td class="mono">{{ l.column }}</td><td class="mono">{{ l.legacy | join(", ") }}</td><td class="mono">{{ l.target | join(", ") }}</td><td class="{{ 'ok' if l.match else 'warn' }}">{{ "&#10003;" | safe if l.match else "review" }}</td></tr>{% endfor %}</table>{% endif %}
+{% if o.name in r.schema %}<h3>Declared type conformance</h3><table><tr><th>Column</th><th>Teradata</th><th>Snowflake</th><th>Assessment</th></tr>
+{% for c in r.schema[o.name] %}<tr><td class="mono">{{ c.column }}</td><td class="mono">{{ c.legacy }}</td><td class="mono">{{ c.target }}</td><td class="{{ 'ok' if c.ok else 'bad' }}">{{ c.note }}</td></tr>{% endfor %}</table>{% endif %}
+</details>{% endfor %}
+
+<h2>Approved waivers</h2>
+<table><tr><th>Object.column</th><th>Justification</th><th>Approver role</th></tr>
+{% for w in r.waivers %}<tr><td class="mono">{{ w.object }}.{{ w.column }}</td><td>{{ w.reason }}</td><td>{{ w.approver_role }}</td></tr>{% else %}<tr><td colspan="3" class="mute">None</td></tr>{% endfor %}</table>
+
+<h2>Coverage &amp; method disclosures</h2>
+<p><b>In scope:</b> <span class="mono">{{ r.coverage.in_scope | join(", ") }}</span><br><b>Out of scope:</b> {{ r.coverage.out_of_scope }}</p>
+<p><b>Data:</b> deterministic synthetic banking data (seed {{ r.manifest.data_seed }}), loaded identically into both engines: {% for t, n in r.coverage.rows_loaded.items() %}<span class="mono">{{ t.split(".")[-1] }}</span> {{ "{:,}".format(n) }}{% if not loop.last %}, {% endif %}{% endfor %}. No customer data was used.</p>
+<h3>Legacy (Teradata) emulation</h3><ul class="findings">{% for d in r.disclosures.legacy %}<li>{{ d }}</li>{% endfor %}</ul>
+<h3>Target (Snowflake) emulation</h3><ul class="findings">{% for d in r.disclosures.target %}<li>{{ d }}</li>{% endfor %}</ul>
+
+<h2>Integrity manifest</h2>
+<p>Every input and every result fingerprint is SHA-256 hashed. Re-running the command below must reproduce manifest <span class="mono">{{ r.manifest.manifest_sha256 }}</span>; any edit to an input, a converted file or a result changes it.</p>
+<p class="mono">{{ reproduce }}</p>
+<p class="mute">{{ r.manifest.tool }} &middot; duckdb {{ r.manifest.engines.duckdb }} &middot; sqlglot {{ r.manifest.engines.sqlglot }} &middot; python {{ r.manifest.engines.python }} &middot; started {{ r.started_utc }} &middot; finished {{ r.finished_utc }}</p>
+<details><summary>Input hashes ({{ r.manifest.inputs | length }})</summary><table><tr><th>File</th><th>SHA-256</th></tr>{% for f, h in r.manifest.inputs.items() %}<tr><td class="mono">{{ f }}</td><td class="mono">{{ h }}</td></tr>{% endfor %}</table></details>
+
+<h2>Sign-off</h2>
+<div class="sign"><div><b>Migration lead</b><br><span class="mute">Name / date</span></div><div><b>Data owner (Regulatory Reporting)</b><br><span class="mute">Name / date</span></div><div><b>Independent validation (2nd line)</b><br><span class="mute">Name / date</span></div></div>
+</main></body></html>

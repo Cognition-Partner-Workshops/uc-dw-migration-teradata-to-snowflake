@@ -1,0 +1,10 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Migration evidence: candidate comparison</title>{% include "_style.html.j2" %}</head><body><main>
+<div class="mute">Teradata &rarr; Snowflake migration &middot; proof-first dual run</div>
+<h1>Which conversion is safe to cut over?</h1>
+<p class="mute">Each candidate conversion was dual-run against the original Teradata logic on identical data. Only a PASS (or PASS with approved waivers) candidate should go to sign-off.</p>
+<table><tr><th>Candidate</th><th>Verdict</th><th>Pass</th><th>Waived</th><th>Fail</th><th>Error</th><th>Schema breaks</th><th>Failing objects</th><th>Pack</th></tr>
+{% for r in results %}{% set slug = r.candidate.name | replace(" ", "-") %}<tr><td><b>{{ r.candidate.name }}</b><br><span class="mono mute">{{ r.candidate.origin }}</span></td><td><span class="pill {{ r.verdict }}">{{ r.verdict | replace("_"," ") }}</span></td>
+<td>{{ r.counts.PASS }}</td><td>{{ r.counts.PASS_WITH_WAIVERS }}</td><td>{{ r.counts.FAIL }}</td><td>{{ r.counts.ERROR }}</td><td>{{ r.schema_breaks }}</td>
+<td class="mono">{% for o in r.objects if o.status in ("FAIL","ERROR") %}{{ o.name.split(".")[-1] }}{% if not loop.last %}, {% endif %}{% endfor %}</td>
+<td><a href="{{ slug }}/evidence_pack.html">open</a></td></tr>{% endfor %}</table>
+</main></body></html>

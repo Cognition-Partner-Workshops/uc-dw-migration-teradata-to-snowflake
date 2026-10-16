@@ -1,0 +1,19 @@
+<style>
+:root{--ok:#0a7d3b;--bad:#b42318;--warn:#b54708;--mute:#5b6472;--line:#e3e6ea;--bg:#f7f8fa}
+*{box-sizing:border-box}body{font:14px/1.5 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:#1c2330;margin:0;background:var(--bg)}
+main{max-width:1180px;margin:0 auto;padding:28px 32px 60px;background:#fff;min-height:100vh}
+h1{font-size:24px;margin:0 0 4px}h2{font-size:18px;margin:34px 0 10px;padding-bottom:6px;border-bottom:2px solid var(--line)}h3{font-size:15px;margin:18px 0 6px}
+.mute{color:var(--mute)}.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px}
+table{border-collapse:collapse;width:100%;margin:6px 0 12px}th,td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}th{background:var(--bg);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.03em;color:var(--mute)}
+.pill{display:inline-block;padding:2px 9px;border-radius:999px;font-size:12px;font-weight:700;color:#fff;white-space:nowrap}
+.PASS{background:var(--ok)}.PASS_WITH_WAIVERS{background:#2f6fbd}.FAIL{background:var(--bad)}.ERROR{background:#6b1d1d}
+.ok{color:var(--ok);font-weight:600}.bad{color:var(--bad);font-weight:600}.warn{color:var(--warn)}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:16px 0}.card{border:1px solid var(--line);border-radius:10px;padding:12px 14px}.card b{display:block;font-size:22px}
+.verdict{border-radius:12px;padding:16px 20px;margin:18px 0;color:#fff}.verdict.PASS{background:var(--ok)}.verdict.PASS_WITH_WAIVERS{background:#2f6fbd}.verdict.FAIL,.verdict.ERROR{background:var(--bad)}
+.verdict h2{border:0;margin:0;padding:0;font-size:20px;color:#fff}
+details{border:1px solid var(--line);border-radius:10px;margin:10px 0;padding:0 14px}details[open]{padding-bottom:10px}summary{cursor:pointer;padding:10px 0;font-weight:600}
+ul.findings{margin:6px 0;padding-left:20px}ul.findings li{margin:2px 0}
+.sign{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.sign div{border:1px dashed #b8bfc9;border-radius:10px;padding:14px;min-height:110px}
+.note{background:#fff8e6;border:1px solid #f5d9a3;border-radius:10px;padding:10px 14px;margin:10px 0}
+@media print{details{break-inside:avoid}details:not([open]) > *:not(summary){display:block}}
+</style>
