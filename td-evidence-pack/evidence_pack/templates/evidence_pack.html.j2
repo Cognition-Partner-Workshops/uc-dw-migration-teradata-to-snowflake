@@ -26,7 +26,11 @@
 <h2>BCBS 239 principle mapping</h2>
 <table><tr><th>Principle</th><th>What this pack evidences</th><th>Outcome</th></tr>
 {% for code, title, text in r.bcbs239 %}<tr><td><b>{{ code }}</b> {{ title }}</td><td>{{ text }}</td><td>
-{% if code in ("P3","P4","P7") %}<span class="{{ 'ok' if r.counts.FAIL == 0 and r.counts.ERROR == 0 else 'bad' }}">{{ "Evidenced" if r.counts.FAIL == 0 and r.counts.ERROR == 0 else "Exceptions raised" }}</span>
+{% if code in ("P3","P4","P7") %}{% set ns = namespace(bad=0) %}{% for o in r.objects %}
+{% if code == "P4" and (o.error or o.legacy_rows != o.target_rows or o.missing_in_target or o.extra_in_target) %}{% set ns.bad = ns.bad + 1 %}
+{% elif code == "P3" and o.kind == "TABLE" and o.status in ("FAIL","ERROR") %}{% set ns.bad = ns.bad + 1 %}
+{% elif code == "P7" and o.kind == "VIEW" and o.status in ("FAIL","ERROR") %}{% set ns.bad = ns.bad + 1 %}{% endif %}{% endfor %}
+<span class="{{ 'ok' if ns.bad == 0 else 'bad' }}">{{ "Evidenced" if ns.bad == 0 else ns.bad ~ " object(s) with exceptions" }}</span>
 {% elif code == "P2" %}{% set ns = namespace(bad=0) %}{% for v in r.lineage.values() %}{% for c in v %}{% if not c.match %}{% set ns.bad = ns.bad + 1 %}{% endif %}{% endfor %}{% endfor %}<span class="{{ 'ok' if ns.bad == 0 else 'warn' }}">{{ "Lineage parity" if ns.bad == 0 else ns.bad ~ " column(s) to review" }}</span>
 {% else %}<span class="ok">Evidenced</span>{% endif %}</td></tr>{% endfor %}
 </table>
