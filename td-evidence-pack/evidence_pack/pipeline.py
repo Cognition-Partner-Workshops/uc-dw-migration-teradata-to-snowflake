@@ -17,10 +17,10 @@ import sqlglot
 
 from . import __version__
 from .data import as_tuples, generate
-from .engines import EngineError, SnowflakeEmulator, TeradataEmulator
+from .engines import EngineError, QueryResult, SnowflakeEmulator, TeradataEmulator
 from .lineage import compare as compare_lineage
 from .lineage import view_lineage
-from .reconcile import ERROR, FAIL, PASS, WAIVED, ObjectReport, Waiver, reconcile
+from .reconcile import ERROR, FAIL, PASS, WAIVED, ObjectReport, Waiver, canonical, fingerprint, reconcile
 from .schema import compare_tables
 from .sources import SourceSet
 
@@ -46,6 +46,10 @@ def load_controls(path: Path | None) -> dict[str, Any]:
 
 def sha256(text: str | bytes) -> str:
     return hashlib.sha256(text.encode() if isinstance(text, str) else text).hexdigest()
+
+
+def _fp(res: QueryResult) -> str:
+    return fingerprint([[canonical(v) for v in row] for row in res.rows])
 
 
 def _ordered(files: dict[str, str]) -> list[tuple[str, str]]:
@@ -97,12 +101,19 @@ def run_candidate(
             continue
         try:
             lres = legacy.query(f"SELECT * FROM {name}")
+            lres_again = legacy.query(f"SELECT * FROM {name}")
             tres = target.query(f"SELECT * FROM {name}")
         except duckdb.Error as e:
             reports.append(ObjectReport(kind=kind, name=name, status=ERROR, error=f"query failed: {e}"))
             continue
         rep = reconcile(kind, name, lres, tres, key=controls.get("keys", {}).get(name),
                         waivers=waivers, controls=controls.get("critical_data_elements", {}).get(name))
+        if _fp(lres) != _fp(lres_again):
+            rep.nondeterministic = True
+            rep.status = FAIL
+            rep.findings.insert(0, "Legacy logic is non-deterministic: two identical runs returned different "
+                                   "results (window ordered by a non-unique key). Expected values cannot be "
+                                   "established until the business owner defines a deterministic ordering.")
         rep.assumptions = sorted(n for n in legacy.notes.get(name, ()) if "confirm" in n)
         if kind == "VIEW":
             try:
@@ -124,7 +135,8 @@ def run_candidate(
     inputs = {f"legacy/{k}": sha256(v) for k, v in legacy_src.files.items()}
     inputs |= {f"candidate/{k}": sha256(v) for k, v in candidate.files.items()}
     inputs |= {f"seed/{p.name}": sha256(p.read_bytes()) for p in sorted(seed_dir.glob("*.csv"))}
-    outputs = {r.name: {"legacy": r.legacy_fingerprint, "target": r.target_fingerprint} for r in reports}
+    outputs = {r.name: {"legacy": "non-deterministic", "target": "non-deterministic"} if r.nondeterministic
+               else {"legacy": r.legacy_fingerprint, "target": r.target_fingerprint} for r in reports}
 
     result: dict[str, Any] = {
         "candidate": {"name": candidate.name, "origin": candidate.origin},

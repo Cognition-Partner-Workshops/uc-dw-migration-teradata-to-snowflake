@@ -47,7 +47,8 @@ fails, so it can gate CI.
 - **Target side:** the converted Snowflake SQL is run *as written* via sqlglot on DuckDB (`SnowflakeEmulator`).
 - **Business date** is pinned (`--as-of`) on both sides so `CURRENT_DATE` logic is comparable.
 - Every emulation rewrite is disclosed in the pack. Where Teradata semantics are ambiguous
-  (e.g. `CSUM`/`MAVG` reset behaviour), the object is flagged for SME confirmation.
+  (e.g. `CSUM`/`MAVG` reset behaviour), the object is flagged for SME confirmation. Each legacy query runs
+  twice; if the results differ (e.g. a window ordered by a non-unique key) the object fails as non-deterministic.
 
 ## Limits (be explicit with stakeholders)
 

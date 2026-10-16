@@ -68,6 +68,7 @@ class ObjectReport:
     control_totals: list[dict[str, Any]] = field(default_factory=list)
     assumptions: list[str] = field(default_factory=list)
     error: str | None = None
+    nondeterministic: bool = False
     findings: list[str] = field(default_factory=list)
 
 
