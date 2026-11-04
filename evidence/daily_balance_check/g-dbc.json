@@ -1,0 +1,587 @@
+{
+  "as_of": "2026-01-31",
+  "commit": "b6d7fa030c7754ebbd53cd101077fd08d43642d6",
+  "deploy_errors": [],
+  "executed_at_utc": "2026-11-04T21:35:31.810382+00:00",
+  "label": "g-dbc",
+  "legacy_sha256": {
+    "actual": "688f0c5f891f1f4486b089e417be89bcb1f53237f1a16a12f570ed056c7d1128",
+    "expected": "688f0c5f891f1f4486b089e417be89bcb1f53237f1a16a12f570ed056c7d1128",
+    "match": true
+  },
+  "outputs": [
+    {
+      "L1": {
+        "actual": null,
+        "applicable": false,
+        "expected": null,
+        "match": false
+      },
+      "L2": {
+        "applicable": false,
+        "match": false,
+        "mismatching_columns": []
+      },
+      "L3": {
+        "applicable": false,
+        "match": false,
+        "match_percent": null,
+        "vacuous": false
+      },
+      "L4": [],
+      "expected_failure": {
+        "legacy_outcome": "failure_no_relational_result",
+        "match": true,
+        "message_token_matched": true,
+        "observed": {
+          "errno": 100038,
+          "sfqid": "01c831af-030c-d2f8-0035-065b0006fc96",
+          "sqlstate": "22018",
+          "type": "ProgrammingError"
+        },
+        "reason": "QUALIFY's window references ACCOUNT_KEY and TRANSACTION_TS outside the grouped relation; see DERIVATION.md. Exact Teradata error number and phase are not observed.",
+        "target_error": {
+          "errno": 100038,
+          "message_contains": "DBC_LEGACY_GROUPING_UNRESOLVED",
+          "sqlstate": "22018"
+        }
+      },
+      "key": [],
+      "name": "legacy_failure_contract",
+      "query_id": "01c831af-030c-d2f8-0035-065b0006fc96",
+      "questions": [
+        {
+          "decision_owner": "Banking reconciliation business owner (unassigned)",
+          "id": "Q-DBC-1",
+          "question": "Should DAILY_BALANCE_CHECK continue to reject execution as the supplied legacy macro does, or may it be repaired to select the latest transaction per account before aggregating? If repaired, what rule resolves equal TRANSACTION_TS with different balances, should negative filtering happen before or after latest-row selection, and how should the second, differently shaped alert result be exposed to the daily load caller (a separate function or an approved combined schema)?",
+          "status": "open"
+        }
+      ],
+      "status": "amber"
+    },
+    {
+      "L1": {
+        "actual": 2,
+        "expected": 2,
+        "match": true
+      },
+      "L2": {
+        "actual": {
+          "ELIGIBLE_ACCOUNTS": {
+            "count": 2,
+            "distinct": 2,
+            "max": "20",
+            "max_length": 2,
+            "min": "1",
+            "nulls": 0,
+            "sum": "21"
+          },
+          "ELIGIBLE_ROWS": {
+            "count": 2,
+            "distinct": 2,
+            "max": "67",
+            "max_length": 2,
+            "min": "1",
+            "nulls": 0,
+            "sum": "68"
+          },
+          "LATEST_CONFLICTING_BALANCE_ACCOUNTS": {
+            "count": 2,
+            "distinct": 2,
+            "max": "1",
+            "max_length": 1,
+            "min": "0",
+            "nulls": 0,
+            "sum": "1"
+          },
+          "LATEST_TIED_ACCOUNTS": {
+            "count": 2,
+            "distinct": 2,
+            "max": "1",
+            "max_length": 1,
+            "min": "0",
+            "nulls": 0,
+            "sum": "1"
+          },
+          "POPULATION": {
+            "count": 2,
+            "distinct": 2,
+            "max": "summary_candidates",
+            "max_length": 18,
+            "min": "alert_candidates",
+            "nulls": 0,
+            "sum": null
+          },
+          "ROWS_IN_TIES": {
+            "count": 2,
+            "distinct": 2,
+            "max": "2",
+            "max_length": 1,
+            "min": "0",
+            "nulls": 0,
+            "sum": "2"
+          },
+          "TIED_TIMESTAMP_GROUPS": {
+            "count": 2,
+            "distinct": 2,
+            "max": "1",
+            "max_length": 1,
+            "min": "0",
+            "nulls": 0,
+            "sum": "1"
+          }
+        },
+        "expected": {
+          "ELIGIBLE_ACCOUNTS": {
+            "count": 2,
+            "distinct": 2,
+            "max": "20",
+            "max_length": 2,
+            "min": "1",
+            "nulls": 0,
+            "sum": "21"
+          },
+          "ELIGIBLE_ROWS": {
+            "count": 2,
+            "distinct": 2,
+            "max": "67",
+            "max_length": 2,
+            "min": "1",
+            "nulls": 0,
+            "sum": "68"
+          },
+          "LATEST_CONFLICTING_BALANCE_ACCOUNTS": {
+            "count": 2,
+            "distinct": 2,
+            "max": "1",
+            "max_length": 1,
+            "min": "0",
+            "nulls": 0,
+            "sum": "1"
+          },
+          "LATEST_TIED_ACCOUNTS": {
+            "count": 2,
+            "distinct": 2,
+            "max": "1",
+            "max_length": 1,
+            "min": "0",
+            "nulls": 0,
+            "sum": "1"
+          },
+          "POPULATION": {
+            "count": 2,
+            "distinct": 2,
+            "max": "summary_candidates",
+            "max_length": 18,
+            "min": "alert_candidates",
+            "nulls": 0,
+            "sum": null
+          },
+          "ROWS_IN_TIES": {
+            "count": 2,
+            "distinct": 2,
+            "max": "2",
+            "max_length": 1,
+            "min": "0",
+            "nulls": 0,
+            "sum": "2"
+          },
+          "TIED_TIMESTAMP_GROUPS": {
+            "count": 2,
+            "distinct": 2,
+            "max": "1",
+            "max_length": 1,
+            "min": "0",
+            "nulls": 0,
+            "sum": "1"
+          }
+        },
+        "match": true,
+        "mismatching_columns": []
+      },
+      "L3": {
+        "actual_sha256": "55d8472d1c30fbfa1f98c52fa101cb1fdff2f4ef6ffa3fe10ded69668f54d659",
+        "expected_sha256": "55d8472d1c30fbfa1f98c52fa101cb1fdff2f4ef6ffa3fe10ded69668f54d659",
+        "keys": 2,
+        "match": true,
+        "match_percent": 100.0,
+        "matching": 2,
+        "vacuous": false
+      },
+      "L4": [],
+      "key": [
+        "POPULATION"
+      ],
+      "name": "timestamp_ties",
+      "query_id": "01c831af-030c-d212-0035-065b00069c86",
+      "questions": [],
+      "status": "green"
+    }
+  ],
+  "precheck": {
+    "documented_count_gate": {
+      "DIM_ACCOUNT": true,
+      "DIM_BRANCH": true,
+      "DIM_CUSTOMER": true,
+      "DIM_DATE": true,
+      "DIM_PRODUCT": true,
+      "FACT_MONTHLY_ACCOUNT_SNAPSHOT": true,
+      "FACT_TRANSACTION": true
+    },
+    "manifest_sha256": "d7cc94ca5d411df98423d7004f648228f511a88f27f79339f26b41188f87b19a",
+    "schema_contract_errors": [],
+    "status": "green",
+    "supplied_role_verified": true,
+    "tables": {
+      "DIM_ACCOUNT": {
+        "L1": {
+          "actual": 20,
+          "expected": 20,
+          "match": true
+        },
+        "L2": {
+          "match": true
+        },
+        "L3": {
+          "keys": 20,
+          "match_percent": 100.0,
+          "matching": 20,
+          "vacuous": false
+        },
+        "query_id": "01c831af-030c-d212-0035-065b00069c76",
+        "status": "green"
+      },
+      "DIM_BRANCH": {
+        "L1": {
+          "actual": 14,
+          "expected": 14,
+          "match": true
+        },
+        "L2": {
+          "match": true
+        },
+        "L3": {
+          "keys": 14,
+          "match_percent": 100.0,
+          "matching": 14,
+          "vacuous": false
+        },
+        "query_id": "01c831af-030c-d217-0035-065b0006cc4e",
+        "status": "green"
+      },
+      "DIM_CUSTOMER": {
+        "L1": {
+          "actual": 15,
+          "expected": 15,
+          "match": true
+        },
+        "L2": {
+          "match": true
+        },
+        "L3": {
+          "keys": 15,
+          "match_percent": 100.0,
+          "matching": 15,
+          "vacuous": false
+        },
+        "query_id": "01c831af-030c-d217-0035-065b0006cc4a",
+        "status": "green"
+      },
+      "DIM_DATE": {
+        "L1": {
+          "actual": 10958,
+          "expected": 10958,
+          "match": true
+        },
+        "L2": {
+          "match": true
+        },
+        "L3": {
+          "keys": 10958,
+          "match_percent": 100.0,
+          "matching": 10958,
+          "vacuous": false
+        },
+        "query_id": "01c831af-030c-d2f7-0035-065b0006bb0e",
+        "status": "green"
+      },
+      "DIM_EXCHANGE_RATES": {
+        "L1": {
+          "actual": 6,
+          "expected": 6,
+          "match": true
+        },
+        "L2": {
+          "match": true
+        },
+        "L3": {
+          "keys": 6,
+          "match_percent": 100.0,
+          "matching": 6,
+          "vacuous": false
+        },
+        "query_id": "01c831af-030c-d212-0035-065b00069c7e",
+        "status": "green"
+      },
+      "DIM_PRODUCT": {
+        "L1": {
+          "actual": 10,
+          "expected": 10,
+          "match": true
+        },
+        "L2": {
+          "match": true
+        },
+        "L3": {
+          "keys": 10,
+          "match_percent": 100.0,
+          "matching": 10,
+          "vacuous": false
+        },
+        "query_id": "01c831af-030c-d1ca-0035-065b00064bb2",
+        "status": "green"
+      },
+      "ETL_BATCH_CONTROL": {
+        "L1": {
+          "actual": 1,
+          "expected": 1,
+          "match": true
+        },
+        "L2": {
+          "match": true
+        },
+        "L3": {
+          "keys": 1,
+          "match_percent": 100.0,
+          "matching": 1,
+          "vacuous": false
+        },
+        "query_id": "01c831af-030c-d41e-0035-065b00075b9e",
+        "status": "green"
+      },
+      "ETL_LOG": {
+        "L1": {
+          "actual": 0,
+          "expected": 0,
+          "match": true
+        },
+        "L2": {
+          "match": true
+        },
+        "L3": {
+          "keys": 0,
+          "match_percent": 100.0,
+          "matching": 0,
+          "vacuous": true
+        },
+        "query_id": "01c831af-030c-d214-0035-065b00065b7e",
+        "status": "green"
+      },
+      "FACT_MONTHLY_ACCOUNT_SNAPSHOT": {
+        "L1": {
+          "actual": 1920,
+          "expected": 1920,
+          "match": true
+        },
+        "L2": {
+          "match": true
+        },
+        "L3": {
+          "keys": 1920,
+          "match_percent": 100.0,
+          "matching": 1920,
+          "vacuous": false
+        },
+        "query_id": "01c831af-030c-d41e-0035-065b00075b9a",
+        "status": "green"
+      },
+      "FACT_TRANSACTION": {
+        "L1": {
+          "actual": 50000,
+          "expected": 50000,
+          "match": true
+        },
+        "L2": {
+          "match": true
+        },
+        "L3": {
+          "keys": 50000,
+          "match_percent": 100.0,
+          "matching": 50000,
+          "vacuous": false
+        },
+        "query_id": "01c831af-030c-d2f8-0035-065b0006fc8a",
+        "status": "green"
+      },
+      "STG_CUSTOMER": {
+        "L1": {
+          "actual": 5,
+          "expected": 5,
+          "match": true
+        },
+        "L2": {
+          "match": true
+        },
+        "L3": {
+          "keys": 5,
+          "match_percent": 100.0,
+          "matching": 5,
+          "vacuous": false
+        },
+        "query_id": "01c831af-030c-d214-0035-065b00065b7a",
+        "status": "green"
+      },
+      "STG_TRANSACTIONS": {
+        "L1": {
+          "actual": 11,
+          "expected": 11,
+          "match": true
+        },
+        "L2": {
+          "match": true
+        },
+        "L3": {
+          "keys": 11,
+          "match_percent": 100.0,
+          "matching": 11,
+          "vacuous": false
+        },
+        "query_id": "01c831af-030c-d2f8-0035-065b0006fc92",
+        "status": "green"
+      },
+      "STG_TRANSACTION_ERRORS": {
+        "L1": {
+          "actual": 0,
+          "expected": 0,
+          "match": true
+        },
+        "L2": {
+          "match": true
+        },
+        "L3": {
+          "keys": 0,
+          "match_percent": 100.0,
+          "matching": 0,
+          "vacuous": true
+        },
+        "query_id": "01c831af-030c-d2f7-0035-065b0006bb16",
+        "status": "green"
+      }
+    },
+    "views": {
+      "VW_BRANCH_PERFORMANCE": {
+        "query_id": "01c831af-030c-d1ca-0035-065b00064bb6",
+        "rows": 250,
+        "semantic_parity": "read only, semantic parity not certified"
+      },
+      "VW_CUSTOMER_360": {
+        "query_id": "01c831af-030c-d214-0035-065b00065b82",
+        "rows": 15,
+        "semantic_parity": "read only, semantic parity not certified"
+      },
+      "VW_REGULATORY_LARGE_TRANSACTIONS": {
+        "query_id": "01c831af-030c-d20d-0035-065b00063c32",
+        "rows": 5478,
+        "semantic_parity": "read only, semantic parity not certified"
+      }
+    }
+  },
+  "reference": "DERIVED, NOT EXECUTED: expected legacy outcomes are derived; no Teradata instance exists.",
+  "reset_seed": false,
+  "spec": {
+    "deploy": [
+      "snowflake/dml/macros/macro_daily_balance_check.sql"
+    ],
+    "derivation": "parity/expected/daily_balance_check/DERIVATION.md",
+    "legacy_sha256": "688f0c5f891f1f4486b089e417be89bcb1f53237f1a16a12f570ed056c7d1128",
+    "legacy_source": "dml/macros/macro_daily_balance_check.sql",
+    "object": "daily_balance_check",
+    "outputs": [
+      {
+        "columns": [
+          {
+            "name": "CHECK_TYPE",
+            "type": "VARCHAR(30)"
+          },
+          {
+            "name": "ACCOUNT_TYPE",
+            "type": "VARCHAR(20)"
+          },
+          {
+            "name": "CURRENCY_CODE",
+            "type": "VARCHAR(3)"
+          },
+          {
+            "name": "ACCOUNT_COUNT",
+            "type": "BIGINT"
+          },
+          {
+            "name": "TOTAL_BALANCE",
+            "type": "DECIMAL(38,2)"
+          },
+          {
+            "name": "AVG_BALANCE",
+            "type": "DECIMAL(38,2)"
+          },
+          {
+            "name": "MIN_BALANCE",
+            "type": "DECIMAL(38,2)"
+          },
+          {
+            "name": "MAX_BALANCE",
+            "type": "DECIMAL(38,2)"
+          }
+        ],
+        "expected_failure": "parity/expected/daily_balance_check/failure.json",
+        "key": [],
+        "name": "legacy_failure_contract",
+        "sql": "snowflake/validation/daily_balance_check.sql"
+      },
+      {
+        "columns": [
+          {
+            "name": "POPULATION",
+            "plain": true,
+            "type": "VARCHAR(30)"
+          },
+          {
+            "name": "ELIGIBLE_ROWS",
+            "type": "BIGINT"
+          },
+          {
+            "name": "ELIGIBLE_ACCOUNTS",
+            "type": "BIGINT"
+          },
+          {
+            "name": "TIED_TIMESTAMP_GROUPS",
+            "type": "BIGINT"
+          },
+          {
+            "name": "ROWS_IN_TIES",
+            "type": "BIGINT"
+          },
+          {
+            "name": "LATEST_TIED_ACCOUNTS",
+            "type": "BIGINT"
+          },
+          {
+            "name": "LATEST_CONFLICTING_BALANCE_ACCOUNTS",
+            "type": "BIGINT"
+          }
+        ],
+        "expected": "parity/expected/daily_balance_check/timestamp_ties.csv",
+        "key": [
+          "POPULATION"
+        ],
+        "name": "timestamp_ties",
+        "sql": "snowflake/validation/daily_balance_check_timestamp_ties.sql"
+      }
+    ],
+    "questions": [],
+    "seed": "verify",
+    "title": "DAILY_BALANCE_CHECK: fail-closed legacy contract and independent timestamp-tie diagnostics (not repaired balance parity)",
+    "waivers": []
+  },
+  "spec_sha256": "d44012662d16edaf84361ac4e4183216eb4f425bea3d63223157379d6d7dca1f",
+  "status": "amber"
+}
