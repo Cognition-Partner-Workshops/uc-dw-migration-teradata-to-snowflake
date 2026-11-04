@@ -1,0 +1,31 @@
+name: Frozen seed contracts
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/frozen-seed.yml'
+      - 'data/seed/**'
+      - 'data/validation/expected_row_counts.csv'
+      - 'ddl/tables/**'
+      - 'snowflake/**'
+      - 'parity/expected/**'
+      - 'tests/**'
+      - 'pyproject.toml'
+
+permissions:
+  contents: read
+
+jobs:
+  contracts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: snowflake/requirements.txt
+      - run: python -m pip install -r snowflake/requirements.txt
+      - run: ruff check snowflake tests
+      - run: mypy snowflake
+      - run: pytest -q
