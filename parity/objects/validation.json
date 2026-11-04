@@ -1,0 +1,90 @@
+{
+  "object": "validation",
+  "title": "Repository validation queries (data/validation/checksum_queries.sql), ported to Snowflake",
+  "legacy_source": "data/validation/checksum_queries.sql",
+  "legacy_sha256": "f44a03f273961af59a944353a8d3aaa2df87779b90eb9e8f9631649330e4dad4",
+  "derivation": "parity/expected/validation/DERIVATION.md",
+  "seed": "verify",
+  "deploy": [],
+  "outputs": [
+    {
+      "name": "q1_row_counts",
+      "sql": "snowflake/validation/q1_row_counts.sql",
+      "expected": "parity/expected/validation/q1_row_counts.csv",
+      "key": ["TABLE_NAME"],
+      "columns": [
+        {"name": "TABLE_NAME", "type": "VARCHAR(30)", "plain": true},
+        {"name": "ROW_COUNT", "type": "BIGINT"}
+      ]
+    },
+    {
+      "name": "q2_dim_customer_checksum",
+      "sql": "snowflake/validation/q2_dim_customer_checksum.sql",
+      "expected": "parity/expected/validation/q2_dim_customer_checksum.csv",
+      "key": [],
+      "columns": [
+        {"name": "ROW_COUNT", "type": "BIGINT"},
+        {"name": "DISTINCT_CUSTOMERS", "type": "BIGINT"},
+        {"name": "HASH_SUM", "type": "DECIMAL(38,0)"},
+        {"name": "MIN_ONBOARD_DATE", "type": "DATE"},
+        {"name": "MAX_ONBOARD_DATE", "type": "DATE"},
+        {"name": "ACTIVE_COUNT", "type": "BIGINT"}
+      ]
+    },
+    {
+      "name": "q3_fact_transaction_aggregates",
+      "sql": "snowflake/validation/q3_fact_transaction_aggregates.sql",
+      "expected": "parity/expected/validation/q3_fact_transaction_aggregates.csv",
+      "key": ["TXN_YEAR", "TXN_MONTH"],
+      "columns": [
+        {"name": "TXN_YEAR", "type": "INTEGER"},
+        {"name": "TXN_MONTH", "type": "INTEGER"},
+        {"name": "TXN_COUNT", "type": "BIGINT"},
+        {"name": "TOTAL_AMOUNT", "type": "DECIMAL(18,2)"},
+        {"name": "TOTAL_BASE_AMOUNT", "type": "DECIMAL(18,2)"},
+        {"name": "DISTINCT_ACCOUNTS", "type": "BIGINT"},
+        {"name": "DISTINCT_CUSTOMERS", "type": "BIGINT"},
+        {"name": "DEBIT_COUNT", "type": "BIGINT"},
+        {"name": "CREDIT_COUNT", "type": "BIGINT"},
+        {"name": "INTL_COUNT", "type": "BIGINT"}
+      ]
+    },
+    {
+      "name": "q4_monthly_balance_reconciliation",
+      "sql": "snowflake/validation/q4_monthly_balance_reconciliation.sql",
+      "expected": "parity/expected/validation/q4_monthly_balance_reconciliation.csv",
+      "key": ["SNAPSHOT_MONTH_KEY"],
+      "columns": [
+        {"name": "SNAPSHOT_MONTH_KEY", "type": "INTEGER"},
+        {"name": "TOTAL_DEPOSITS", "type": "DECIMAL(18,2)"},
+        {"name": "TOTAL_DEBITS", "type": "DECIMAL(18,2)"},
+        {"name": "TOTAL_CREDITS", "type": "DECIMAL(18,2)"},
+        {"name": "TOTAL_INTEREST", "type": "DECIMAL(18,2)"},
+        {"name": "TOTAL_FEES", "type": "DECIMAL(18,2)"},
+        {"name": "ACCOUNT_COUNT", "type": "BIGINT"}
+      ]
+    },
+    {
+      "name": "q5_orphan_checks",
+      "sql": "snowflake/validation/q5_orphan_checks.sql",
+      "expected": "parity/expected/validation/q5_orphan_checks.csv",
+      "key": ["CHECK_NAME"],
+      "columns": [
+        {"name": "CHECK_NAME", "type": "VARCHAR(30)", "plain": true},
+        {"name": "ORPHAN_COUNT", "type": "BIGINT"}
+      ]
+    }
+  ],
+  "waivers": [
+    {
+      "id": "W1-hashrow",
+      "outputs": ["q2_dim_customer_checksum"],
+      "columns": ["HASH_SUM"],
+      "change": "SUM(HASHROW(CUSTOMER_ID, FIRST_NAME, LAST_NAME, CUSTOMER_SEGMENT)) replaced by the sum of the first 64 bits of SHA-256 over a canonical string, computed identically in the derived reference and the Snowflake port.",
+      "reason": "HASHROW is Teradata's AMP row-distribution hash (BYTE(4)); it has no Snowflake equivalent and its values cannot be reproduced on another engine. The replacement is case- and whitespace-preserving, so it is stricter than HASHROW on NOT CASESPECIFIC columns.",
+      "approver_role": "Migration lead (comparison-method change; no business value involved)",
+      "status": "documented"
+    }
+  ],
+  "questions": []
+}

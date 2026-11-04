@@ -1,0 +1,44 @@
+{
+  "object": "daily_balance_check",
+  "title": "DAILY_BALANCE_CHECK: fail-closed legacy contract and independent timestamp-tie diagnostics (not repaired balance parity)",
+  "legacy_source": "dml/macros/macro_daily_balance_check.sql",
+  "legacy_sha256": "688f0c5f891f1f4486b089e417be89bcb1f53237f1a16a12f570ed056c7d1128",
+  "derivation": "parity/expected/daily_balance_check/DERIVATION.md",
+  "seed": "verify",
+  "deploy": ["snowflake/dml/macros/macro_daily_balance_check.sql"],
+  "outputs": [
+    {
+      "name": "legacy_failure_contract",
+      "sql": "snowflake/validation/daily_balance_check.sql",
+      "expected_failure": "parity/expected/daily_balance_check/failure.json",
+      "key": [],
+      "columns": [
+        {"name": "CHECK_TYPE", "type": "VARCHAR(30)"},
+        {"name": "ACCOUNT_TYPE", "type": "VARCHAR(20)"},
+        {"name": "CURRENCY_CODE", "type": "VARCHAR(3)"},
+        {"name": "ACCOUNT_COUNT", "type": "BIGINT"},
+        {"name": "TOTAL_BALANCE", "type": "DECIMAL(38,2)"},
+        {"name": "AVG_BALANCE", "type": "DECIMAL(38,2)"},
+        {"name": "MIN_BALANCE", "type": "DECIMAL(38,2)"},
+        {"name": "MAX_BALANCE", "type": "DECIMAL(38,2)"}
+      ]
+    },
+    {
+      "name": "timestamp_ties",
+      "sql": "snowflake/validation/daily_balance_check_timestamp_ties.sql",
+      "expected": "parity/expected/daily_balance_check/timestamp_ties.csv",
+      "key": ["POPULATION"],
+      "columns": [
+        {"name": "POPULATION", "type": "VARCHAR(30)", "plain": true},
+        {"name": "ELIGIBLE_ROWS", "type": "BIGINT"},
+        {"name": "ELIGIBLE_ACCOUNTS", "type": "BIGINT"},
+        {"name": "TIED_TIMESTAMP_GROUPS", "type": "BIGINT"},
+        {"name": "ROWS_IN_TIES", "type": "BIGINT"},
+        {"name": "LATEST_TIED_ACCOUNTS", "type": "BIGINT"},
+        {"name": "LATEST_CONFLICTING_BALANCE_ACCOUNTS", "type": "BIGINT"}
+      ]
+    }
+  ],
+  "waivers": [],
+  "questions": []
+}
