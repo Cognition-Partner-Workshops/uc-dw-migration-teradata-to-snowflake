@@ -1,0 +1,15 @@
+{
+  "legacy_outcome": "failure_no_relational_result",
+  "reason": "QUALIFY's window references ACCOUNT_KEY and TRANSACTION_TS outside the grouped relation; see DERIVATION.md. Exact Teradata error number and phase are not observed.",
+  "target_error": {
+    "errno": 100038,
+    "sqlstate": "22018",
+    "message_contains": "DBC_LEGACY_GROUPING_UNRESOLVED"
+  },
+  "question": {
+    "id": "Q-DBC-1",
+    "question": "Should DAILY_BALANCE_CHECK continue to reject execution as the supplied legacy macro does, or may it be repaired to select the latest transaction per account before aggregating? If repaired, what rule resolves equal TRANSACTION_TS with different balances, should negative filtering happen before or after latest-row selection, and how should the second, differently shaped alert result be exposed to the daily load caller (a separate function or an approved combined schema)?",
+    "decision_owner": "Banking reconciliation business owner (unassigned)",
+    "status": "open"
+  }
+}
