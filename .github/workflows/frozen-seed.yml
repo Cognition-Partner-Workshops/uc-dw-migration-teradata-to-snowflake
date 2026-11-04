@@ -5,10 +5,12 @@ on:
     paths:
       - '.github/workflows/frozen-seed.yml'
       - 'data/seed/**'
+      - 'data/validation/**'
       - 'data/validation/expected_row_counts.csv'
       - 'ddl/tables/**'
       - 'snowflake/**'
       - 'parity/expected/**'
+      - 'parity/**'
       - 'tests/**'
       - 'pyproject.toml'
 
@@ -26,6 +28,6 @@ jobs:
           cache: pip
           cache-dependency-path: snowflake/requirements.txt
       - run: python -m pip install -r snowflake/requirements.txt
-      - run: ruff check snowflake tests
-      - run: mypy snowflake
+      - run: ruff check snowflake parity tests
+      - run: mypy snowflake parity
       - run: pytest -q
