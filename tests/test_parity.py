@@ -349,3 +349,165 @@ def test_as_of_rejects_non_frozen_date_before_connect(
     monkeypatch.setattr(runner.load_seed, "connect", lambda: pytest.fail("must not connect"))
     assert main(["smoke", "--as-of", "2026-02-01"]) == 1
     assert "Invalid --as-of" in capsys.readouterr().out
+
+
+def _failure_contract() -> dict[str, Any]:
+    return {
+        "legacy_outcome": "failure_no_relational_result",
+        "reason": "Documented invalid grouped window",
+        "target_error": {
+            "errno": 100038, "sqlstate": "22018", "message_contains": "EXPLICIT_LEGACY_FAILURE",
+        },
+        "question": {
+            "id": "Q1", "question": "May the legacy failure be repaired?",
+            "decision_owner": "Business owner", "status": "open",
+        },
+    }
+
+
+class _TargetFailure(Exception):
+    errno = 100038
+    sqlstate = "22018"
+    sfqid = "failed-query-123"
+
+
+@pytest.mark.parametrize("phase", ["execute", "fetch"])
+@pytest.mark.parametrize("change", [None, "errno", "sqlstate", "token", "success"])
+def test_failure_contract_requires_exact_error_and_never_certifies_rows(phase: str, change: str | None):
+    from parity.runner import _run_expected_failure
+
+    error = _TargetFailure("EXPLICIT_LEGACY_FAILURE raw private data must not be persisted")
+    if change == "errno":
+        error.errno = 2003
+    if change == "sqlstate":
+        error.sqlstate = "42000"
+    if change == "token":
+        error = _TargetFailure("Unrelated numeric conversion")
+
+    class Cursor:
+        sfqid = "failed-query-123"
+        closed = False
+
+        def execute(self, _: str) -> None:
+            if phase == "execute" and change != "success":
+                raise error
+
+        def fetchall(self) -> list:
+            if phase == "fetch" and change != "success":
+                raise error
+            return []
+
+        def close(self) -> None:
+            self.closed = True
+
+    cursor = Cursor()
+
+    class Connection:
+        def cursor(self) -> Cursor:
+            return cursor
+
+    result = _run_expected_failure(Connection(), "SELECT * FROM TABLE(F())", _failure_contract())
+    assert result["status"] == ("amber" if change is None else "red")
+    assert result["expected_failure"]["match"] == (change is None)
+    assert all(result[level]["applicable"] is False for level in ("L1", "L2", "L3"))
+    assert result["L3"]["match_percent"] is None
+    assert result["questions"][0]["status"] == "open"
+    assert "private data" not in json.dumps(result)
+    assert cursor.closed
+
+
+@pytest.mark.parametrize("change", ["both", "neither", "status", "token", "errno", "sqlstate", "unknown"])
+def test_spec_rejects_ambiguous_or_unconstrained_failure_contracts(tmp_path: Path, change: str):
+    spec = _fixture_spec(tmp_path)
+    output = spec["outputs"][0]
+    contract = _failure_contract()
+    output["expected_failure"] = "parity/expected/failure.json"
+    if change != "both":
+        del output["expected"]
+    if change == "neither":
+        del output["expected_failure"]
+    elif change == "status":
+        contract["question"]["status"] = "approved"
+    elif change in {"token", "errno", "sqlstate"}:
+        field = "message_contains" if change == "token" else change
+        contract["target_error"][field] = "" if change != "errno" else True
+    elif change == "unknown":
+        contract["ignore_any_error"] = True
+    (tmp_path / "parity/expected/failure.json").write_text(json.dumps(contract), encoding="utf-8")
+    with pytest.raises(ValueError):
+        validate_spec(spec, tmp_path)
+
+
+@pytest.mark.parametrize("defect", [None, "seed", "deploy", "session", "checksum", "other_output"])
+def test_matching_failure_stays_amber_and_cannot_mask_other_defects(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, defect: str | None
+):
+    from parity import runner
+
+    spec = _fixture_spec(tmp_path)
+    output = spec["outputs"][0]
+    del output["expected"]
+    output["expected_failure"] = "parity/expected/failure.json"
+    (tmp_path / output["expected_failure"]).write_text(json.dumps(_failure_contract()), encoding="utf-8")
+    if defect == "checksum":
+        spec["legacy_sha256"] = "0" * 64
+    if defect == "deploy":
+        spec["deploy"] = ["snowflake/out.sql"]
+    if defect == "other_output":
+        spec["outputs"].append({**output, "name": "other"})
+    (tmp_path / "parity/objects/fixture.json").write_text(json.dumps(spec), encoding="utf-8")
+
+    class Cursor:
+        sfqid = "failed-query-123"
+
+        def execute(self, sql: str) -> None:
+            if sql.startswith("SELECT"):
+                raise _TargetFailure("EXPLICIT_LEGACY_FAILURE")
+            if defect == "session":
+                raise RuntimeError("Session configuration failed")
+
+        def fetchall(self) -> list:
+            return []
+
+        def close(self) -> None:
+            pass
+
+        def __enter__(self) -> Cursor:
+            return self
+
+        def __exit__(self, *_: Any) -> None:
+            pass
+
+    class Connection:
+        def cursor(self) -> Cursor:
+            return Cursor()
+
+        def close(self) -> None:
+            pass
+
+    monkeypatch.setattr(runner, "_commit", lambda: "deadbeef")
+    monkeypatch.setattr(runner.load_seed, "verify_manifest", lambda: {"as_of_date": "2026-01-31"})
+    monkeypatch.setattr(runner.load_seed, "connect", lambda: Connection())
+    monkeypatch.setattr(runner.load_seed, "verify", lambda *_: ({"tables": {}, "views": {}}, defect != "seed"))
+
+    def deploy(*_: Any) -> None:
+        raise RuntimeError("Deployment failed")
+
+    monkeypatch.setattr(runner.load_seed, "execute_ddl", deploy)
+    original_run = runner._run_output
+
+    def run_output(connection: Any, selected: dict[str, Any], root: Path) -> dict[str, Any]:
+        if selected["name"] == "other":
+            raise RuntimeError("Unrelated output failure")
+        return original_run(connection, selected, root)
+
+    monkeypatch.setattr(runner, "_run_output", run_output)
+    report, code = runner.run_object("fixture", "2026-01-31", root=tmp_path)
+    assert report["outputs"][0]["status"] == "amber"
+    assert code == (2 if defect is None else 1)
+    assert report["status"] == ("amber" if defect is None else "red")
+    markdown = (tmp_path / "evidence/fixture/run.md").read_text(encoding="utf-8")
+    assert "**not applicable**" in markdown
+    assert "failure contract | N/A | N/A | N/A | N/A | AMBER" in markdown
+    assert "May the legacy failure be repaired?" in markdown
+    assert "not production-ready" in markdown

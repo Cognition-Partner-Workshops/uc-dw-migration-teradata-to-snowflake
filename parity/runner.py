@@ -15,7 +15,7 @@ from bank_model import AS_OF, ROOT
 import load_seed
 from parity import compare
 from parity.report import write_object_report, write_smoke_report
-from parity.spec import load_spec
+from parity.spec import load_expected_failure, load_spec
 
 _LABEL = re.compile(r"[a-zA-Z0-9_-]+")
 
@@ -48,6 +48,7 @@ def _error(error: Exception) -> dict[str, Any]:
     return {
         "type": type(error).__name__,
         "errno": getattr(error, "errno", None),
+        "sqlstate": getattr(error, "sqlstate", None),
         "sfqid": getattr(error, "sfqid", None),
     }
 
@@ -151,13 +152,54 @@ def _column_names(description: Any) -> list[str]:
     return names
 
 
+def _run_expected_failure(connection: Any, query: str, contract: dict[str, Any]) -> dict[str, Any]:
+    target = contract["target_error"]
+    observed = None
+    token_matched = False
+    cursor = connection.cursor()
+    try:
+        try:
+            cursor.execute(query)
+            cursor.fetchall()
+        except Exception as error:
+            observed = _error(error)
+            token_matched = target["message_contains"] in str(error)
+        matched = (
+            observed is not None
+            and observed["errno"] == target["errno"]
+            and observed["sqlstate"] == target["sqlstate"]
+            and token_matched
+        )
+        return {
+            "status": "amber" if matched else "red",
+            "query_id": _query_id(cursor),
+            "expected_failure": {
+                "legacy_outcome": contract["legacy_outcome"],
+                "reason": contract["reason"],
+                "target_error": target,
+                "observed": observed if observed is not None else "unexpected success",
+                "message_token_matched": token_matched,
+                "match": matched,
+            },
+            "L1": {"applicable": False, "expected": None, "actual": None, "match": False},
+            "L2": {"applicable": False, "match": False, "mismatching_columns": []},
+            "L3": {"applicable": False, "match_percent": None, "match": False, "vacuous": False},
+            "L4": [],
+            "questions": [contract["question"]],
+        }
+    finally:
+        cursor.close()
+
+
 def _run_output(connection: Any, output: dict[str, Any], root: Path) -> dict[str, Any]:
-    expected_rows = compare.read_expected(root / output["expected"], output["columns"])
     query = (
         (root / output["sql"]).read_text(encoding="utf-8")
         if "sql" in output
         else f"SELECT * FROM {output['table']}"
     )
+    if "expected_failure" in output:
+        return _run_expected_failure(connection, query, load_expected_failure(root / output["expected_failure"]))
+    expected_rows = compare.read_expected(root / output["expected"], output["columns"])
     cursor = connection.cursor()
     try:
         cursor.execute(query)
@@ -215,6 +257,7 @@ def run_object(
     spec, spec_path = load_spec(object_name, root)
     spec_digest = hashlib.sha256(spec_path.read_bytes()).hexdigest()
     report: dict[str, Any] = {
+        "reference": "DERIVED, NOT EXECUTED: expected legacy outcomes are derived; no Teradata instance exists.",
         "spec": spec,
         "spec_sha256": spec_digest,
         "label": label,

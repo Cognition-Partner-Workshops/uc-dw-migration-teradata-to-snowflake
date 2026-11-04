@@ -42,7 +42,9 @@ method changes but never exclude data from comparison.
 - **Green**: row counts, all L2 profiles, and all keyed L3 hashes match.
 - **Amber**: the normal comparison is red, but applying only an open question's
   `value_map` to expected values makes the residual comparison green. The report
-  records the question and residual result.
+  records the question and residual result. An explicitly derived legacy failure
+  can also be amber under the strict failure contract below; it never certifies
+  row parity.
 - **Red**: checksum, seed precheck, schema, comparison, execution, or evidence
   validation fails; or an open question does not fully explain the residual.
 
@@ -57,3 +59,37 @@ running the converted object. Record comparison-method changes as waivers and
 unresolved business semantics as questions.
 
 Exit codes: `0` green, `2` amber, `1` red or error.
+
+## Legacy objects with no valid relational result
+
+An output can specify `expected_failure` (a JSON path) **instead of** `expected`.
+The contract must document `legacy_outcome: "failure_no_relational_result"`, a
+`reason`, an open business `question` (`id`, `question`, `decision_owner`, `status`),
+and a `target_error` with an exact integer `errno`, five-character `sqlstate`, and
+explicit uppercase `message_contains` diagnostic token. All three must match the
+target query's exception. Raw exception messages are inspected in memory but
+never persisted. Unexpected success (including zero rows), a different error,
+seed/checksum/deploy failure, or any unrelated output mismatch is **red**.
+
+A matching failure is always **amber**, with L1-L4 **not applicable**: it is not
+an empty successful result and cannot earn a vacuous 100% hash match. This is a
+fail-closed compatibility gate, not permission to label broken conversions green.
+The `columns` remain a provisional target signature, not a certified result.
+Only use this mode after independently documenting why the legacy object fails;
+business approval and a new derived reference are needed before implementing a
+repair. Error numbers/phases need not coincide across engines and must not be
+represented as observed Teradata errors.
+
+### DAILY_BALANCE_CHECK
+
+```sh
+python -m parity run --object daily_balance_check --as-of 2026-01-31
+```
+
+The actual macro has two SELECTs, and the first is invalid after aggregation.
+The SQL UDTF compiles but deliberately rejects data-producing evaluation until
+Q-DBC-1 is answered; it is **not ready for daily load use**. Its typed summary
+signature is provisional. The separately compared timestamp-tie diagnostics are
+not balance output parity. See `expected/daily_balance_check/DERIVATION.md` for
+the documented semantics, source/seed hashes, counts and business question.
+No FORMAT-to-string conversion or downstream BTEQ repair is made.

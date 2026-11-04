@@ -25,7 +25,7 @@ TOP_KEYS = {
     "waivers",
     "questions",
 }
-OUTPUT_KEYS = {"name", "expected", "key", "columns", "sql", "table"}
+OUTPUT_KEYS = {"name", "expected", "expected_failure", "key", "columns", "sql", "table"}
 COLUMN_KEYS = {"name", "type", "plain"}
 WAIVER_KEYS = {"id", "outputs", "columns", "change", "reason", "approver_role", "status"}
 QUESTION_KEYS = {"id", "output", "column", "value_map", "question", "decision_owner", "status"}
@@ -52,6 +52,44 @@ def _path(value: Any, root: Path, context: str) -> Path:
     if not path.is_file():
         raise ValueError(f"{context}: file does not exist: {value}")
     return path
+
+
+def load_expected_failure(path: Path) -> dict[str, Any]:
+    contract = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(contract, dict):
+        raise ValueError("Expected failure must be an object")
+    keys = {"legacy_outcome", "reason", "target_error", "question"}
+    _unknown_keys(contract, keys, "Expected failure")
+    _required(contract, keys, "Expected failure")
+    if contract["legacy_outcome"] != "failure_no_relational_result":
+        raise ValueError("Expected failure must document failure_no_relational_result")
+    if not isinstance(contract["reason"], str) or not contract["reason"].strip():
+        raise ValueError("Expected failure requires a reason")
+    target = contract["target_error"]
+    if not isinstance(target, dict):
+        raise ValueError("Expected failure target_error must be an object")
+    keys = {"errno", "sqlstate", "message_contains"}
+    _unknown_keys(target, keys, "Expected failure target_error")
+    _required(target, keys, "Expected failure target_error")
+    if type(target["errno"]) is not int or target["errno"] <= 0:
+        raise ValueError("Expected failure errno must be a positive integer")
+    if not isinstance(target["sqlstate"], str) or not re.fullmatch(r"[0-9A-Z]{5}", target["sqlstate"]):
+        raise ValueError("Expected failure sqlstate must contain five uppercase letters/digits")
+    if not isinstance(target["message_contains"], str) or not re.fullmatch(
+        r"[A-Z][A-Z0-9_]{7,127}", target["message_contains"]
+    ):
+        raise ValueError("Expected failure message_contains must be an explicit uppercase diagnostic token")
+    question = contract["question"]
+    if not isinstance(question, dict):
+        raise ValueError("Expected failure question must be an object")
+    keys = {"id", "question", "decision_owner", "status"}
+    _unknown_keys(question, keys, "Expected failure question")
+    _required(question, keys, "Expected failure question")
+    if any(not isinstance(question[key], str) or not question[key].strip() for key in keys):
+        raise ValueError("Expected failure question fields must be non-empty strings")
+    if question["status"].casefold() not in {"open", "pending", "unresolved"}:
+        raise ValueError("Expected failure requires an open business question; it cannot certify green")
+    return contract
 
 
 def validate_spec(spec: Any, root: Path = ROOT) -> dict[str, Any]:
@@ -85,14 +123,19 @@ def validate_spec(spec: Any, root: Path = ROOT) -> dict[str, Any]:
         if not isinstance(output, dict):
             raise ValueError(f"{context}: must be an object")
         _unknown_keys(output, OUTPUT_KEYS, context)
-        _required(output, {"name", "expected", "key", "columns"}, context)
+        _required(output, {"name", "key", "columns"}, context)
         if not isinstance(output["name"], str) or not output["name"]:
             raise ValueError(f"{context}: name must be a non-empty string")
         if output["name"] in outputs:
             raise ValueError(f"{context}: duplicate output name {output['name']}")
         if ("sql" in output) == ("table" in output):
             raise ValueError(f"{context}: specify exactly one of sql or table")
-        _path(output["expected"], root, f"{context} expected")
+        if ("expected" in output) == ("expected_failure" in output):
+            raise ValueError(f"{context}: specify exactly one of expected or expected_failure")
+        if "expected_failure" in output:
+            load_expected_failure(_path(output["expected_failure"], root, f"{context} expected_failure"))
+        else:
+            _path(output["expected"], root, f"{context} expected")
         if "sql" in output:
             _path(output["sql"], root, f"{context} sql")
         if "table" in output and (

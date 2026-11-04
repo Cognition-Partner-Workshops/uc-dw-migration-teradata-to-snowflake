@@ -52,6 +52,11 @@ def write_object_report(root: Path, report: dict[str, Any]) -> None:
         l2 = output.get("L2", {})
         l3 = output.get("L3", {})
         key = ", ".join(output["key"]) if output.get("key") else "(single row)"
+        if output.get("expected_failure"):
+            lines.append(
+                f"| {output['name']} | failure contract | N/A | N/A | N/A | N/A | {output['status'].upper()} |"
+            )
+            continue
         l1_text = f"{l1.get('expected', '—')}/{l1.get('actual', '—')}"
         l2_text = "match" if l2.get("match") else "MISMATCH"
         l3_text = f"{l3.get('match_percent', '—')}%"
@@ -61,6 +66,26 @@ def write_object_report(root: Path, report: dict[str, Any]) -> None:
             f"| {output['name']} | {key} | {l1_text} | {l2_text} | "
             f"{l3_text} | {_l4_count(output)} | {output['status'].upper()} |"
         )
+    lines += ["", "## Expected execution failures", ""]
+    failures = [output for output in report["outputs"] if output.get("expected_failure")]
+    if failures:
+        lines += [
+            "L1-L4 are **not applicable** to a failed relational result, not zero rows or a 100% match.",
+            "A matching fail-closed target contract remains **AMBER / not production-ready** pending business approval.",
+            "The target error mechanism is not an observed Teradata error code or phase.",
+            "",
+        ]
+        for output in failures:
+            failure = output["expected_failure"]
+            lines += [
+                f"### {output['name']}", "",
+                failure["reason"], "",
+                f"Contract matched: {failure['match']}. Query ID: `{output['query_id']}`.",
+                f"Expected target error: `{json.dumps(failure['target_error'], sort_keys=True)}`.",
+                f"Observed (sanitized): `{json.dumps(failure['observed'], sort_keys=True)}`.", "",
+            ]
+    else:
+        lines.append("None.")
     lines += ["", "## Waivers", ""]
     if spec["waivers"]:
         lines += ["| ID | Change | Reason | Approver role |", "|---|---|---|---|"]
@@ -84,9 +109,13 @@ def write_object_report(root: Path, report: dict[str, Any]) -> None:
                 "",
                 question["question"],
                 "",
-                f"Decision owner: {question['decision_owner']}. Column: `{question['column']}`.",
-                f"Exact value_map: `{json.dumps(question['value_map'], ensure_ascii=False, sort_keys=True)}`",
+                f"Decision owner: {question['decision_owner']}.",
             ]
+            if "value_map" in question:
+                lines += [
+                    f"Column: `{question['column']}`.",
+                    f"Exact value_map: `{json.dumps(question['value_map'], ensure_ascii=False, sort_keys=True)}`",
+                ]
             residual = question.get("residual")
             if residual:
                 lines.append(
