@@ -2,6 +2,10 @@
 
 This repository contains a sample **Teradata-based data warehouse** designed as the starting point for a hands-on migration lab. The goal is to convert Teradata DDL/DML, stored procedures, and macros to Snowflake-compatible SQL, build a migration runbook, and implement validation tests.
 
+The [frozen Snowflake foundation](snowflake/README.md) includes target DDL, the 2026-01-31
+seed, an idempotent JWT PUT/COPY loader and committed landing evidence. Its Teradata
+reference is derived, not executed; no Teradata instance exists.
+
 ## Repository Structure
 
 ```

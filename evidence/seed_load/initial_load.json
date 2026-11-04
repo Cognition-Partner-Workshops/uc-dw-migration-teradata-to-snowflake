@@ -1,0 +1,5282 @@
+{
+  "as_of_date": "2026-01-31",
+  "copies": [
+    {
+      "copy_query_id": "01c83192-030c-d41e-0035-065b0007556e",
+      "put_query_id": "01c83192-030c-d2f8-0035-065b0006f60e",
+      "rows_loaded": 20,
+      "table": "DIM_ACCOUNT"
+    },
+    {
+      "copy_query_id": "01c83192-030c-d214-0035-065b00065586",
+      "put_query_id": "01c83192-030c-d214-0035-065b00065582",
+      "rows_loaded": 14,
+      "table": "DIM_BRANCH"
+    },
+    {
+      "copy_query_id": "01c83192-030c-d2f7-0035-065b0006b522",
+      "put_query_id": "01c83192-030c-d1ca-0035-065b00064592",
+      "rows_loaded": 15,
+      "table": "DIM_CUSTOMER"
+    },
+    {
+      "copy_query_id": "01c83192-030c-d216-0035-065b000685aa",
+      "put_query_id": "01c83192-030c-d216-0035-065b000685a6",
+      "rows_loaded": 10958,
+      "table": "DIM_DATE"
+    },
+    {
+      "copy_query_id": "01c83192-030c-d217-0035-065b0006c5b6",
+      "put_query_id": "01c83192-030c-d214-0035-065b0006558a",
+      "rows_loaded": 6,
+      "table": "DIM_EXCHANGE_RATES"
+    },
+    {
+      "copy_query_id": "01c83192-030c-d20d-0035-065b000635a6",
+      "put_query_id": "01c83192-030c-d212-0035-065b00069656",
+      "rows_loaded": 10,
+      "table": "DIM_PRODUCT"
+    },
+    {
+      "copy_query_id": "01c83192-030c-d217-0035-065b0006c5ba",
+      "put_query_id": "01c83192-030c-d216-0035-065b000685ae",
+      "rows_loaded": 1,
+      "table": "ETL_BATCH_CONTROL"
+    },
+    {
+      "copy_query_id": "01c83192-030c-d20d-0035-065b000635aa",
+      "put_query_id": "01c83192-030c-d41e-0035-065b00075572",
+      "rows_loaded": 0,
+      "table": "ETL_LOG"
+    },
+    {
+      "copy_query_id": "01c83192-030c-d41e-0035-065b00075576",
+      "put_query_id": "01c83192-030c-d216-0035-065b000685b2",
+      "rows_loaded": 1920,
+      "table": "FACT_MONTHLY_ACCOUNT_SNAPSHOT"
+    },
+    {
+      "copy_query_id": "01c83192-030c-d217-0035-065b0006c5be",
+      "put_query_id": "01c83192-030c-d2f7-0035-065b0006b526",
+      "rows_loaded": 50000,
+      "table": "FACT_TRANSACTION"
+    },
+    {
+      "copy_query_id": "01c83192-030c-d41e-0035-065b0007557a",
+      "put_query_id": "01c83192-030c-d20e-0035-065b0006d5fa",
+      "rows_loaded": 5,
+      "table": "STG_CUSTOMER"
+    },
+    {
+      "copy_query_id": "01c83192-030c-d216-0035-065b000685b6",
+      "put_query_id": "01c83192-030c-d217-0035-065b0006c5c2",
+      "rows_loaded": 11,
+      "table": "STG_TRANSACTIONS"
+    },
+    {
+      "copy_query_id": "01c83192-030c-d214-0035-065b0006558e",
+      "put_query_id": "01c83192-030c-d216-0035-065b000685ba",
+      "rows_loaded": 0,
+      "table": "STG_TRANSACTION_ERRORS"
+    }
+  ],
+  "documented_count_gate": {
+    "DIM_ACCOUNT": true,
+    "DIM_BRANCH": true,
+    "DIM_CUSTOMER": true,
+    "DIM_DATE": true,
+    "DIM_PRODUCT": true,
+    "FACT_MONTHLY_ACCOUNT_SNAPSHOT": true,
+    "FACT_TRANSACTION": true
+  },
+  "executed_at_utc": "2026-11-04T21:07:00.673174+00:00",
+  "manifest_sha256": "d7cc94ca5d411df98423d7004f648228f511a88f27f79339f26b41188f87b19a",
+  "reference": "DERIVED, NOT EXECUTED: no Teradata instance exists.",
+  "schema_columns": {
+    "DIM_ACCOUNT": [
+      {
+        "column": "ACCOUNT_KEY",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "NO",
+        "precision": 38,
+        "scale": 0,
+        "type": "NUMBER"
+      },
+      {
+        "column": "ACCOUNT_ID",
+        "datetime_precision": null,
+        "length": 20,
+        "nullable": "NO",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "CUSTOMER_ID",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "NO",
+        "precision": 38,
+        "scale": 0,
+        "type": "NUMBER"
+      },
+      {
+        "column": "ACCOUNT_TYPE",
+        "datetime_precision": null,
+        "length": 20,
+        "nullable": "NO",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "ACCOUNT_SUBTYPE",
+        "datetime_precision": null,
+        "length": 30,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "CURRENCY_CODE",
+        "datetime_precision": null,
+        "length": 3,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "OPENING_DATE",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "NO",
+        "precision": null,
+        "scale": null,
+        "type": "DATE"
+      },
+      {
+        "column": "CLOSING_DATE",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "DATE"
+      },
+      {
+        "column": "ACCOUNT_STATUS",
+        "datetime_precision": null,
+        "length": 15,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "INTEREST_RATE",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": 7,
+        "scale": 4,
+        "type": "NUMBER"
+      },
+      {
+        "column": "CREDIT_LIMIT",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": 15,
+        "scale": 2,
+        "type": "NUMBER"
+      },
+      {
+        "column": "OVERDRAFT_LIMIT",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": 15,
+        "scale": 2,
+        "type": "NUMBER"
+      },
+      {
+        "column": "BRANCH_ID",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": 38,
+        "scale": 0,
+        "type": "NUMBER"
+      },
+      {
+        "column": "RELATIONSHIP_MGR_ID",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": 38,
+        "scale": 0,
+        "type": "NUMBER"
+      },
+      {
+        "column": "PRODUCT_ID",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "NO",
+        "precision": 38,
+        "scale": 0,
+        "type": "NUMBER"
+      },
+      {
+        "column": "IS_JOINT_ACCOUNT",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": 38,
+        "scale": 0,
+        "type": "NUMBER"
+      },
+      {
+        "column": "TAX_REPORTING_FLAG",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": 38,
+        "scale": 0,
+        "type": "NUMBER"
+      },
+      {
+        "column": "EFFECTIVE_FROM",
+        "datetime_precision": 0,
+        "length": null,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TIMESTAMP_NTZ"
+      },
+      {
+        "column": "EFFECTIVE_TO",
+        "datetime_precision": 0,
+        "length": null,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TIMESTAMP_NTZ"
+      },
+      {
+        "column": "CURRENT_FLAG",
+        "datetime_precision": null,
+        "length": 1,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "ETL_BATCH_ID",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": 38,
+        "scale": 0,
+        "type": "NUMBER"
+      },
+      {
+        "column": "ETL_INSERT_TS",
+        "datetime_precision": 0,
+        "length": null,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TIMESTAMP_NTZ"
+      },
+      {
+        "column": "ETL_UPDATE_TS",
+        "datetime_precision": 0,
+        "length": null,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TIMESTAMP_NTZ"
+      }
+    ],
+    "DIM_BRANCH": [
+      {
+        "column": "BRANCH_ID",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "NO",
+        "precision": 38,
+        "scale": 0,
+        "type": "NUMBER"
+      },
+      {
+        "column": "BRANCH_CODE",
+        "datetime_precision": null,
+        "length": 6,
+        "nullable": "NO",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "BRANCH_NAME",
+        "datetime_precision": null,
+        "length": 100,
+        "nullable": "NO",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "BRANCH_TYPE",
+        "datetime_precision": null,
+        "length": 20,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "ADDRESS_LINE_1",
+        "datetime_precision": null,
+        "length": 100,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "CITY",
+        "datetime_precision": null,
+        "length": 50,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "COUNTY",
+        "datetime_precision": null,
+        "length": 50,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "REGION",
+        "datetime_precision": null,
+        "length": 50,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "POSTAL_CODE",
+        "datetime_precision": null,
+        "length": 10,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "COUNTRY_CODE",
+        "datetime_precision": null,
+        "length": 3,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "LATITUDE",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": 10,
+        "scale": 7,
+        "type": "NUMBER"
+      },
+      {
+        "column": "LONGITUDE",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": 10,
+        "scale": 7,
+        "type": "NUMBER"
+      },
+      {
+        "column": "MANAGER_ID",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": 38,
+        "scale": 0,
+        "type": "NUMBER"
+      },
+      {
+        "column": "OPENING_DATE",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "DATE"
+      },
+      {
+        "column": "CLOSING_DATE",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "DATE"
+      },
+      {
+        "column": "IS_ACTIVE",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": 38,
+        "scale": 0,
+        "type": "NUMBER"
+      },
+      {
+        "column": "EMPLOYEE_COUNT",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": 38,
+        "scale": 0,
+        "type": "NUMBER"
+      },
+      {
+        "column": "ETL_BATCH_ID",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": 38,
+        "scale": 0,
+        "type": "NUMBER"
+      },
+      {
+        "column": "ETL_INSERT_TS",
+        "datetime_precision": 0,
+        "length": null,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TIMESTAMP_NTZ"
+      }
+    ],
+    "DIM_CUSTOMER": [
+      {
+        "column": "CUSTOMER_ID",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "NO",
+        "precision": 38,
+        "scale": 0,
+        "type": "NUMBER"
+      },
+      {
+        "column": "CUSTOMER_KEY",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "NO",
+        "precision": 38,
+        "scale": 0,
+        "type": "NUMBER"
+      },
+      {
+        "column": "FIRST_NAME",
+        "datetime_precision": null,
+        "length": 50,
+        "nullable": "NO",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "LAST_NAME",
+        "datetime_precision": null,
+        "length": 50,
+        "nullable": "NO",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "DATE_OF_BIRTH",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "DATE"
+      },
+      {
+        "column": "GENDER",
+        "datetime_precision": null,
+        "length": 1,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "MARITAL_STATUS",
+        "datetime_precision": null,
+        "length": 1,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "EMAIL_ADDRESS",
+        "datetime_precision": null,
+        "length": 100,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "PHONE_NUMBER",
+        "datetime_precision": null,
+        "length": 20,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "ADDRESS_LINE_1",
+        "datetime_precision": null,
+        "length": 100,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "ADDRESS_LINE_2",
+        "datetime_precision": null,
+        "length": 100,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "CITY",
+        "datetime_precision": null,
+        "length": 50,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "STATE_PROVINCE",
+        "datetime_precision": null,
+        "length": 50,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "POSTAL_CODE",
+        "datetime_precision": null,
+        "length": 10,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "COUNTRY_CODE",
+        "datetime_precision": null,
+        "length": 3,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "CUSTOMER_SEGMENT",
+        "datetime_precision": null,
+        "length": 20,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "RISK_SCORE",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": 5,
+        "scale": 2,
+        "type": "NUMBER"
+      },
+      {
+        "column": "CREDIT_RATING",
+        "datetime_precision": null,
+        "length": 3,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "KYC_STATUS",
+        "datetime_precision": null,
+        "length": 15,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "ONBOARDING_DATE",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "NO",
+        "precision": null,
+        "scale": null,
+        "type": "DATE"
+      },
+      {
+        "column": "LAST_REVIEW_DATE",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "DATE"
+      },
+      {
+        "column": "IS_ACTIVE",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": 38,
+        "scale": 0,
+        "type": "NUMBER"
+      },
+      {
+        "column": "EFFECTIVE_FROM",
+        "datetime_precision": 0,
+        "length": null,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TIMESTAMP_NTZ"
+      },
+      {
+        "column": "EFFECTIVE_TO",
+        "datetime_precision": 0,
+        "length": null,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TIMESTAMP_NTZ"
+      },
+      {
+        "column": "CURRENT_FLAG",
+        "datetime_precision": null,
+        "length": 1,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "ETL_BATCH_ID",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": 38,
+        "scale": 0,
+        "type": "NUMBER"
+      },
+      {
+        "column": "ETL_INSERT_TS",
+        "datetime_precision": 0,
+        "length": null,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TIMESTAMP_NTZ"
+      },
+      {
+        "column": "ETL_UPDATE_TS",
+        "datetime_precision": 0,
+        "length": null,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TIMESTAMP_NTZ"
+      }
+    ],
+    "DIM_DATE": [
+      {
+        "column": "DATE_KEY",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "NO",
+        "precision": 38,
+        "scale": 0,
+        "type": "NUMBER"
+      },
+      {
+        "column": "CALENDAR_DATE",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "NO",
+        "precision": null,
+        "scale": null,
+        "type": "DATE"
+      },
+      {
+        "column": "DAY_OF_WEEK",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "NO",
+        "precision": 38,
+        "scale": 0,
+        "type": "NUMBER"
+      },
+      {
+        "column": "DAY_NAME",
+        "datetime_precision": null,
+        "length": 10,
+        "nullable": "NO",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "DAY_OF_MONTH",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "NO",
+        "precision": 38,
+        "scale": 0,
+        "type": "NUMBER"
+      },
+      {
+        "column": "DAY_OF_YEAR",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "NO",
+        "precision": 38,
+        "scale": 0,
+        "type": "NUMBER"
+      },
+      {
+        "column": "WEEK_OF_YEAR",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "NO",
+        "precision": 38,
+        "scale": 0,
+        "type": "NUMBER"
+      },
+      {
+        "column": "ISO_WEEK",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "NO",
+        "precision": 38,
+        "scale": 0,
+        "type": "NUMBER"
+      },
+      {
+        "column": "MONTH_NUM",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "NO",
+        "precision": 38,
+        "scale": 0,
+        "type": "NUMBER"
+      },
+      {
+        "column": "MONTH_NAME",
+        "datetime_precision": null,
+        "length": 15,
+        "nullable": "NO",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "MONTH_SHORT",
+        "datetime_precision": null,
+        "length": 3,
+        "nullable": "NO",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "QUARTER_NUM",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "NO",
+        "precision": 38,
+        "scale": 0,
+        "type": "NUMBER"
+      },
+      {
+        "column": "QUARTER_NAME",
+        "datetime_precision": null,
+        "length": 2,
+        "nullable": "NO",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "HALF_YEAR",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "NO",
+        "precision": 38,
+        "scale": 0,
+        "type": "NUMBER"
+      },
+      {
+        "column": "CALENDAR_YEAR",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "NO",
+        "precision": 38,
+        "scale": 0,
+        "type": "NUMBER"
+      },
+      {
+        "column": "FISCAL_YEAR",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "NO",
+        "precision": 38,
+        "scale": 0,
+        "type": "NUMBER"
+      },
+      {
+        "column": "FISCAL_QUARTER",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "NO",
+        "precision": 38,
+        "scale": 0,
+        "type": "NUMBER"
+      },
+      {
+        "column": "IS_WEEKEND",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "NO",
+        "precision": 38,
+        "scale": 0,
+        "type": "NUMBER"
+      },
+      {
+        "column": "IS_NORWEGIAN_HOLIDAY",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": 38,
+        "scale": 0,
+        "type": "NUMBER"
+      },
+      {
+        "column": "HOLIDAY_NAME",
+        "datetime_precision": null,
+        "length": 50,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "IS_BUSINESS_DAY",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "NO",
+        "precision": 38,
+        "scale": 0,
+        "type": "NUMBER"
+      },
+      {
+        "column": "IS_MONTH_END",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "NO",
+        "precision": 38,
+        "scale": 0,
+        "type": "NUMBER"
+      },
+      {
+        "column": "IS_QUARTER_END",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "NO",
+        "precision": 38,
+        "scale": 0,
+        "type": "NUMBER"
+      },
+      {
+        "column": "IS_YEAR_END",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "NO",
+        "precision": 38,
+        "scale": 0,
+        "type": "NUMBER"
+      },
+      {
+        "column": "PRIOR_DAY_DATE",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "DATE"
+      },
+      {
+        "column": "NEXT_DAY_DATE",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "DATE"
+      },
+      {
+        "column": "SAME_DAY_PREV_YEAR",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "DATE"
+      }
+    ],
+    "DIM_EXCHANGE_RATES": [
+      {
+        "column": "FROM_CURRENCY",
+        "datetime_precision": null,
+        "length": 3,
+        "nullable": "NO",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "TO_CURRENCY",
+        "datetime_precision": null,
+        "length": 3,
+        "nullable": "NO",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "RATE_DATE",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "NO",
+        "precision": null,
+        "scale": null,
+        "type": "DATE"
+      },
+      {
+        "column": "EXCHANGE_RATE",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": 12,
+        "scale": 6,
+        "type": "NUMBER"
+      }
+    ],
+    "DIM_PRODUCT": [
+      {
+        "column": "PRODUCT_ID",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "NO",
+        "precision": 38,
+        "scale": 0,
+        "type": "NUMBER"
+      },
+      {
+        "column": "PRODUCT_CODE",
+        "datetime_precision": null,
+        "length": 20,
+        "nullable": "NO",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "PRODUCT_NAME",
+        "datetime_precision": null,
+        "length": 100,
+        "nullable": "NO",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "PRODUCT_CATEGORY",
+        "datetime_precision": null,
+        "length": 30,
+        "nullable": "NO",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "PRODUCT_SUBCATEGORY",
+        "datetime_precision": null,
+        "length": 50,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "BASE_INTEREST_RATE",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": 7,
+        "scale": 4,
+        "type": "NUMBER"
+      },
+      {
+        "column": "MIN_BALANCE",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": 15,
+        "scale": 2,
+        "type": "NUMBER"
+      },
+      {
+        "column": "MAX_BALANCE",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": 15,
+        "scale": 2,
+        "type": "NUMBER"
+      },
+      {
+        "column": "FEE_STRUCTURE",
+        "datetime_precision": null,
+        "length": 20,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "MONTHLY_FEE",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": 10,
+        "scale": 2,
+        "type": "NUMBER"
+      },
+      {
+        "column": "IS_REGULATED",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": 38,
+        "scale": 0,
+        "type": "NUMBER"
+      },
+      {
+        "column": "REGULATORY_CODE",
+        "datetime_precision": null,
+        "length": 20,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "LAUNCH_DATE",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "DATE"
+      },
+      {
+        "column": "DISCONTINUE_DATE",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "DATE"
+      },
+      {
+        "column": "IS_ACTIVE",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": 38,
+        "scale": 0,
+        "type": "NUMBER"
+      },
+      {
+        "column": "ETL_BATCH_ID",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": 38,
+        "scale": 0,
+        "type": "NUMBER"
+      },
+      {
+        "column": "ETL_INSERT_TS",
+        "datetime_precision": 0,
+        "length": null,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TIMESTAMP_NTZ"
+      }
+    ],
+    "ETL_BATCH_CONTROL": [
+      {
+        "column": "BATCH_ID",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "NO",
+        "precision": 38,
+        "scale": 0,
+        "type": "NUMBER"
+      },
+      {
+        "column": "BATCH_DATE",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "DATE"
+      },
+      {
+        "column": "BATCH_STATUS",
+        "datetime_precision": null,
+        "length": 20,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "START_TS",
+        "datetime_precision": 0,
+        "length": null,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TIMESTAMP_NTZ"
+      },
+      {
+        "column": "END_TS",
+        "datetime_precision": 0,
+        "length": null,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TIMESTAMP_NTZ"
+      }
+    ],
+    "ETL_LOG": [
+      {
+        "column": "PROCEDURE_NAME",
+        "datetime_precision": null,
+        "length": 128,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "BATCH_ID",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": 38,
+        "scale": 0,
+        "type": "NUMBER"
+      },
+      {
+        "column": "LOG_LEVEL",
+        "datetime_precision": null,
+        "length": 10,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "LOG_MESSAGE",
+        "datetime_precision": null,
+        "length": 2000,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "LOG_TS",
+        "datetime_precision": 0,
+        "length": null,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TIMESTAMP_NTZ"
+      }
+    ],
+    "FACT_MONTHLY_ACCOUNT_SNAPSHOT": [
+      {
+        "column": "SNAPSHOT_DATE",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "NO",
+        "precision": null,
+        "scale": null,
+        "type": "DATE"
+      },
+      {
+        "column": "SNAPSHOT_MONTH_KEY",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "NO",
+        "precision": 38,
+        "scale": 0,
+        "type": "NUMBER"
+      },
+      {
+        "column": "ACCOUNT_KEY",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "NO",
+        "precision": 38,
+        "scale": 0,
+        "type": "NUMBER"
+      },
+      {
+        "column": "CUSTOMER_KEY",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "NO",
+        "precision": 38,
+        "scale": 0,
+        "type": "NUMBER"
+      },
+      {
+        "column": "PRODUCT_ID",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "NO",
+        "precision": 38,
+        "scale": 0,
+        "type": "NUMBER"
+      },
+      {
+        "column": "BRANCH_ID",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": 38,
+        "scale": 0,
+        "type": "NUMBER"
+      },
+      {
+        "column": "OPENING_BALANCE",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "NO",
+        "precision": 15,
+        "scale": 2,
+        "type": "NUMBER"
+      },
+      {
+        "column": "CLOSING_BALANCE",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "NO",
+        "precision": 15,
+        "scale": 2,
+        "type": "NUMBER"
+      },
+      {
+        "column": "AVERAGE_BALANCE",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": 15,
+        "scale": 2,
+        "type": "NUMBER"
+      },
+      {
+        "column": "MINIMUM_BALANCE",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": 15,
+        "scale": 2,
+        "type": "NUMBER"
+      },
+      {
+        "column": "MAXIMUM_BALANCE",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": 15,
+        "scale": 2,
+        "type": "NUMBER"
+      },
+      {
+        "column": "TOTAL_DEBITS",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": 15,
+        "scale": 2,
+        "type": "NUMBER"
+      },
+      {
+        "column": "TOTAL_CREDITS",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": 15,
+        "scale": 2,
+        "type": "NUMBER"
+      },
+      {
+        "column": "DEBIT_COUNT",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": 38,
+        "scale": 0,
+        "type": "NUMBER"
+      },
+      {
+        "column": "CREDIT_COUNT",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": 38,
+        "scale": 0,
+        "type": "NUMBER"
+      },
+      {
+        "column": "INTEREST_EARNED",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": 12,
+        "scale": 2,
+        "type": "NUMBER"
+      },
+      {
+        "column": "INTEREST_CHARGED",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": 12,
+        "scale": 2,
+        "type": "NUMBER"
+      },
+      {
+        "column": "FEES_CHARGED",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": 12,
+        "scale": 2,
+        "type": "NUMBER"
+      },
+      {
+        "column": "DAYS_IN_OVERDRAFT",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": 38,
+        "scale": 0,
+        "type": "NUMBER"
+      },
+      {
+        "column": "DAYS_DORMANT",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": 38,
+        "scale": 0,
+        "type": "NUMBER"
+      },
+      {
+        "column": "CURRENCY_CODE",
+        "datetime_precision": null,
+        "length": 3,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "BASE_CURRENCY_CLOSING",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": 15,
+        "scale": 2,
+        "type": "NUMBER"
+      },
+      {
+        "column": "ETL_BATCH_ID",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": 38,
+        "scale": 0,
+        "type": "NUMBER"
+      },
+      {
+        "column": "ETL_INSERT_TS",
+        "datetime_precision": 0,
+        "length": null,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TIMESTAMP_NTZ"
+      }
+    ],
+    "FACT_TRANSACTION": [
+      {
+        "column": "TRANSACTION_ID",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "NO",
+        "precision": 38,
+        "scale": 0,
+        "type": "NUMBER"
+      },
+      {
+        "column": "TRANSACTION_DATE",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "NO",
+        "precision": null,
+        "scale": null,
+        "type": "DATE"
+      },
+      {
+        "column": "TRANSACTION_TIME",
+        "datetime_precision": 0,
+        "length": null,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TIME"
+      },
+      {
+        "column": "TRANSACTION_TS",
+        "datetime_precision": 6,
+        "length": null,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TIMESTAMP_NTZ"
+      },
+      {
+        "column": "ACCOUNT_KEY",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "NO",
+        "precision": 38,
+        "scale": 0,
+        "type": "NUMBER"
+      },
+      {
+        "column": "CUSTOMER_KEY",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "NO",
+        "precision": 38,
+        "scale": 0,
+        "type": "NUMBER"
+      },
+      {
+        "column": "PRODUCT_ID",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "NO",
+        "precision": 38,
+        "scale": 0,
+        "type": "NUMBER"
+      },
+      {
+        "column": "BRANCH_ID",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": 38,
+        "scale": 0,
+        "type": "NUMBER"
+      },
+      {
+        "column": "DATE_KEY",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "NO",
+        "precision": 38,
+        "scale": 0,
+        "type": "NUMBER"
+      },
+      {
+        "column": "TRANSACTION_TYPE",
+        "datetime_precision": null,
+        "length": 20,
+        "nullable": "NO",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "TRANSACTION_SUBTYPE",
+        "datetime_precision": null,
+        "length": 30,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "CHANNEL",
+        "datetime_precision": null,
+        "length": 20,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "TRANSACTION_AMOUNT",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "NO",
+        "precision": 15,
+        "scale": 2,
+        "type": "NUMBER"
+      },
+      {
+        "column": "TRANSACTION_CURRENCY",
+        "datetime_precision": null,
+        "length": 3,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "BASE_CURRENCY_AMOUNT",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": 15,
+        "scale": 2,
+        "type": "NUMBER"
+      },
+      {
+        "column": "EXCHANGE_RATE",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": 12,
+        "scale": 6,
+        "type": "NUMBER"
+      },
+      {
+        "column": "RUNNING_BALANCE",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": 15,
+        "scale": 2,
+        "type": "NUMBER"
+      },
+      {
+        "column": "MERCHANT_ID",
+        "datetime_precision": null,
+        "length": 20,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "MERCHANT_NAME",
+        "datetime_precision": null,
+        "length": 100,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "MERCHANT_CATEGORY",
+        "datetime_precision": null,
+        "length": 4,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "COUNTERPARTY_ACCT",
+        "datetime_precision": null,
+        "length": 20,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "REFERENCE_NUMBER",
+        "datetime_precision": null,
+        "length": 30,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "DESCRIPTION_TEXT",
+        "datetime_precision": null,
+        "length": 200,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "IS_INTERNATIONAL",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": 38,
+        "scale": 0,
+        "type": "NUMBER"
+      },
+      {
+        "column": "IS_FLAGGED",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": 38,
+        "scale": 0,
+        "type": "NUMBER"
+      },
+      {
+        "column": "FLAG_REASON",
+        "datetime_precision": null,
+        "length": 50,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "POSTING_DATE",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "DATE"
+      },
+      {
+        "column": "VALUE_DATE",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "DATE"
+      },
+      {
+        "column": "ETL_BATCH_ID",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": 38,
+        "scale": 0,
+        "type": "NUMBER"
+      },
+      {
+        "column": "ETL_INSERT_TS",
+        "datetime_precision": 0,
+        "length": null,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TIMESTAMP_NTZ"
+      }
+    ],
+    "STG_CUSTOMER": [
+      {
+        "column": "CUSTOMER_ID",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "NO",
+        "precision": 38,
+        "scale": 0,
+        "type": "NUMBER"
+      },
+      {
+        "column": "FIRST_NAME",
+        "datetime_precision": null,
+        "length": 50,
+        "nullable": "NO",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "LAST_NAME",
+        "datetime_precision": null,
+        "length": 50,
+        "nullable": "NO",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "DATE_OF_BIRTH",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "DATE"
+      },
+      {
+        "column": "GENDER",
+        "datetime_precision": null,
+        "length": 1,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "MARITAL_STATUS",
+        "datetime_precision": null,
+        "length": 1,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "EMAIL_ADDRESS",
+        "datetime_precision": null,
+        "length": 100,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "PHONE_NUMBER",
+        "datetime_precision": null,
+        "length": 20,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "ADDRESS_LINE_1",
+        "datetime_precision": null,
+        "length": 100,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "ADDRESS_LINE_2",
+        "datetime_precision": null,
+        "length": 100,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "CITY",
+        "datetime_precision": null,
+        "length": 50,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "STATE_PROVINCE",
+        "datetime_precision": null,
+        "length": 50,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "POSTAL_CODE",
+        "datetime_precision": null,
+        "length": 10,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "COUNTRY_CODE",
+        "datetime_precision": null,
+        "length": 3,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "CUSTOMER_SEGMENT",
+        "datetime_precision": null,
+        "length": 20,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "RISK_SCORE",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": 5,
+        "scale": 2,
+        "type": "NUMBER"
+      },
+      {
+        "column": "CREDIT_RATING",
+        "datetime_precision": null,
+        "length": 3,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "KYC_STATUS",
+        "datetime_precision": null,
+        "length": 15,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      }
+    ],
+    "STG_TRANSACTIONS": [
+      {
+        "column": "TRANSACTION_ID",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "NO",
+        "precision": 38,
+        "scale": 0,
+        "type": "NUMBER"
+      },
+      {
+        "column": "ACCOUNT_ID",
+        "datetime_precision": null,
+        "length": 20,
+        "nullable": "NO",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "TRANSACTION_DATE",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "NO",
+        "precision": null,
+        "scale": null,
+        "type": "DATE"
+      },
+      {
+        "column": "TRANSACTION_TIME",
+        "datetime_precision": 0,
+        "length": null,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TIME"
+      },
+      {
+        "column": "TRANSACTION_TYPE",
+        "datetime_precision": null,
+        "length": 20,
+        "nullable": "NO",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "TRANSACTION_SUBTYPE",
+        "datetime_precision": null,
+        "length": 30,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "CHANNEL",
+        "datetime_precision": null,
+        "length": 20,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "TRANSACTION_AMOUNT",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "NO",
+        "precision": 15,
+        "scale": 2,
+        "type": "NUMBER"
+      },
+      {
+        "column": "CURRENCY_CODE",
+        "datetime_precision": null,
+        "length": 3,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "MERCHANT_ID",
+        "datetime_precision": null,
+        "length": 20,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "MERCHANT_NAME",
+        "datetime_precision": null,
+        "length": 100,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "MERCHANT_CATEGORY",
+        "datetime_precision": null,
+        "length": 4,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "COUNTERPARTY_ACCT",
+        "datetime_precision": null,
+        "length": 20,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "REFERENCE_NUMBER",
+        "datetime_precision": null,
+        "length": 30,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "DESCRIPTION_TEXT",
+        "datetime_precision": null,
+        "length": 200,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "POSTING_DATE",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "DATE"
+      },
+      {
+        "column": "VALUE_DATE",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "DATE"
+      },
+      {
+        "column": "LOAD_DATE",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "NO",
+        "precision": null,
+        "scale": null,
+        "type": "DATE"
+      }
+    ],
+    "STG_TRANSACTION_ERRORS": [
+      {
+        "column": "TRANSACTION_ID",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "NO",
+        "precision": 38,
+        "scale": 0,
+        "type": "NUMBER"
+      },
+      {
+        "column": "ACCOUNT_ID",
+        "datetime_precision": null,
+        "length": 20,
+        "nullable": "NO",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "TRANSACTION_DATE",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "NO",
+        "precision": null,
+        "scale": null,
+        "type": "DATE"
+      },
+      {
+        "column": "TRANSACTION_TIME",
+        "datetime_precision": 0,
+        "length": null,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TIME"
+      },
+      {
+        "column": "TRANSACTION_TYPE",
+        "datetime_precision": null,
+        "length": 20,
+        "nullable": "NO",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "TRANSACTION_SUBTYPE",
+        "datetime_precision": null,
+        "length": 30,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "CHANNEL",
+        "datetime_precision": null,
+        "length": 20,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "TRANSACTION_AMOUNT",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "NO",
+        "precision": 15,
+        "scale": 2,
+        "type": "NUMBER"
+      },
+      {
+        "column": "CURRENCY_CODE",
+        "datetime_precision": null,
+        "length": 3,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "MERCHANT_ID",
+        "datetime_precision": null,
+        "length": 20,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "MERCHANT_NAME",
+        "datetime_precision": null,
+        "length": 100,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "MERCHANT_CATEGORY",
+        "datetime_precision": null,
+        "length": 4,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "COUNTERPARTY_ACCT",
+        "datetime_precision": null,
+        "length": 20,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "REFERENCE_NUMBER",
+        "datetime_precision": null,
+        "length": 30,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "DESCRIPTION_TEXT",
+        "datetime_precision": null,
+        "length": 200,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "POSTING_DATE",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "DATE"
+      },
+      {
+        "column": "VALUE_DATE",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "DATE"
+      },
+      {
+        "column": "LOAD_DATE",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "NO",
+        "precision": null,
+        "scale": null,
+        "type": "DATE"
+      },
+      {
+        "column": "ERROR_REASON",
+        "datetime_precision": null,
+        "length": 50,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "BATCH_ID",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": 38,
+        "scale": 0,
+        "type": "NUMBER"
+      }
+    ],
+    "VW_BRANCH_PERFORMANCE": [
+      {
+        "column": "BRANCH_ID",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "NO",
+        "precision": 38,
+        "scale": 0,
+        "type": "NUMBER"
+      },
+      {
+        "column": "BRANCH_NAME",
+        "datetime_precision": null,
+        "length": 100,
+        "nullable": "NO",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "BRANCH_TYPE",
+        "datetime_precision": null,
+        "length": 20,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "REGION",
+        "datetime_precision": null,
+        "length": 50,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "CITY",
+        "datetime_precision": null,
+        "length": 50,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "SNAPSHOT_MONTH_KEY",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "NO",
+        "precision": 38,
+        "scale": 0,
+        "type": "NUMBER"
+      },
+      {
+        "column": "MONTH_LABEL",
+        "datetime_precision": null,
+        "length": 16777216,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "ACCOUNTS_SERVICED",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": 18,
+        "scale": 0,
+        "type": "NUMBER"
+      },
+      {
+        "column": "CUSTOMERS_SERVICED",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": 18,
+        "scale": 0,
+        "type": "NUMBER"
+      },
+      {
+        "column": "TOTAL_DEPOSITS",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": 27,
+        "scale": 2,
+        "type": "NUMBER"
+      },
+      {
+        "column": "TOTAL_VOLUME",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": 28,
+        "scale": 2,
+        "type": "NUMBER"
+      },
+      {
+        "column": "TOTAL_FEES_EARNED",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": 24,
+        "scale": 2,
+        "type": "NUMBER"
+      },
+      {
+        "column": "TOTAL_INTEREST_INCOME",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": 24,
+        "scale": 2,
+        "type": "NUMBER"
+      },
+      {
+        "column": "AVG_ACCOUNT_BALANCE",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": 33,
+        "scale": 8,
+        "type": "NUMBER"
+      },
+      {
+        "column": "CUMULATIVE_FEES_YTD",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": 36,
+        "scale": 2,
+        "type": "NUMBER"
+      },
+      {
+        "column": "MOVING_AVG_VOLUME_3M",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": 38,
+        "scale": 5,
+        "type": "NUMBER"
+      },
+      {
+        "column": "REGION_DEPOSIT_RANK",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": 18,
+        "scale": 0,
+        "type": "NUMBER"
+      },
+      {
+        "column": "PCT_OF_REGION_DEPOSITS",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": 38,
+        "scale": 8,
+        "type": "NUMBER"
+      }
+    ],
+    "VW_CUSTOMER_360": [
+      {
+        "column": "CUSTOMER_ID",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "NO",
+        "precision": 38,
+        "scale": 0,
+        "type": "NUMBER"
+      },
+      {
+        "column": "FULL_NAME",
+        "datetime_precision": null,
+        "length": 101,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "CUSTOMER_SEGMENT",
+        "datetime_precision": null,
+        "length": 20,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "RISK_SCORE",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": 5,
+        "scale": 2,
+        "type": "NUMBER"
+      },
+      {
+        "column": "CREDIT_RATING",
+        "datetime_precision": null,
+        "length": 3,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "KYC_STATUS",
+        "datetime_precision": null,
+        "length": 15,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "ONBOARDING_DATE",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "NO",
+        "precision": null,
+        "scale": null,
+        "type": "DATE"
+      },
+      {
+        "column": "TENURE_YEARS",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": 5,
+        "scale": 1,
+        "type": "NUMBER"
+      },
+      {
+        "column": "TOTAL_ACCOUNTS",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": 18,
+        "scale": 0,
+        "type": "NUMBER"
+      },
+      {
+        "column": "ACTIVE_ACCOUNTS",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": 13,
+        "scale": 0,
+        "type": "NUMBER"
+      },
+      {
+        "column": "TOTAL_BALANCE",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": 27,
+        "scale": 2,
+        "type": "NUMBER"
+      },
+      {
+        "column": "TXN_COUNT_LAST_90_DAYS",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": 18,
+        "scale": 0,
+        "type": "NUMBER"
+      },
+      {
+        "column": "TXN_AMOUNT_LAST_90_DAYS",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": 27,
+        "scale": 2,
+        "type": "NUMBER"
+      },
+      {
+        "column": "LAST_TXN_DATE",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "DATE"
+      },
+      {
+        "column": "PRIMARY_CHANNEL",
+        "datetime_precision": null,
+        "length": 20,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "CITY",
+        "datetime_precision": null,
+        "length": 50,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "COUNTRY_CODE",
+        "datetime_precision": null,
+        "length": 3,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      }
+    ],
+    "VW_REGULATORY_LARGE_TRANSACTIONS": [
+      {
+        "column": "TRANSACTION_ID",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "NO",
+        "precision": 38,
+        "scale": 0,
+        "type": "NUMBER"
+      },
+      {
+        "column": "TRANSACTION_DATE",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "NO",
+        "precision": null,
+        "scale": null,
+        "type": "DATE"
+      },
+      {
+        "column": "TRANSACTION_TS",
+        "datetime_precision": 6,
+        "length": null,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TIMESTAMP_NTZ"
+      },
+      {
+        "column": "CUSTOMER_ID",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "NO",
+        "precision": 38,
+        "scale": 0,
+        "type": "NUMBER"
+      },
+      {
+        "column": "FIRST_NAME",
+        "datetime_precision": null,
+        "length": 50,
+        "nullable": "NO",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "LAST_NAME",
+        "datetime_precision": null,
+        "length": 50,
+        "nullable": "NO",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "KYC_STATUS",
+        "datetime_precision": null,
+        "length": 15,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "ACCOUNT_ID",
+        "datetime_precision": null,
+        "length": 20,
+        "nullable": "NO",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "ACCOUNT_TYPE",
+        "datetime_precision": null,
+        "length": 20,
+        "nullable": "NO",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "TRANSACTION_TYPE",
+        "datetime_precision": null,
+        "length": 20,
+        "nullable": "NO",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "TRANSACTION_SUBTYPE",
+        "datetime_precision": null,
+        "length": 30,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "TRANSACTION_AMOUNT",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "NO",
+        "precision": 15,
+        "scale": 2,
+        "type": "NUMBER"
+      },
+      {
+        "column": "TRANSACTION_CURRENCY",
+        "datetime_precision": null,
+        "length": 3,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "BASE_CURRENCY_AMOUNT",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": 15,
+        "scale": 2,
+        "type": "NUMBER"
+      },
+      {
+        "column": "MERCHANT_NAME",
+        "datetime_precision": null,
+        "length": 100,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "COUNTERPARTY_ACCT",
+        "datetime_precision": null,
+        "length": 20,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "IS_INTERNATIONAL",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": 38,
+        "scale": 0,
+        "type": "NUMBER"
+      },
+      {
+        "column": "REFERENCE_NUMBER",
+        "datetime_precision": null,
+        "length": 30,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "DESCRIPTION_TEXT",
+        "datetime_precision": null,
+        "length": 200,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "BRANCH_NAME",
+        "datetime_precision": null,
+        "length": 100,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "REGION",
+        "datetime_precision": null,
+        "length": 50,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "REPORTING_CATEGORY",
+        "datetime_precision": null,
+        "length": 18,
+        "nullable": "YES",
+        "precision": null,
+        "scale": null,
+        "type": "TEXT"
+      },
+      {
+        "column": "ROW_HASH",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": 19,
+        "scale": 0,
+        "type": "NUMBER"
+      },
+      {
+        "column": "ETL_BATCH_ID",
+        "datetime_precision": null,
+        "length": null,
+        "nullable": "YES",
+        "precision": 38,
+        "scale": 0,
+        "type": "NUMBER"
+      }
+    ]
+  },
+  "schema_contract_errors": [],
+  "scope": "Seed landing only (not transformed object parity)",
+  "status": "green",
+  "supplied_role_verified": true,
+  "tables": {
+    "DIM_ACCOUNT": {
+      "L1": {
+        "actual": 20,
+        "expected": 20,
+        "match": true
+      },
+      "L2": {
+        "actual": {
+          "ACCOUNT_ID": {
+            "count": 20,
+            "distinct": 20,
+            "max": "dad48c20199acd1b1ae54bcb395f77a025e14acc5b775fc4aab5c303709410d8",
+            "max_length": 14,
+            "min": "e490440f7a16edecf08916637420e1b409ccc9c93c1e0eba0a67ac62a41e5d86",
+            "nulls": 0,
+            "sum": null
+          },
+          "ACCOUNT_KEY": {
+            "count": 20,
+            "distinct": 20,
+            "max": "20",
+            "max_length": 2,
+            "min": "1",
+            "nulls": 0,
+            "sum": "210"
+          },
+          "ACCOUNT_STATUS": {
+            "count": 20,
+            "distinct": 1,
+            "max": "77ff42a3ee266d7bdd15afca0b44c7ae71d875464026dcf96b158e450c797a93",
+            "max_length": 6,
+            "min": "77ff42a3ee266d7bdd15afca0b44c7ae71d875464026dcf96b158e450c797a93",
+            "nulls": 0,
+            "sum": null
+          },
+          "ACCOUNT_SUBTYPE": {
+            "count": 20,
+            "distinct": 2,
+            "max": "9e009c9036a053ad4a4362f064b1c47dfcdfe471bf9b80eeba0a1baf8b85f966",
+            "max_length": 8,
+            "min": "51e9d2e20ab7c0b4b4eae3a345c2bbadb9354863fbbf39b240b9a682475af5f0",
+            "nulls": 0,
+            "sum": null
+          },
+          "ACCOUNT_TYPE": {
+            "count": 20,
+            "distinct": 7,
+            "max": "aee4f1620b9df7670f88061294088e2087acb22b6eaa00b1bbe7970a6af93007",
+            "max_length": 11,
+            "min": "8fb3b73132e4bea74bc9443276375905b7f2e5ba7ce2100ade51b52d5f28efcc",
+            "nulls": 0,
+            "sum": null
+          },
+          "BRANCH_ID": {
+            "count": 20,
+            "distinct": 10,
+            "max": "401",
+            "max_length": 3,
+            "min": "101",
+            "nulls": 0,
+            "sum": "4040"
+          },
+          "CLOSING_DATE": {
+            "count": 0,
+            "distinct": 0,
+            "max": null,
+            "max_length": 0,
+            "min": null,
+            "nulls": 20,
+            "sum": null
+          },
+          "CREDIT_LIMIT": {
+            "count": 20,
+            "distinct": 3,
+            "max": "100000.00",
+            "max_length": 9,
+            "min": "0.00",
+            "nulls": 0,
+            "sum": "150000.00"
+          },
+          "CURRENCY_CODE": {
+            "count": 20,
+            "distinct": 2,
+            "max": "4411244d921616a0e12cbbfe05eb7da0d96ff2033c6436f01e8a76535f3a74bf",
+            "max_length": 3,
+            "min": "87ef325635aa32dd785d818665ee8fe141d7fae0566c7ea09701c82a524452ba",
+            "nulls": 0,
+            "sum": null
+          },
+          "CURRENT_FLAG": {
+            "count": 20,
+            "distinct": 1,
+            "max": "db5b9a971cd33ab6d8daa0e11bb224bf35a913cea3007e99b103b04a5f4b1068",
+            "max_length": 1,
+            "min": "db5b9a971cd33ab6d8daa0e11bb224bf35a913cea3007e99b103b04a5f4b1068",
+            "nulls": 0,
+            "sum": null
+          },
+          "CUSTOMER_ID": {
+            "count": 20,
+            "distinct": 10,
+            "max": "1010",
+            "max_length": 4,
+            "min": "1001",
+            "nulls": 0,
+            "sum": "20107"
+          },
+          "EFFECTIVE_FROM": {
+            "count": 20,
+            "distinct": 20,
+            "max": "2024-01-08 00:00:00.000000",
+            "max_length": 26,
+            "min": "2008-04-15 00:00:00.000000",
+            "nulls": 0,
+            "sum": null
+          },
+          "EFFECTIVE_TO": {
+            "count": 20,
+            "distinct": 1,
+            "max": "9999-12-31 23:59:59.000000",
+            "max_length": 26,
+            "min": "9999-12-31 23:59:59.000000",
+            "nulls": 0,
+            "sum": null
+          },
+          "ETL_BATCH_ID": {
+            "count": 20,
+            "distinct": 1,
+            "max": "20260131",
+            "max_length": 8,
+            "min": "20260131",
+            "nulls": 0,
+            "sum": "405202620"
+          },
+          "ETL_INSERT_TS": {
+            "count": 20,
+            "distinct": 1,
+            "max": "2026-01-31 06:00:00.000000",
+            "max_length": 26,
+            "min": "2026-01-31 06:00:00.000000",
+            "nulls": 0,
+            "sum": null
+          },
+          "ETL_UPDATE_TS": {
+            "count": 20,
+            "distinct": 1,
+            "max": "2026-01-31 06:00:00.000000",
+            "max_length": 26,
+            "min": "2026-01-31 06:00:00.000000",
+            "nulls": 0,
+            "sum": null
+          },
+          "INTEREST_RATE": {
+            "count": 20,
+            "distinct": 13,
+            "max": "19.9000",
+            "max_length": 7,
+            "min": "0.0000",
+            "nulls": 0,
+            "sum": "58.9000"
+          },
+          "IS_JOINT_ACCOUNT": {
+            "count": 20,
+            "distinct": 2,
+            "max": "1",
+            "max_length": 1,
+            "min": "0",
+            "nulls": 0,
+            "sum": "1"
+          },
+          "OPENING_DATE": {
+            "count": 20,
+            "distinct": 20,
+            "max": "2024-01-08",
+            "max_length": 10,
+            "min": "2008-04-15",
+            "nulls": 0,
+            "sum": null
+          },
+          "OVERDRAFT_LIMIT": {
+            "count": 20,
+            "distinct": 9,
+            "max": "500000.00",
+            "max_length": 9,
+            "min": "0.00",
+            "nulls": 0,
+            "sum": "750000.00"
+          },
+          "PRODUCT_ID": {
+            "count": 20,
+            "distinct": 10,
+            "max": "10",
+            "max_length": 2,
+            "min": "1",
+            "nulls": 0,
+            "sum": "70"
+          },
+          "RELATIONSHIP_MGR_ID": {
+            "count": 20,
+            "distinct": 4,
+            "max": "903",
+            "max_length": 3,
+            "min": "900",
+            "nulls": 0,
+            "sum": "18030"
+          },
+          "TAX_REPORTING_FLAG": {
+            "count": 20,
+            "distinct": 1,
+            "max": "1",
+            "max_length": 1,
+            "min": "1",
+            "nulls": 0,
+            "sum": "20"
+          }
+        },
+        "match": true,
+        "mismatching_columns": []
+      },
+      "L3": {
+        "actual_sha256": "957da99b54328ad8876fb1c55eaa689ecdbd01c284dbad82921c32216e289950",
+        "expected_sha256": "957da99b54328ad8876fb1c55eaa689ecdbd01c284dbad82921c32216e289950",
+        "keys": 20,
+        "match_percent": 100.0,
+        "matching": 20
+      },
+      "L4": [],
+      "manifest_count_match": true,
+      "select_query_id": "01c83193-030c-d216-0035-065b000685c2",
+      "status": "green"
+    },
+    "DIM_BRANCH": {
+      "L1": {
+        "actual": 14,
+        "expected": 14,
+        "match": true
+      },
+      "L2": {
+        "actual": {
+          "ADDRESS_LINE_1": {
+            "count": 14,
+            "distinct": 14,
+            "max": "6e4ef3f47c6dbfa497ad756c71410cefbe91207a56b452345bd2ffccb2d98977",
+            "max_length": 8,
+            "min": "7c97091ee9f9e117fd9b8af8e01fba15b18f2c8a43cd52a018b577f853fa0422",
+            "nulls": 0,
+            "sum": null
+          },
+          "BRANCH_CODE": {
+            "count": 14,
+            "distinct": 14,
+            "max": "4b93c090e1ad1d355cedc0b95d9a1e665decf5acb24ae6660f8ccd01da3ce685",
+            "max_length": 6,
+            "min": "8acad2819b755964196ec15b78b723b20436b09a7452dd6bcc7abdbffb17a389",
+            "nulls": 0,
+            "sum": null
+          },
+          "BRANCH_ID": {
+            "count": 14,
+            "distinct": 14,
+            "max": "502",
+            "max_length": 3,
+            "min": "101",
+            "nulls": 0,
+            "sum": "3629"
+          },
+          "BRANCH_NAME": {
+            "count": 14,
+            "distinct": 14,
+            "max": "af38b36d49fc5feef92b038b0e3cc47b148f82edafd831d4676a606624acec51",
+            "max_length": 20,
+            "min": "85fc2f80c06b89a9113a75d1bb66ed7100a4bce8003323cbac478c2feb6434a3",
+            "nulls": 0,
+            "sum": null
+          },
+          "BRANCH_TYPE": {
+            "count": 14,
+            "distinct": 3,
+            "max": "2b59a698f32b1ca74ec088ded5b83124f0ec12d008e8bc9e26af49cdc7d171d6",
+            "max_length": 12,
+            "min": "d61743723f0646127a25ea64c7a8769f8ef93a06f6ffc0dabfc3fd11affed94d",
+            "nulls": 0,
+            "sum": null
+          },
+          "CITY": {
+            "count": 14,
+            "distinct": 9,
+            "max": "6cc73f4f0c28d6e1048bc10e3e0c64a504ce182bc9faa2320438ea2b11145789",
+            "max_length": 12,
+            "min": "71a0279ee1143efa4f8d77fedecd24839dee1ada14a63b43c678bb2a3ad580dd",
+            "nulls": 0,
+            "sum": null
+          },
+          "CLOSING_DATE": {
+            "count": 0,
+            "distinct": 0,
+            "max": null,
+            "max_length": 0,
+            "min": null,
+            "nulls": 14,
+            "sum": null
+          },
+          "COUNTRY_CODE": {
+            "count": 14,
+            "distinct": 1,
+            "max": "a90cd8d6394bac9e46a263fe6e88b0cdbc018b74268b6d0f4e1834ba48da0490",
+            "max_length": 3,
+            "min": "a90cd8d6394bac9e46a263fe6e88b0cdbc018b74268b6d0f4e1834ba48da0490",
+            "nulls": 0,
+            "sum": null
+          },
+          "COUNTY": {
+            "count": 14,
+            "distinct": 9,
+            "max": "b418efd4ff56a6063494416f8bc21e352278faa321939d707b784081e2603aa8",
+            "max_length": 17,
+            "min": "a454af8f309d66acaa4b4c1e37fd29f5f1831ec0b7c3cd0d87e5529fbc272cc0",
+            "nulls": 0,
+            "sum": null
+          },
+          "EMPLOYEE_COUNT": {
+            "count": 14,
+            "distinct": 13,
+            "max": "45",
+            "max_length": 2,
+            "min": "5",
+            "nulls": 0,
+            "sum": "306"
+          },
+          "ETL_BATCH_ID": {
+            "count": 14,
+            "distinct": 1,
+            "max": "20260131",
+            "max_length": 8,
+            "min": "20260131",
+            "nulls": 0,
+            "sum": "283641834"
+          },
+          "ETL_INSERT_TS": {
+            "count": 14,
+            "distinct": 1,
+            "max": "2026-01-31 06:00:00.000000",
+            "max_length": 26,
+            "min": "2026-01-31 06:00:00.000000",
+            "nulls": 0,
+            "sum": null
+          },
+          "IS_ACTIVE": {
+            "count": 14,
+            "distinct": 1,
+            "max": "1",
+            "max_length": 1,
+            "min": "1",
+            "nulls": 0,
+            "sum": "14"
+          },
+          "LATITUDE": {
+            "count": 14,
+            "distinct": 14,
+            "max": "69.6489000",
+            "max_length": 10,
+            "min": "58.1462000",
+            "nulls": 0,
+            "sum": "861.5913000"
+          },
+          "LONGITUDE": {
+            "count": 14,
+            "distinct": 14,
+            "max": "18.9551000",
+            "max_length": 10,
+            "min": "5.3221000",
+            "nulls": 0,
+            "sum": "139.0476000"
+          },
+          "MANAGER_ID": {
+            "count": 14,
+            "distinct": 14,
+            "max": "1002",
+            "max_length": 4,
+            "min": "601",
+            "nulls": 0,
+            "sum": "10629"
+          },
+          "OPENING_DATE": {
+            "count": 14,
+            "distinct": 14,
+            "max": "2020-01-15",
+            "max_length": 10,
+            "min": "1990-01-01",
+            "nulls": 0,
+            "sum": null
+          },
+          "POSTAL_CODE": {
+            "count": 14,
+            "distinct": 14,
+            "max": "cf9f5172b663d926f2293f31dbf2d1e5bf208a1742be72c500f8d283e63a89f1",
+            "max_length": 4,
+            "min": "afd1edefe9fe3c36a6ce1df8bc1c262cb6a8828237cefd7a361cc7a5736a5ffd",
+            "nulls": 0,
+            "sum": null
+          },
+          "REGION": {
+            "count": 14,
+            "distinct": 5,
+            "max": "f075bbd6185a742d701bb653cbfd1d7cdcf3abdfdb26971efba6e95f70bbd92e",
+            "max_length": 10,
+            "min": "c0f305f416b45e08ab63c88b6b207d521448098af14a8cf77ccb0235a14ac110",
+            "nulls": 0,
+            "sum": null
+          }
+        },
+        "match": true,
+        "mismatching_columns": []
+      },
+      "L3": {
+        "actual_sha256": "2c9a05ec8f4aa00032ffb3239347b6a449e798cfab11e413c26ecb7dbb6dace0",
+        "expected_sha256": "2c9a05ec8f4aa00032ffb3239347b6a449e798cfab11e413c26ecb7dbb6dace0",
+        "keys": 14,
+        "match_percent": 100.0,
+        "matching": 14
+      },
+      "L4": [],
+      "manifest_count_match": true,
+      "select_query_id": "01c83193-030c-d20e-0035-065b0006d5fe",
+      "status": "green"
+    },
+    "DIM_CUSTOMER": {
+      "L1": {
+        "actual": 15,
+        "expected": 15,
+        "match": true
+      },
+      "L2": {
+        "actual": {
+          "ADDRESS_LINE_1": {
+            "count": 15,
+            "distinct": 15,
+            "max": "ee4b4456bc1af8d75bcf41ed6e63af7fb10b61aef02852555fa5a7a4bef0f471",
+            "max_length": 100,
+            "min": "f82c4e07429ba85df7aa33b5f08c4db97fa9466aa141e2132d262edd8618b5e5",
+            "nulls": 0,
+            "sum": null
+          },
+          "ADDRESS_LINE_2": {
+            "count": 1,
+            "distinct": 1,
+            "max": "5da059799c4c56327d97abbc9908d0fd19b9dd8e2a6ee4b31afc33eb205368e0",
+            "max_length": 100,
+            "min": "5da059799c4c56327d97abbc9908d0fd19b9dd8e2a6ee4b31afc33eb205368e0",
+            "nulls": 14,
+            "sum": null
+          },
+          "CITY": {
+            "count": 15,
+            "distinct": 2,
+            "max": "87b62fca3c4a1301f590bd355e43e881a992c30bfcb75f4e986bdb775c3fe52c",
+            "max_length": 50,
+            "min": "09a791d1132eeb43e48db1563498e7736b54b68ca34baaa389a65a8298309e7c",
+            "nulls": 0,
+            "sum": null
+          },
+          "COUNTRY_CODE": {
+            "count": 15,
+            "distinct": 1,
+            "max": "a90cd8d6394bac9e46a263fe6e88b0cdbc018b74268b6d0f4e1834ba48da0490",
+            "max_length": 3,
+            "min": "a90cd8d6394bac9e46a263fe6e88b0cdbc018b74268b6d0f4e1834ba48da0490",
+            "nulls": 0,
+            "sum": null
+          },
+          "CREDIT_RATING": {
+            "count": 15,
+            "distinct": 5,
+            "max": "2304fe36ff9e4428cd33c3d0c696221f4a76fb898519b43097881f74edc694f9",
+            "max_length": 3,
+            "min": "798640599597df7a8daa32b1132f07850a68b5e71bd295650399a38074f52804",
+            "nulls": 0,
+            "sum": null
+          },
+          "CURRENT_FLAG": {
+            "count": 15,
+            "distinct": 1,
+            "max": "db5b9a971cd33ab6d8daa0e11bb224bf35a913cea3007e99b103b04a5f4b1068",
+            "max_length": 1,
+            "min": "db5b9a971cd33ab6d8daa0e11bb224bf35a913cea3007e99b103b04a5f4b1068",
+            "nulls": 0,
+            "sum": null
+          },
+          "CUSTOMER_ID": {
+            "count": 15,
+            "distinct": 15,
+            "max": "1015",
+            "max_length": 4,
+            "min": "1001",
+            "nulls": 0,
+            "sum": "15120"
+          },
+          "CUSTOMER_KEY": {
+            "count": 15,
+            "distinct": 15,
+            "max": "15",
+            "max_length": 2,
+            "min": "1",
+            "nulls": 0,
+            "sum": "120"
+          },
+          "CUSTOMER_SEGMENT": {
+            "count": 15,
+            "distinct": 4,
+            "max": "4be477f350b9ba4175bf61dd26c15b4257d80e2cda5784af81ee3ff708e5a2b2",
+            "max_length": 9,
+            "min": "bacc35b0ca489f1ff493601eaea8f72d67329dd0287e4815e53c7718c5cca40f",
+            "nulls": 0,
+            "sum": null
+          },
+          "DATE_OF_BIRTH": {
+            "count": 15,
+            "distinct": 15,
+            "max": "1980-01-15",
+            "max_length": 10,
+            "min": "1980-01-01",
+            "nulls": 0,
+            "sum": null
+          },
+          "EFFECTIVE_FROM": {
+            "count": 15,
+            "distinct": 15,
+            "max": "2026-01-15 00:00:00.000000",
+            "max_length": 26,
+            "min": "2005-02-28 00:00:00.000000",
+            "nulls": 0,
+            "sum": null
+          },
+          "EFFECTIVE_TO": {
+            "count": 15,
+            "distinct": 1,
+            "max": "9999-12-31 23:59:59.000000",
+            "max_length": 26,
+            "min": "9999-12-31 23:59:59.000000",
+            "nulls": 0,
+            "sum": null
+          },
+          "EMAIL_ADDRESS": {
+            "count": 15,
+            "distinct": 15,
+            "max": "65eb88335e4726e7c7c1f2d6352197c814a920c153d8e9eb57d4178db064ea7c",
+            "max_length": 100,
+            "min": "abaa287d170c4115b06ffa4ab02bdf5d6b950ffa9c30d7137fb18e068f979167",
+            "nulls": 0,
+            "sum": null
+          },
+          "ETL_BATCH_ID": {
+            "count": 15,
+            "distinct": 1,
+            "max": "20260131",
+            "max_length": 8,
+            "min": "20260131",
+            "nulls": 0,
+            "sum": "303901965"
+          },
+          "ETL_INSERT_TS": {
+            "count": 15,
+            "distinct": 1,
+            "max": "2026-01-31 06:00:00.000000",
+            "max_length": 26,
+            "min": "2026-01-31 06:00:00.000000",
+            "nulls": 0,
+            "sum": null
+          },
+          "ETL_UPDATE_TS": {
+            "count": 15,
+            "distinct": 1,
+            "max": "2026-01-31 06:00:00.000000",
+            "max_length": 26,
+            "min": "2026-01-31 06:00:00.000000",
+            "nulls": 0,
+            "sum": null
+          },
+          "FIRST_NAME": {
+            "count": 15,
+            "distinct": 15,
+            "max": "d0be76d93e679df0aef6768442a4abb0119a1ce66b0af5a5266d7110d7952dae",
+            "max_length": 50,
+            "min": "f367fc918a2f8a8bc2bc647e00fc78aa0933c0894fa5fe188d7ff0ccf655cc30",
+            "nulls": 0,
+            "sum": null
+          },
+          "GENDER": {
+            "count": 15,
+            "distinct": 2,
+            "max": "7ab5b2d9e5bb761726f65f3c85e8236974910ab12653899a5c737e95a6f23888",
+            "max_length": 1,
+            "min": "66804d12743756eb85fb3115e558e09a95661b3d0f176ac5318ac90dd6fe7811",
+            "nulls": 0,
+            "sum": null
+          },
+          "IS_ACTIVE": {
+            "count": 15,
+            "distinct": 1,
+            "max": "1",
+            "max_length": 1,
+            "min": "1",
+            "nulls": 0,
+            "sum": "15"
+          },
+          "KYC_STATUS": {
+            "count": 15,
+            "distinct": 3,
+            "max": "c0ea28df48673d3a9957864d4ce5f3963522a14f280fd7d74a98489fdf837cd4",
+            "max_length": 8,
+            "min": "b11db31f9f80ef4e6e6102f35194c9dd470efb6599cb483393ab3b220b64c93c",
+            "nulls": 0,
+            "sum": null
+          },
+          "LAST_NAME": {
+            "count": 15,
+            "distinct": 15,
+            "max": "e3ec7a181d31bfcddaa8226eec56f78a0636596378caf1ba5d4ede8716b43d2d",
+            "max_length": 50,
+            "min": "6eb826fb10302f26bd4551d19fe5a2f09f27a5dafc5264c2db0f99d18278429c",
+            "nulls": 0,
+            "sum": null
+          },
+          "LAST_REVIEW_DATE": {
+            "count": 15,
+            "distinct": 15,
+            "max": "2026-01-15",
+            "max_length": 10,
+            "min": "2024-11-07",
+            "nulls": 0,
+            "sum": null
+          },
+          "MARITAL_STATUS": {
+            "count": 15,
+            "distinct": 4,
+            "max": "bf225f2e4787e165f5a245e55bb71f55793511a8a605aefe07ca2c056ccf936d",
+            "max_length": 1,
+            "min": "8f097023401b3d58704c1f3abea8ec2eba57c387f09d10125cd66076afd13b1e",
+            "nulls": 0,
+            "sum": null
+          },
+          "ONBOARDING_DATE": {
+            "count": 15,
+            "distinct": 15,
+            "max": "2026-01-15",
+            "max_length": 10,
+            "min": "2005-02-28",
+            "nulls": 0,
+            "sum": null
+          },
+          "PHONE_NUMBER": {
+            "count": 15,
+            "distinct": 15,
+            "max": "0c386608dcb5b0637eefe83640afc75e046871cb92783bcec7ff6aad294015ca",
+            "max_length": 9,
+            "min": "9199f72b54e795d7bd4492eaa8c2b7388855988a4dc8875e15736e927e525fc7",
+            "nulls": 0,
+            "sum": null
+          },
+          "POSTAL_CODE": {
+            "count": 15,
+            "distinct": 15,
+            "max": "f484efdaff6590ee4f27a88ecd6ea52ba266781f7c14a07eba1333d4795ddda2",
+            "max_length": 4,
+            "min": "fb6d895a6fdd851283f23e2f0b2945dd7420625f18477c694c8bf33731693d33",
+            "nulls": 0,
+            "sum": null
+          },
+          "RISK_SCORE": {
+            "count": 15,
+            "distinct": 15,
+            "max": "91.40",
+            "max_length": 5,
+            "min": "22.30",
+            "nulls": 0,
+            "sum": "880.65"
+          },
+          "STATE_PROVINCE": {
+            "count": 15,
+            "distinct": 2,
+            "max": "be9b027d65e9508b4e5662c7247506ec47131fc80fbc66b2dfee507e80a74427",
+            "max_length": 50,
+            "min": "3d70d3c2a9c90c1a02a2d30d87c4fa9d6049dd80f7bb2777f44d0f343b1a6665",
+            "nulls": 0,
+            "sum": null
+          }
+        },
+        "match": true,
+        "mismatching_columns": []
+      },
+      "L3": {
+        "actual_sha256": "a0665ea87d60ec3e7f906285233f4dc97db22d868ae31aabc565fe97a9e0e674",
+        "expected_sha256": "a0665ea87d60ec3e7f906285233f4dc97db22d868ae31aabc565fe97a9e0e674",
+        "keys": 15,
+        "match_percent": 100.0,
+        "matching": 15
+      },
+      "L4": [],
+      "manifest_count_match": true,
+      "select_query_id": "01c83193-030c-d20d-0035-065b000635b6",
+      "status": "green"
+    },
+    "DIM_DATE": {
+      "L1": {
+        "actual": 10958,
+        "expected": 10958,
+        "match": true
+      },
+      "L2": {
+        "actual": {
+          "CALENDAR_DATE": {
+            "count": 10958,
+            "distinct": 10958,
+            "max": "2029-12-31",
+            "max_length": 10,
+            "min": "2000-01-01",
+            "nulls": 0,
+            "sum": null
+          },
+          "CALENDAR_YEAR": {
+            "count": 10958,
+            "distinct": 30,
+            "max": "2029",
+            "max_length": 4,
+            "min": "2000",
+            "nulls": 0,
+            "sum": "22074887"
+          },
+          "DATE_KEY": {
+            "count": 10958,
+            "distinct": 10958,
+            "max": "20291231",
+            "max_length": 8,
+            "min": "20000101",
+            "nulls": 0,
+            "sum": "220756189972"
+          },
+          "DAY_NAME": {
+            "count": 10958,
+            "distinct": 7,
+            "max": "069f5bef5755c804b95ae0c59a1894f76ffe561448073194390423d9836721ca",
+            "max_length": 9,
+            "min": "53b487dd0f6d21376511385a5c40d7e48b1ef1c136419a295dff915c2e94623e",
+            "nulls": 0,
+            "sum": null
+          },
+          "DAY_OF_MONTH": {
+            "count": 10958,
+            "distinct": 31,
+            "max": "31",
+            "max_length": 2,
+            "min": "1",
+            "nulls": 0,
+            "sum": "172372"
+          },
+          "DAY_OF_WEEK": {
+            "count": 10958,
+            "distinct": 7,
+            "max": "7",
+            "max_length": 1,
+            "min": "1",
+            "nulls": 0,
+            "sum": "43834"
+          },
+          "DAY_OF_YEAR": {
+            "count": 10958,
+            "distinct": 366,
+            "max": "366",
+            "max_length": 3,
+            "min": "1",
+            "nulls": 0,
+            "sum": "2006778"
+          },
+          "FISCAL_QUARTER": {
+            "count": 10958,
+            "distinct": 4,
+            "max": "4",
+            "max_length": 1,
+            "min": "1",
+            "nulls": 0,
+            "sum": "27488"
+          },
+          "FISCAL_YEAR": {
+            "count": 10958,
+            "distinct": 30,
+            "max": "2029",
+            "max_length": 4,
+            "min": "2000",
+            "nulls": 0,
+            "sum": "22074887"
+          },
+          "HALF_YEAR": {
+            "count": 10958,
+            "distinct": 2,
+            "max": "2",
+            "max_length": 1,
+            "min": "1",
+            "nulls": 0,
+            "sum": "16478"
+          },
+          "HOLIDAY_NAME": {
+            "count": 356,
+            "distinct": 12,
+            "max": "b0580705d054845fc515e4abe6fc6c2b04cff639cb509b931ede8f7c030756ab",
+            "max_length": 16,
+            "min": "078d7d5e11d8810f1c8accc330a58e790fa361d59ab43ea0ecceaa8d5339ab30",
+            "nulls": 10602,
+            "sum": null
+          },
+          "ISO_WEEK": {
+            "count": 10958,
+            "distinct": 53,
+            "max": "53",
+            "max_length": 2,
+            "min": "1",
+            "nulls": 0,
+            "sum": "291340"
+          },
+          "IS_BUSINESS_DAY": {
+            "count": 10958,
+            "distinct": 2,
+            "max": "1",
+            "max_length": 1,
+            "min": "0",
+            "nulls": 0,
+            "sum": "7571"
+          },
+          "IS_MONTH_END": {
+            "count": 10958,
+            "distinct": 2,
+            "max": "1",
+            "max_length": 1,
+            "min": "0",
+            "nulls": 0,
+            "sum": "360"
+          },
+          "IS_NORWEGIAN_HOLIDAY": {
+            "count": 10958,
+            "distinct": 2,
+            "max": "1",
+            "max_length": 1,
+            "min": "0",
+            "nulls": 0,
+            "sum": "356"
+          },
+          "IS_QUARTER_END": {
+            "count": 10958,
+            "distinct": 2,
+            "max": "1",
+            "max_length": 1,
+            "min": "0",
+            "nulls": 0,
+            "sum": "120"
+          },
+          "IS_WEEKEND": {
+            "count": 10958,
+            "distinct": 2,
+            "max": "1",
+            "max_length": 1,
+            "min": "0",
+            "nulls": 0,
+            "sum": "3132"
+          },
+          "IS_YEAR_END": {
+            "count": 10958,
+            "distinct": 2,
+            "max": "1",
+            "max_length": 1,
+            "min": "0",
+            "nulls": 0,
+            "sum": "30"
+          },
+          "MONTH_NAME": {
+            "count": 10958,
+            "distinct": 12,
+            "max": "213046a86cb36e2a355008e6cee4a4418695f37bacaa653b4dc08c54a0968a97",
+            "max_length": 9,
+            "min": "29cdbb40e5e507ea5d1a546022d1103d564718b4453a973a1927f2e069c7ad6e",
+            "nulls": 0,
+            "sum": null
+          },
+          "MONTH_NUM": {
+            "count": 10958,
+            "distinct": 12,
+            "max": "12",
+            "max_length": 2,
+            "min": "1",
+            "nulls": 0,
+            "sum": "71476"
+          },
+          "MONTH_SHORT": {
+            "count": 10958,
+            "distinct": 12,
+            "max": "58ee4597eb2d9f381707b0be026c1e6d845034df68f808d7311a6e63c78ec416",
+            "max_length": 3,
+            "min": "18b8c9749b1853305c9a143abad3439d4f5739244fd6bd512806674cd2023719",
+            "nulls": 0,
+            "sum": null
+          },
+          "NEXT_DAY_DATE": {
+            "count": 10958,
+            "distinct": 10958,
+            "max": "2030-01-01",
+            "max_length": 10,
+            "min": "2000-01-02",
+            "nulls": 0,
+            "sum": null
+          },
+          "PRIOR_DAY_DATE": {
+            "count": 10958,
+            "distinct": 10958,
+            "max": "2029-12-30",
+            "max_length": 10,
+            "min": "1999-12-31",
+            "nulls": 0,
+            "sum": null
+          },
+          "QUARTER_NAME": {
+            "count": 10958,
+            "distinct": 4,
+            "max": "4cada23d6bd154edb07fbfc43313070bb2ce0968253d3c21f25f88b22affcd08",
+            "max_length": 2,
+            "min": "249158bfa15d7ce9de943f1e7c8ffcaa1611675919d2fb42ad539e719bb6e74f",
+            "nulls": 0,
+            "sum": null
+          },
+          "QUARTER_NUM": {
+            "count": 10958,
+            "distinct": 4,
+            "max": "4",
+            "max_length": 1,
+            "min": "1",
+            "nulls": 0,
+            "sum": "27488"
+          },
+          "SAME_DAY_PREV_YEAR": {
+            "count": 10950,
+            "distinct": 10950,
+            "max": "2028-12-31",
+            "max_length": 10,
+            "min": "1999-01-01",
+            "nulls": 8,
+            "sum": null
+          },
+          "WEEK_OF_YEAR": {
+            "count": 10958,
+            "distinct": 54,
+            "max": "53",
+            "max_length": 2,
+            "min": "0",
+            "nulls": 0,
+            "sum": "286891"
+          }
+        },
+        "match": true,
+        "mismatching_columns": []
+      },
+      "L3": {
+        "actual_sha256": "c446f1cd63deb63e4455f26f86c12a7ba2d2b0bdc2ae050b7e88e094b5fab8b4",
+        "expected_sha256": "c446f1cd63deb63e4455f26f86c12a7ba2d2b0bdc2ae050b7e88e094b5fab8b4",
+        "keys": 10958,
+        "match_percent": 100.0,
+        "matching": 10958
+      },
+      "L4": [],
+      "manifest_count_match": true,
+      "select_query_id": "01c83193-030c-d212-0035-065b0006965e",
+      "status": "green"
+    },
+    "DIM_EXCHANGE_RATES": {
+      "L1": {
+        "actual": 6,
+        "expected": 6,
+        "match": true
+      },
+      "L2": {
+        "actual": {
+          "EXCHANGE_RATE": {
+            "count": 6,
+            "distinct": 6,
+            "max": "13.400001",
+            "max_length": 9,
+            "min": "0.980123",
+            "nulls": 0,
+            "sum": "39.020253"
+          },
+          "FROM_CURRENCY": {
+            "count": 6,
+            "distinct": 6,
+            "max": "82bb059ec10744f31e0406b8ef7a7a0f3c30c9b18435120fa859b2c0b9627888",
+            "max_length": 3,
+            "min": "4e009a773fd09abd692eb899f6094c88f6dc9f704985a9315e4e9c534f913a31",
+            "nulls": 0,
+            "sum": null
+          },
+          "RATE_DATE": {
+            "count": 6,
+            "distinct": 1,
+            "max": "2026-01-31",
+            "max_length": 10,
+            "min": "2026-01-31",
+            "nulls": 0,
+            "sum": null
+          },
+          "TO_CURRENCY": {
+            "count": 6,
+            "distinct": 1,
+            "max": "4411244d921616a0e12cbbfe05eb7da0d96ff2033c6436f01e8a76535f3a74bf",
+            "max_length": 3,
+            "min": "4411244d921616a0e12cbbfe05eb7da0d96ff2033c6436f01e8a76535f3a74bf",
+            "nulls": 0,
+            "sum": null
+          }
+        },
+        "match": true,
+        "mismatching_columns": []
+      },
+      "L3": {
+        "actual_sha256": "261750383ca42e845082057fb4d5bf41474536c07016fcf593032c947860581d",
+        "expected_sha256": "261750383ca42e845082057fb4d5bf41474536c07016fcf593032c947860581d",
+        "keys": 6,
+        "match_percent": 100.0,
+        "matching": 6
+      },
+      "L4": [],
+      "manifest_count_match": true,
+      "select_query_id": "01c83193-030c-d216-0035-065b000685ca",
+      "status": "green"
+    },
+    "DIM_PRODUCT": {
+      "L1": {
+        "actual": 10,
+        "expected": 10,
+        "match": true
+      },
+      "L2": {
+        "actual": {
+          "BASE_INTEREST_RATE": {
+            "count": 10,
+            "distinct": 10,
+            "max": "19.9000",
+            "max_length": 7,
+            "min": "0.0000",
+            "nulls": 0,
+            "sum": "38.7800"
+          },
+          "DISCONTINUE_DATE": {
+            "count": 0,
+            "distinct": 0,
+            "max": null,
+            "max_length": 0,
+            "min": null,
+            "nulls": 10,
+            "sum": null
+          },
+          "ETL_BATCH_ID": {
+            "count": 10,
+            "distinct": 1,
+            "max": "20260131",
+            "max_length": 8,
+            "min": "20260131",
+            "nulls": 0,
+            "sum": "202601310"
+          },
+          "ETL_INSERT_TS": {
+            "count": 10,
+            "distinct": 1,
+            "max": "2026-01-31 06:00:00.000000",
+            "max_length": 26,
+            "min": "2026-01-31 06:00:00.000000",
+            "nulls": 0,
+            "sum": null
+          },
+          "FEE_STRUCTURE": {
+            "count": 10,
+            "distinct": 4,
+            "max": "ecef2120578f9e08c65623319c835f6c8e4f3fec1ce45094e40fdea6e1f06f04",
+            "max_length": 10,
+            "min": "30207233049073658c13d98b9b3af67e6f74439c892eada52c2a7199c7ada3c0",
+            "nulls": 0,
+            "sum": null
+          },
+          "IS_ACTIVE": {
+            "count": 10,
+            "distinct": 1,
+            "max": "1",
+            "max_length": 1,
+            "min": "1",
+            "nulls": 0,
+            "sum": "10"
+          },
+          "IS_REGULATED": {
+            "count": 10,
+            "distinct": 1,
+            "max": "1",
+            "max_length": 1,
+            "min": "1",
+            "nulls": 0,
+            "sum": "10"
+          },
+          "LAUNCH_DATE": {
+            "count": 10,
+            "distinct": 6,
+            "max": "2010-01-15",
+            "max_length": 10,
+            "min": "2000-01-01",
+            "nulls": 0,
+            "sum": null
+          },
+          "MAX_BALANCE": {
+            "count": 0,
+            "distinct": 0,
+            "max": null,
+            "max_length": 0,
+            "min": null,
+            "nulls": 10,
+            "sum": "0.00"
+          },
+          "MIN_BALANCE": {
+            "count": 10,
+            "distinct": 6,
+            "max": "50000.00",
+            "max_length": 8,
+            "min": "0.00",
+            "nulls": 0,
+            "sum": "86500.00"
+          },
+          "MONTHLY_FEE": {
+            "count": 10,
+            "distinct": 4,
+            "max": "199.00",
+            "max_length": 6,
+            "min": "0.00",
+            "nulls": 0,
+            "sum": "273.00"
+          },
+          "PRODUCT_CATEGORY": {
+            "count": 10,
+            "distinct": 4,
+            "max": "fbe099cea7d905d61e74c58098b76575eab259e0c87c94cd873ad9be2a82985f",
+            "max_length": 10,
+            "min": "2d17dc4ab02126fcaf607e2ee0467e9b36e0dfaeccdf8696a5ad558e630342e1",
+            "nulls": 0,
+            "sum": null
+          },
+          "PRODUCT_CODE": {
+            "count": 10,
+            "distinct": 10,
+            "max": "d4e2307d232150f1d5eab6d7867e85726335019fa425d9d9da4f3f3d14febd90",
+            "max_length": 7,
+            "min": "0052a500157d151b96c0663ba56e94b01b4fc9b6884e4f03bb483c09d4c4c0c6",
+            "nulls": 0,
+            "sum": null
+          },
+          "PRODUCT_ID": {
+            "count": 10,
+            "distinct": 10,
+            "max": "10",
+            "max_length": 2,
+            "min": "1",
+            "nulls": 0,
+            "sum": "55"
+          },
+          "PRODUCT_NAME": {
+            "count": 10,
+            "distinct": 10,
+            "max": "8d7e1c9fd6af7d4ad431128894cd1fd567c5b96cc586946bc526e43eff6ae41b",
+            "max_length": 20,
+            "min": "1d7f3ca58ce003ce3d802fd48c0910b703a42e178184a6a59ede97ea4a853d1f",
+            "nulls": 0,
+            "sum": null
+          },
+          "PRODUCT_SUBCATEGORY": {
+            "count": 10,
+            "distinct": 10,
+            "max": "bd238bd36c5661984dffcb97f2cc3db28896bf4a8cbd5469367350e8ccecd123",
+            "max_length": 26,
+            "min": "5240e2e478a3df5017ee16c69d0819a10bbf4d4c6d5d705639fa5b83ed991725",
+            "nulls": 0,
+            "sum": null
+          },
+          "REGULATORY_CODE": {
+            "count": 0,
+            "distinct": 0,
+            "max": null,
+            "max_length": 0,
+            "min": null,
+            "nulls": 10,
+            "sum": null
+          }
+        },
+        "match": true,
+        "mismatching_columns": []
+      },
+      "L3": {
+        "actual_sha256": "5fc4be9383a8f6921bdf48fffdb3afe1198a95b9b5d02733ecf30f771bfc941d",
+        "expected_sha256": "5fc4be9383a8f6921bdf48fffdb3afe1198a95b9b5d02733ecf30f771bfc941d",
+        "keys": 10,
+        "match_percent": 100.0,
+        "matching": 10
+      },
+      "L4": [],
+      "manifest_count_match": true,
+      "select_query_id": "01c83193-030c-d212-0035-065b0006965a",
+      "status": "green"
+    },
+    "ETL_BATCH_CONTROL": {
+      "L1": {
+        "actual": 1,
+        "expected": 1,
+        "match": true
+      },
+      "L2": {
+        "actual": {
+          "BATCH_DATE": {
+            "count": 1,
+            "distinct": 1,
+            "max": "2026-01-30",
+            "max_length": 10,
+            "min": "2026-01-30",
+            "nulls": 0,
+            "sum": null
+          },
+          "BATCH_ID": {
+            "count": 1,
+            "distinct": 1,
+            "max": "20260130",
+            "max_length": 8,
+            "min": "20260130",
+            "nulls": 0,
+            "sum": "20260130"
+          },
+          "BATCH_STATUS": {
+            "count": 1,
+            "distinct": 1,
+            "max": "ba0ae16a200116e07f05885dfbad38d09f10323434cdeefb998aa0d03f7dbf91",
+            "max_length": 9,
+            "min": "ba0ae16a200116e07f05885dfbad38d09f10323434cdeefb998aa0d03f7dbf91",
+            "nulls": 0,
+            "sum": null
+          },
+          "END_TS": {
+            "count": 1,
+            "distinct": 1,
+            "max": "2026-01-30 07:00:00.000000",
+            "max_length": 26,
+            "min": "2026-01-30 07:00:00.000000",
+            "nulls": 0,
+            "sum": null
+          },
+          "START_TS": {
+            "count": 1,
+            "distinct": 1,
+            "max": "2026-01-30 06:00:00.000000",
+            "max_length": 26,
+            "min": "2026-01-30 06:00:00.000000",
+            "nulls": 0,
+            "sum": null
+          }
+        },
+        "match": true,
+        "mismatching_columns": []
+      },
+      "L3": {
+        "actual_sha256": "bbd737c6af1d8cde60e9d66c27d4fbd198216d76dea6a3ad4acefc5d9a043d5c",
+        "expected_sha256": "bbd737c6af1d8cde60e9d66c27d4fbd198216d76dea6a3ad4acefc5d9a043d5c",
+        "keys": 1,
+        "match_percent": 100.0,
+        "matching": 1
+      },
+      "L4": [],
+      "manifest_count_match": true,
+      "select_query_id": "01c83193-030c-d212-0035-065b00069666",
+      "status": "green"
+    },
+    "ETL_LOG": {
+      "L1": {
+        "actual": 0,
+        "expected": 0,
+        "match": true
+      },
+      "L2": {
+        "actual": {
+          "BATCH_ID": {
+            "count": 0,
+            "distinct": 0,
+            "max": null,
+            "max_length": 0,
+            "min": null,
+            "nulls": 0,
+            "sum": "0"
+          },
+          "LOG_LEVEL": {
+            "count": 0,
+            "distinct": 0,
+            "max": null,
+            "max_length": 0,
+            "min": null,
+            "nulls": 0,
+            "sum": null
+          },
+          "LOG_MESSAGE": {
+            "count": 0,
+            "distinct": 0,
+            "max": null,
+            "max_length": 0,
+            "min": null,
+            "nulls": 0,
+            "sum": null
+          },
+          "LOG_TS": {
+            "count": 0,
+            "distinct": 0,
+            "max": null,
+            "max_length": 0,
+            "min": null,
+            "nulls": 0,
+            "sum": null
+          },
+          "PROCEDURE_NAME": {
+            "count": 0,
+            "distinct": 0,
+            "max": null,
+            "max_length": 0,
+            "min": null,
+            "nulls": 0,
+            "sum": null
+          }
+        },
+        "match": true,
+        "mismatching_columns": []
+      },
+      "L3": {
+        "actual_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "expected_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "keys": 0,
+        "match_percent": 100.0,
+        "matching": 0
+      },
+      "L4": [],
+      "manifest_count_match": true,
+      "select_query_id": "01c83193-030c-d20e-0035-065b0006d602",
+      "status": "green"
+    },
+    "FACT_MONTHLY_ACCOUNT_SNAPSHOT": {
+      "L1": {
+        "actual": 1920,
+        "expected": 1920,
+        "match": true
+      },
+      "L2": {
+        "actual": {
+          "ACCOUNT_KEY": {
+            "count": 1920,
+            "distinct": 20,
+            "max": "20",
+            "max_length": 2,
+            "min": "1",
+            "nulls": 0,
+            "sum": "20160"
+          },
+          "AVERAGE_BALANCE": {
+            "count": 1920,
+            "distinct": 1920,
+            "max": "485779.40",
+            "max_length": 10,
+            "min": "-219789.40",
+            "nulls": 0,
+            "sum": "228370735.53"
+          },
+          "BASE_CURRENCY_CLOSING": {
+            "count": 1920,
+            "distinct": 1920,
+            "max": "486384.31",
+            "max_length": 10,
+            "min": "-221118.87",
+            "nulls": 0,
+            "sum": "228408151.60"
+          },
+          "BRANCH_ID": {
+            "count": 1920,
+            "distinct": 10,
+            "max": "401",
+            "max_length": 3,
+            "min": "101",
+            "nulls": 0,
+            "sum": "387840"
+          },
+          "CLOSING_BALANCE": {
+            "count": 1920,
+            "distinct": 1920,
+            "max": "486384.31",
+            "max_length": 10,
+            "min": "-221118.87",
+            "nulls": 0,
+            "sum": "228408151.60"
+          },
+          "CREDIT_COUNT": {
+            "count": 1920,
+            "distinct": 9,
+            "max": "9",
+            "max_length": 1,
+            "min": "1",
+            "nulls": 0,
+            "sum": "9641"
+          },
+          "CURRENCY_CODE": {
+            "count": 1920,
+            "distinct": 2,
+            "max": "4411244d921616a0e12cbbfe05eb7da0d96ff2033c6436f01e8a76535f3a74bf",
+            "max_length": 3,
+            "min": "87ef325635aa32dd785d818665ee8fe141d7fae0566c7ea09701c82a524452ba",
+            "nulls": 0,
+            "sum": null
+          },
+          "CUSTOMER_KEY": {
+            "count": 1920,
+            "distinct": 10,
+            "max": "10",
+            "max_length": 2,
+            "min": "1",
+            "nulls": 0,
+            "sum": "10272"
+          },
+          "DAYS_DORMANT": {
+            "count": 1920,
+            "distinct": 1,
+            "max": "0",
+            "max_length": 1,
+            "min": "0",
+            "nulls": 0,
+            "sum": "0"
+          },
+          "DAYS_IN_OVERDRAFT": {
+            "count": 1920,
+            "distinct": 1,
+            "max": "0",
+            "max_length": 1,
+            "min": "0",
+            "nulls": 0,
+            "sum": "0"
+          },
+          "DEBIT_COUNT": {
+            "count": 1920,
+            "distinct": 39,
+            "max": "39",
+            "max_length": 2,
+            "min": "1",
+            "nulls": 0,
+            "sum": "38331"
+          },
+          "ETL_BATCH_ID": {
+            "count": 1920,
+            "distinct": 1,
+            "max": "20260131",
+            "max_length": 8,
+            "min": "20260131",
+            "nulls": 0,
+            "sum": "38899451520"
+          },
+          "ETL_INSERT_TS": {
+            "count": 1920,
+            "distinct": 1,
+            "max": "2026-01-31 06:00:00.000000",
+            "max_length": 26,
+            "min": "2026-01-31 06:00:00.000000",
+            "nulls": 0,
+            "sum": null
+          },
+          "FEES_CHARGED": {
+            "count": 1920,
+            "distinct": 1798,
+            "max": "149.93",
+            "max_length": 6,
+            "min": "0.02",
+            "nulls": 0,
+            "sum": "143733.93"
+          },
+          "INTEREST_CHARGED": {
+            "count": 1920,
+            "distinct": 1870,
+            "max": "299.91",
+            "max_length": 6,
+            "min": "0.04",
+            "nulls": 0,
+            "sum": "291428.68"
+          },
+          "INTEREST_EARNED": {
+            "count": 1920,
+            "distinct": 1862,
+            "max": "299.92",
+            "max_length": 6,
+            "min": "0.04",
+            "nulls": 0,
+            "sum": "288553.00"
+          },
+          "MAXIMUM_BALANCE": {
+            "count": 1920,
+            "distinct": 1424,
+            "max": "486384.31",
+            "max_length": 10,
+            "min": "-218459.93",
+            "nulls": 0,
+            "sum": "241014347.58"
+          },
+          "MINIMUM_BALANCE": {
+            "count": 1920,
+            "distinct": 1428,
+            "max": "485174.50",
+            "max_length": 10,
+            "min": "-221118.87",
+            "nulls": 0,
+            "sum": "215727123.71"
+          },
+          "OPENING_BALANCE": {
+            "count": 1920,
+            "distinct": 1920,
+            "max": "486384.31",
+            "max_length": 10,
+            "min": "-221118.87",
+            "nulls": 0,
+            "sum": "228333319.69"
+          },
+          "PRODUCT_ID": {
+            "count": 1920,
+            "distinct": 10,
+            "max": "10",
+            "max_length": 2,
+            "min": "1",
+            "nulls": 0,
+            "sum": "6720"
+          },
+          "SNAPSHOT_DATE": {
+            "count": 1920,
+            "distinct": 96,
+            "max": "2026-01-31",
+            "max_length": 10,
+            "min": "2018-02-28",
+            "nulls": 0,
+            "sum": null
+          },
+          "SNAPSHOT_MONTH_KEY": {
+            "count": 1920,
+            "distinct": 96,
+            "max": "202601",
+            "max_length": 6,
+            "min": "201802",
+            "nulls": 0,
+            "sum": "388156480"
+          },
+          "TOTAL_CREDITS": {
+            "count": 1920,
+            "distinct": 1920,
+            "max": "39972.67",
+            "max_length": 8,
+            "min": "1.26",
+            "nulls": 0,
+            "sum": "38026738.27"
+          },
+          "TOTAL_DEBITS": {
+            "count": 1920,
+            "distinct": 1919,
+            "max": "39998.98",
+            "max_length": 8,
+            "min": "7.46",
+            "nulls": 0,
+            "sum": "37951906.36"
+          }
+        },
+        "match": true,
+        "mismatching_columns": []
+      },
+      "L3": {
+        "actual_sha256": "2d8362cdd3cdd3b14d0fdd338e98d9a4595fd96cc637aae924e7cd867f287b4d",
+        "expected_sha256": "2d8362cdd3cdd3b14d0fdd338e98d9a4595fd96cc637aae924e7cd867f287b4d",
+        "keys": 1920,
+        "match_percent": 100.0,
+        "matching": 1920
+      },
+      "L4": [],
+      "manifest_count_match": true,
+      "select_query_id": "01c83193-030c-d20d-0035-065b000635ba",
+      "status": "green"
+    },
+    "FACT_TRANSACTION": {
+      "L1": {
+        "actual": 50000,
+        "expected": 50000,
+        "match": true
+      },
+      "L2": {
+        "actual": {
+          "ACCOUNT_KEY": {
+            "count": 50000,
+            "distinct": 20,
+            "max": "20",
+            "max_length": 2,
+            "min": "1",
+            "nulls": 0,
+            "sum": "525522"
+          },
+          "BASE_CURRENCY_AMOUNT": {
+            "count": 50000,
+            "distinct": 49230,
+            "max": "12057971.64",
+            "max_length": 11,
+            "min": "10.04",
+            "nulls": 0,
+            "sum": "4723528919.45"
+          },
+          "BRANCH_ID": {
+            "count": 50000,
+            "distinct": 10,
+            "max": "401",
+            "max_length": 3,
+            "min": "101",
+            "nulls": 0,
+            "sum": "10077356"
+          },
+          "CHANNEL": {
+            "count": 50000,
+            "distinct": 6,
+            "max": "64d3dc739857f8bff8e50d42f6faa2b404ea983446d5d6bca0c140d08f19ea72",
+            "max_length": 6,
+            "min": "e3af609e5881b83e0dd75a520c2468b37e986feaa6c216a7c704151da2097dcb",
+            "nulls": 0,
+            "sum": null
+          },
+          "COUNTERPARTY_ACCT": {
+            "count": 50000,
+            "distinct": 49990,
+            "max": "a34d1e00bccd2aeed2539c1e830ef57812dd041f775a35adbacd61fbe32ec962",
+            "max_length": 12,
+            "min": "48146c969e7140f680a8d171f060a36d95a855c38ec6f3648dfff032b9a4ca31",
+            "nulls": 0,
+            "sum": null
+          },
+          "CUSTOMER_KEY": {
+            "count": 50000,
+            "distinct": 10,
+            "max": "10",
+            "max_length": 2,
+            "min": "1",
+            "nulls": 0,
+            "sum": "267770"
+          },
+          "DATE_KEY": {
+            "count": 50000,
+            "distinct": 731,
+            "max": "20260131",
+            "max_length": 8,
+            "min": "20240201",
+            "nulls": 0,
+            "sum": "1012324166649"
+          },
+          "DESCRIPTION_TEXT": {
+            "count": 50000,
+            "distinct": 1,
+            "max": "1751728f4ca7eb0cc97ffc40c0a12b53fe88a245d4f549890ce89b79c127e30c",
+            "max_length": 21,
+            "min": "1751728f4ca7eb0cc97ffc40c0a12b53fe88a245d4f549890ce89b79c127e30c",
+            "nulls": 0,
+            "sum": null
+          },
+          "ETL_BATCH_ID": {
+            "count": 50000,
+            "distinct": 2,
+            "max": "20260131",
+            "max_length": 8,
+            "min": "20260130",
+            "nulls": 0,
+            "sum": "1013006500010"
+          },
+          "ETL_INSERT_TS": {
+            "count": 50000,
+            "distinct": 1,
+            "max": "2026-01-31 06:00:00.000000",
+            "max_length": 26,
+            "min": "2026-01-31 06:00:00.000000",
+            "nulls": 0,
+            "sum": null
+          },
+          "EXCHANGE_RATE": {
+            "count": 50000,
+            "distinct": 5,
+            "max": "13.400000",
+            "max_length": 9,
+            "min": "0.980000",
+            "nulls": 0,
+            "sum": "282079.140000"
+          },
+          "FLAG_REASON": {
+            "count": 513,
+            "distinct": 2,
+            "max": "d1dba3e09c6c3a006a9efc2ebe5a18816aeca4ca088708548a773c11e317e7d1",
+            "max_length": 13,
+            "min": "1bf6578698a1561a171c99a9d9de9855636181e19c44722e9716e03bf1d099b3",
+            "nulls": 49487,
+            "sum": null
+          },
+          "IS_FLAGGED": {
+            "count": 50000,
+            "distinct": 2,
+            "max": "1",
+            "max_length": 1,
+            "min": "0",
+            "nulls": 0,
+            "sum": "513"
+          },
+          "IS_INTERNATIONAL": {
+            "count": 50000,
+            "distinct": 2,
+            "max": "1",
+            "max_length": 1,
+            "min": "0",
+            "nulls": 0,
+            "sum": "28610"
+          },
+          "MERCHANT_CATEGORY": {
+            "count": 50000,
+            "distinct": 1,
+            "max": "5db4f14573cbfd03a2c2291949b1f2592d1a8ec38d1f44c6c9c319a2201770df",
+            "max_length": 4,
+            "min": "5db4f14573cbfd03a2c2291949b1f2592d1a8ec38d1f44c6c9c319a2201770df",
+            "nulls": 0,
+            "sum": null
+          },
+          "MERCHANT_ID": {
+            "count": 50000,
+            "distinct": 8963,
+            "max": "054b7d6d2e5c30244ee6381d754d6059d543aec91c067e6a3773ecdf58c8c7c4",
+            "max_length": 5,
+            "min": "0c222e95cfcc6e30678a94570b190c75130b81b37a363cf2a3588122b6a8fc46",
+            "nulls": 0,
+            "sum": null
+          },
+          "MERCHANT_NAME": {
+            "count": 50000,
+            "distinct": 50,
+            "max": "abf4f3a8ffdf9c651986b85928aa6d079cb5a778900a6e79ddda260a0de5d0a9",
+            "max_length": 11,
+            "min": "ece7adb2d39af3e24660c4b902325c5a07397990cf7a1f6cdbd99b1d1a9f711a",
+            "nulls": 0,
+            "sum": null
+          },
+          "POSTING_DATE": {
+            "count": 50000,
+            "distinct": 731,
+            "max": "2026-01-31",
+            "max_length": 10,
+            "min": "2024-02-01",
+            "nulls": 0,
+            "sum": null
+          },
+          "PRODUCT_ID": {
+            "count": 50000,
+            "distinct": 10,
+            "max": "10",
+            "max_length": 2,
+            "min": "1",
+            "nulls": 0,
+            "sum": "174881"
+          },
+          "REFERENCE_NUMBER": {
+            "count": 50000,
+            "distinct": 49990,
+            "max": "b217934cf8fd8dc722f4d3acb03ef5ea62a099d5c536f3d8a3bac02c92925b67",
+            "max_length": 11,
+            "min": "05bd504d8af5eefa6419c7a0219a9ef3b5fc2e5e376fcec8f71b937247ff0d3a",
+            "nulls": 0,
+            "sum": null
+          },
+          "RUNNING_BALANCE": {
+            "count": 2,
+            "distinct": 2,
+            "max": "100.00",
+            "max_length": 7,
+            "min": "-500.00",
+            "nulls": 49998,
+            "sum": "-400.00"
+          },
+          "TRANSACTION_AMOUNT": {
+            "count": 50000,
+            "distinct": 48265,
+            "max": "899848.63",
+            "max_length": 9,
+            "min": "10.24",
+            "nulls": 0,
+            "sum": "1034014842.38"
+          },
+          "TRANSACTION_CURRENCY": {
+            "count": 50000,
+            "distinct": 5,
+            "max": "82bb059ec10744f31e0406b8ef7a7a0f3c30c9b18435120fa859b2c0b9627888",
+            "max_length": 3,
+            "min": "87ef325635aa32dd785d818665ee8fe141d7fae0566c7ea09701c82a524452ba",
+            "nulls": 0,
+            "sum": null
+          },
+          "TRANSACTION_DATE": {
+            "count": 50000,
+            "distinct": 731,
+            "max": "2026-01-31",
+            "max_length": 10,
+            "min": "2024-02-01",
+            "nulls": 0,
+            "sum": null
+          },
+          "TRANSACTION_ID": {
+            "count": 50000,
+            "distinct": 49990,
+            "max": "49990",
+            "max_length": 5,
+            "min": "1",
+            "nulls": 0,
+            "sum": "1249780556"
+          },
+          "TRANSACTION_SUBTYPE": {
+            "count": 50000,
+            "distinct": 1,
+            "max": "3a0b5a3033f8edebbe12e85621ae42dce1306e2c94891a4a6b1670324f7e8bb1",
+            "max_length": 12,
+            "min": "3a0b5a3033f8edebbe12e85621ae42dce1306e2c94891a4a6b1670324f7e8bb1",
+            "nulls": 0,
+            "sum": null
+          },
+          "TRANSACTION_TIME": {
+            "count": 50000,
+            "distinct": 37965,
+            "max": "23:59:57.000000",
+            "max_length": 15,
+            "min": "00:00:02.000000",
+            "nulls": 0,
+            "sum": null
+          },
+          "TRANSACTION_TS": {
+            "count": 50000,
+            "distinct": 49969,
+            "max": "2026-01-31 23:59:00.000000",
+            "max_length": 26,
+            "min": "2024-02-01 00:04:14.000000",
+            "nulls": 0,
+            "sum": null
+          },
+          "TRANSACTION_TYPE": {
+            "count": 50000,
+            "distinct": 5,
+            "max": "38d0b4316ac349c529cdc97feaa420027180cb069edd4b2b1ca04bde5022d278",
+            "max_length": 8,
+            "min": "d1cbdb073968bff085da5e2c31855b359fec8ef824cf0b1b479176452afc65bf",
+            "nulls": 0,
+            "sum": null
+          },
+          "VALUE_DATE": {
+            "count": 50000,
+            "distinct": 731,
+            "max": "2026-01-31",
+            "max_length": 10,
+            "min": "2024-02-01",
+            "nulls": 0,
+            "sum": null
+          }
+        },
+        "match": true,
+        "mismatching_columns": []
+      },
+      "L3": {
+        "actual_sha256": "c0c25833fdde5f16543e471c9b8a9ff221e815b54461670f451a39ee70131467",
+        "expected_sha256": "c0c25833fdde5f16543e471c9b8a9ff221e815b54461670f451a39ee70131467",
+        "keys": 50000,
+        "match_percent": 100.0,
+        "matching": 50000
+      },
+      "L4": [],
+      "manifest_count_match": true,
+      "select_query_id": "01c83193-030c-d217-0035-065b0006c5ce",
+      "status": "green"
+    },
+    "STG_CUSTOMER": {
+      "L1": {
+        "actual": 5,
+        "expected": 5,
+        "match": true
+      },
+      "L2": {
+        "actual": {
+          "ADDRESS_LINE_1": {
+            "count": 2,
+            "distinct": 2,
+            "max": "595a2e9dfcd375b11da146d36e5b7c35a849f336b25c294da6d1da455039e35a",
+            "max_length": 100,
+            "min": "f82c4e07429ba85df7aa33b5f08c4db97fa9466aa141e2132d262edd8618b5e5",
+            "nulls": 3,
+            "sum": null
+          },
+          "ADDRESS_LINE_2": {
+            "count": 1,
+            "distinct": 1,
+            "max": "5da059799c4c56327d97abbc9908d0fd19b9dd8e2a6ee4b31afc33eb205368e0",
+            "max_length": 100,
+            "min": "5da059799c4c56327d97abbc9908d0fd19b9dd8e2a6ee4b31afc33eb205368e0",
+            "nulls": 4,
+            "sum": null
+          },
+          "CITY": {
+            "count": 5,
+            "distinct": 2,
+            "max": "87b62fca3c4a1301f590bd355e43e881a992c30bfcb75f4e986bdb775c3fe52c",
+            "max_length": 50,
+            "min": "09a791d1132eeb43e48db1563498e7736b54b68ca34baaa389a65a8298309e7c",
+            "nulls": 0,
+            "sum": null
+          },
+          "COUNTRY_CODE": {
+            "count": 5,
+            "distinct": 1,
+            "max": "a90cd8d6394bac9e46a263fe6e88b0cdbc018b74268b6d0f4e1834ba48da0490",
+            "max_length": 3,
+            "min": "a90cd8d6394bac9e46a263fe6e88b0cdbc018b74268b6d0f4e1834ba48da0490",
+            "nulls": 0,
+            "sum": null
+          },
+          "CREDIT_RATING": {
+            "count": 5,
+            "distinct": 2,
+            "max": "e35d2ca82f96488a17d735d12f5b5d61ceb2fcbf8a391b8f6bd96abf9de43cc2",
+            "max_length": 2,
+            "min": "798640599597df7a8daa32b1132f07850a68b5e71bd295650399a38074f52804",
+            "nulls": 0,
+            "sum": null
+          },
+          "CUSTOMER_ID": {
+            "count": 5,
+            "distinct": 5,
+            "max": "2026002",
+            "max_length": 7,
+            "min": "1001",
+            "nulls": 0,
+            "sum": "4055009"
+          },
+          "CUSTOMER_SEGMENT": {
+            "count": 5,
+            "distinct": 2,
+            "max": "d45ca6f9138540d08ac47f69229b88b954816f181e8a9f80d43d97093fc04624",
+            "max_length": 7,
+            "min": "ee301c337af1b9ecbf0a44cd75c092c6b7cfed3e2c63f7a530d3dbbdaf7684ba",
+            "nulls": 0,
+            "sum": null
+          },
+          "DATE_OF_BIRTH": {
+            "count": 5,
+            "distinct": 3,
+            "max": "1980-01-03",
+            "max_length": 10,
+            "min": "1980-01-01",
+            "nulls": 0,
+            "sum": null
+          },
+          "EMAIL_ADDRESS": {
+            "count": 3,
+            "distinct": 3,
+            "max": "65eb88335e4726e7c7c1f2d6352197c814a920c153d8e9eb57d4178db064ea7c",
+            "max_length": 100,
+            "min": "03e0a9682d04cc7fccaab6c48f55a5c5874b42e5cb5be318b6a07b5be9fb2f72",
+            "nulls": 2,
+            "sum": null
+          },
+          "FIRST_NAME": {
+            "count": 5,
+            "distinct": 4,
+            "max": "68a42d0a1eca513cd181408fa6e853e43dab19de8c59815f2e5b479b76c7a971",
+            "max_length": 50,
+            "min": "f367fc918a2f8a8bc2bc647e00fc78aa0933c0894fa5fe188d7ff0ccf655cc30",
+            "nulls": 0,
+            "sum": null
+          },
+          "GENDER": {
+            "count": 5,
+            "distinct": 2,
+            "max": "7ab5b2d9e5bb761726f65f3c85e8236974910ab12653899a5c737e95a6f23888",
+            "max_length": 1,
+            "min": "66804d12743756eb85fb3115e558e09a95661b3d0f176ac5318ac90dd6fe7811",
+            "nulls": 0,
+            "sum": null
+          },
+          "KYC_STATUS": {
+            "count": 5,
+            "distinct": 2,
+            "max": "c0ea28df48673d3a9957864d4ce5f3963522a14f280fd7d74a98489fdf837cd4",
+            "max_length": 8,
+            "min": "02db5f49d79862ea4bc24c13c6c6f29de1c9028c23831d0429d6df00c63958df",
+            "nulls": 0,
+            "sum": null
+          },
+          "LAST_NAME": {
+            "count": 5,
+            "distinct": 5,
+            "max": "e3ec7a181d31bfcddaa8226eec56f78a0636596378caf1ba5d4ede8716b43d2d",
+            "max_length": 50,
+            "min": "a39da58e9e4b1e4e2d71fd08f3d8b9aef41f3aaf38434aad98e41c8494e8e91b",
+            "nulls": 0,
+            "sum": null
+          },
+          "MARITAL_STATUS": {
+            "count": 5,
+            "distinct": 2,
+            "max": "52bd5f3d03badf80f7ab61b0ebd226fa4b122255c1293fd4530e227c9a66a3f4",
+            "max_length": 1,
+            "min": "7ab5b2d9e5bb761726f65f3c85e8236974910ab12653899a5c737e95a6f23888",
+            "nulls": 0,
+            "sum": null
+          },
+          "PHONE_NUMBER": {
+            "count": 3,
+            "distinct": 3,
+            "max": "905be009fe1bfbedbbb976bde00f01c54fca8b20b01c248327b10fca304bd502",
+            "max_length": 9,
+            "min": "9199f72b54e795d7bd4492eaa8c2b7388855988a4dc8875e15736e927e525fc7",
+            "nulls": 2,
+            "sum": null
+          },
+          "POSTAL_CODE": {
+            "count": 5,
+            "distinct": 3,
+            "max": "f61f821ca415d6d443193bc786e481c7de663cd91e90971637fcdc6db22c479d",
+            "max_length": 4,
+            "min": "fb6d895a6fdd851283f23e2f0b2945dd7420625f18477c694c8bf33731693d33",
+            "nulls": 0,
+            "sum": null
+          },
+          "RISK_SCORE": {
+            "count": 5,
+            "distinct": 3,
+            "max": "88.75",
+            "max_length": 5,
+            "min": "68.30",
+            "nulls": 0,
+            "sum": "374.55"
+          },
+          "STATE_PROVINCE": {
+            "count": 5,
+            "distinct": 2,
+            "max": "be9b027d65e9508b4e5662c7247506ec47131fc80fbc66b2dfee507e80a74427",
+            "max_length": 50,
+            "min": "3d70d3c2a9c90c1a02a2d30d87c4fa9d6049dd80f7bb2777f44d0f343b1a6665",
+            "nulls": 0,
+            "sum": null
+          }
+        },
+        "match": true,
+        "mismatching_columns": []
+      },
+      "L3": {
+        "actual_sha256": "fb948f40d161025f698e2f3430198a41a302d09b587e7d8b9cdde867d638b664",
+        "expected_sha256": "fb948f40d161025f698e2f3430198a41a302d09b587e7d8b9cdde867d638b664",
+        "keys": 5,
+        "match_percent": 100.0,
+        "matching": 5
+      },
+      "L4": [],
+      "manifest_count_match": true,
+      "select_query_id": "01c83193-030c-d212-0035-065b00069662",
+      "status": "green"
+    },
+    "STG_TRANSACTIONS": {
+      "L1": {
+        "actual": 11,
+        "expected": 11,
+        "match": true
+      },
+      "L2": {
+        "actual": {
+          "ACCOUNT_ID": {
+            "count": 11,
+            "distinct": 2,
+            "max": "f9d161ff658a17179ae6ee8328e0e48a45fc7cfa4fb612c6b47cc39fb8d69355",
+            "max_length": 15,
+            "min": "1ecab514bce7070a1c790b1f58774148049ebb5d258ab6a3685900b237376796",
+            "nulls": 0,
+            "sum": null
+          },
+          "CHANNEL": {
+            "count": 11,
+            "distinct": 1,
+            "max": "8083782cc6939d35cfb3092b70356373daf00c1351434b77b03fd871939fdd9b",
+            "max_length": 6,
+            "min": "8083782cc6939d35cfb3092b70356373daf00c1351434b77b03fd871939fdd9b",
+            "nulls": 0,
+            "sum": null
+          },
+          "COUNTERPARTY_ACCT": {
+            "count": 11,
+            "distinct": 1,
+            "max": "ea37281948ff3f1bab05431fb154b7dce1f727bb7d502820927bf83b1573327f",
+            "max_length": 20,
+            "min": "ea37281948ff3f1bab05431fb154b7dce1f727bb7d502820927bf83b1573327f",
+            "nulls": 0,
+            "sum": null
+          },
+          "CURRENCY_CODE": {
+            "count": 11,
+            "distinct": 2,
+            "max": "4411244d921616a0e12cbbfe05eb7da0d96ff2033c6436f01e8a76535f3a74bf",
+            "max_length": 3,
+            "min": "87ef325635aa32dd785d818665ee8fe141d7fae0566c7ea09701c82a524452ba",
+            "nulls": 0,
+            "sum": null
+          },
+          "DESCRIPTION_TEXT": {
+            "count": 11,
+            "distinct": 6,
+            "max": "03bb9fc34e31667f3fd11e48e8a3e058063147bec7108edd5fcbb074a8591496",
+            "max_length": 17,
+            "min": "eef2ac7e7887a590a29a621d9f8b4ea7699f7662f1316eb2ed219c90def10a8e",
+            "nulls": 0,
+            "sum": null
+          },
+          "LOAD_DATE": {
+            "count": 11,
+            "distinct": 1,
+            "max": "2026-01-31",
+            "max_length": 10,
+            "min": "2026-01-31",
+            "nulls": 0,
+            "sum": null
+          },
+          "MERCHANT_CATEGORY": {
+            "count": 0,
+            "distinct": 0,
+            "max": null,
+            "max_length": 0,
+            "min": null,
+            "nulls": 11,
+            "sum": null
+          },
+          "MERCHANT_ID": {
+            "count": 0,
+            "distinct": 0,
+            "max": null,
+            "max_length": 0,
+            "min": null,
+            "nulls": 11,
+            "sum": null
+          },
+          "MERCHANT_NAME": {
+            "count": 0,
+            "distinct": 0,
+            "max": null,
+            "max_length": 0,
+            "min": null,
+            "nulls": 11,
+            "sum": null
+          },
+          "POSTING_DATE": {
+            "count": 11,
+            "distinct": 1,
+            "max": "2026-01-31",
+            "max_length": 10,
+            "min": "2026-01-31",
+            "nulls": 0,
+            "sum": null
+          },
+          "REFERENCE_NUMBER": {
+            "count": 11,
+            "distinct": 11,
+            "max": "0ac02e65460127f0876154be1721602bc302c3cba4760f30cc3681db5e3f5162",
+            "max_length": 11,
+            "min": "371b15401d392ad3b7acdfbda8ff2b6df8e032605aff921fa2e6f25bd071837f",
+            "nulls": 0,
+            "sum": null
+          },
+          "TRANSACTION_AMOUNT": {
+            "count": 11,
+            "distinct": 7,
+            "max": "100000.00",
+            "max_length": 9,
+            "min": "50.00",
+            "nulls": 0,
+            "sum": "333325.00"
+          },
+          "TRANSACTION_DATE": {
+            "count": 11,
+            "distinct": 1,
+            "max": "2026-01-31",
+            "max_length": 10,
+            "min": "2026-01-31",
+            "nulls": 0,
+            "sum": null
+          },
+          "TRANSACTION_ID": {
+            "count": 11,
+            "distinct": 11,
+            "max": "900011",
+            "max_length": 6,
+            "min": "900001",
+            "nulls": 0,
+            "sum": "9900066"
+          },
+          "TRANSACTION_SUBTYPE": {
+            "count": 11,
+            "distinct": 1,
+            "max": "1b512e762eecd4781dcd5107e158571f9e062e52f11f72196034792379d557e8",
+            "max_length": 13,
+            "min": "1b512e762eecd4781dcd5107e158571f9e062e52f11f72196034792379d557e8",
+            "nulls": 0,
+            "sum": null
+          },
+          "TRANSACTION_TIME": {
+            "count": 11,
+            "distinct": 9,
+            "max": "19:00:00.000000",
+            "max_length": 15,
+            "min": "09:00:00.000000",
+            "nulls": 0,
+            "sum": null
+          },
+          "TRANSACTION_TYPE": {
+            "count": 11,
+            "distinct": 3,
+            "max": "38d0b4316ac349c529cdc97feaa420027180cb069edd4b2b1ca04bde5022d278",
+            "max_length": 8,
+            "min": "d1cbdb073968bff085da5e2c31855b359fec8ef824cf0b1b479176452afc65bf",
+            "nulls": 0,
+            "sum": null
+          },
+          "VALUE_DATE": {
+            "count": 11,
+            "distinct": 1,
+            "max": "2026-01-31",
+            "max_length": 10,
+            "min": "2026-01-31",
+            "nulls": 0,
+            "sum": null
+          }
+        },
+        "match": true,
+        "mismatching_columns": []
+      },
+      "L3": {
+        "actual_sha256": "dde6fa5316cdf2b9d3e829f1df208d52bdfaff7468670af24436b78e3244de17",
+        "expected_sha256": "dde6fa5316cdf2b9d3e829f1df208d52bdfaff7468670af24436b78e3244de17",
+        "keys": 11,
+        "match_percent": 100.0,
+        "matching": 11
+      },
+      "L4": [],
+      "manifest_count_match": true,
+      "select_query_id": "01c83193-030c-d216-0035-065b000685c6",
+      "status": "green"
+    },
+    "STG_TRANSACTION_ERRORS": {
+      "L1": {
+        "actual": 0,
+        "expected": 0,
+        "match": true
+      },
+      "L2": {
+        "actual": {
+          "ACCOUNT_ID": {
+            "count": 0,
+            "distinct": 0,
+            "max": null,
+            "max_length": 0,
+            "min": null,
+            "nulls": 0,
+            "sum": null
+          },
+          "BATCH_ID": {
+            "count": 0,
+            "distinct": 0,
+            "max": null,
+            "max_length": 0,
+            "min": null,
+            "nulls": 0,
+            "sum": "0"
+          },
+          "CHANNEL": {
+            "count": 0,
+            "distinct": 0,
+            "max": null,
+            "max_length": 0,
+            "min": null,
+            "nulls": 0,
+            "sum": null
+          },
+          "COUNTERPARTY_ACCT": {
+            "count": 0,
+            "distinct": 0,
+            "max": null,
+            "max_length": 0,
+            "min": null,
+            "nulls": 0,
+            "sum": null
+          },
+          "CURRENCY_CODE": {
+            "count": 0,
+            "distinct": 0,
+            "max": null,
+            "max_length": 0,
+            "min": null,
+            "nulls": 0,
+            "sum": null
+          },
+          "DESCRIPTION_TEXT": {
+            "count": 0,
+            "distinct": 0,
+            "max": null,
+            "max_length": 0,
+            "min": null,
+            "nulls": 0,
+            "sum": null
+          },
+          "ERROR_REASON": {
+            "count": 0,
+            "distinct": 0,
+            "max": null,
+            "max_length": 0,
+            "min": null,
+            "nulls": 0,
+            "sum": null
+          },
+          "LOAD_DATE": {
+            "count": 0,
+            "distinct": 0,
+            "max": null,
+            "max_length": 0,
+            "min": null,
+            "nulls": 0,
+            "sum": null
+          },
+          "MERCHANT_CATEGORY": {
+            "count": 0,
+            "distinct": 0,
+            "max": null,
+            "max_length": 0,
+            "min": null,
+            "nulls": 0,
+            "sum": null
+          },
+          "MERCHANT_ID": {
+            "count": 0,
+            "distinct": 0,
+            "max": null,
+            "max_length": 0,
+            "min": null,
+            "nulls": 0,
+            "sum": null
+          },
+          "MERCHANT_NAME": {
+            "count": 0,
+            "distinct": 0,
+            "max": null,
+            "max_length": 0,
+            "min": null,
+            "nulls": 0,
+            "sum": null
+          },
+          "POSTING_DATE": {
+            "count": 0,
+            "distinct": 0,
+            "max": null,
+            "max_length": 0,
+            "min": null,
+            "nulls": 0,
+            "sum": null
+          },
+          "REFERENCE_NUMBER": {
+            "count": 0,
+            "distinct": 0,
+            "max": null,
+            "max_length": 0,
+            "min": null,
+            "nulls": 0,
+            "sum": null
+          },
+          "TRANSACTION_AMOUNT": {
+            "count": 0,
+            "distinct": 0,
+            "max": null,
+            "max_length": 0,
+            "min": null,
+            "nulls": 0,
+            "sum": "0.00"
+          },
+          "TRANSACTION_DATE": {
+            "count": 0,
+            "distinct": 0,
+            "max": null,
+            "max_length": 0,
+            "min": null,
+            "nulls": 0,
+            "sum": null
+          },
+          "TRANSACTION_ID": {
+            "count": 0,
+            "distinct": 0,
+            "max": null,
+            "max_length": 0,
+            "min": null,
+            "nulls": 0,
+            "sum": "0"
+          },
+          "TRANSACTION_SUBTYPE": {
+            "count": 0,
+            "distinct": 0,
+            "max": null,
+            "max_length": 0,
+            "min": null,
+            "nulls": 0,
+            "sum": null
+          },
+          "TRANSACTION_TIME": {
+            "count": 0,
+            "distinct": 0,
+            "max": null,
+            "max_length": 0,
+            "min": null,
+            "nulls": 0,
+            "sum": null
+          },
+          "TRANSACTION_TYPE": {
+            "count": 0,
+            "distinct": 0,
+            "max": null,
+            "max_length": 0,
+            "min": null,
+            "nulls": 0,
+            "sum": null
+          },
+          "VALUE_DATE": {
+            "count": 0,
+            "distinct": 0,
+            "max": null,
+            "max_length": 0,
+            "min": null,
+            "nulls": 0,
+            "sum": null
+          }
+        },
+        "match": true,
+        "mismatching_columns": []
+      },
+      "L3": {
+        "actual_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "expected_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "keys": 0,
+        "match_percent": 100.0,
+        "matching": 0
+      },
+      "L4": [],
+      "manifest_count_match": true,
+      "select_query_id": "01c83193-030c-d2f7-0035-065b0006b532",
+      "status": "green"
+    }
+  },
+  "views": {
+    "VW_BRANCH_PERFORMANCE": {
+      "compile_and_read": true,
+      "query_id": "01c83193-030c-d2f7-0035-065b0006b536",
+      "rows": 250,
+      "semantic_parity": "not evaluated in this seed ticket"
+    },
+    "VW_CUSTOMER_360": {
+      "compile_and_read": true,
+      "query_id": "01c83193-030c-d212-0035-065b0006966a",
+      "rows": 15,
+      "semantic_parity": "not evaluated in this seed ticket"
+    },
+    "VW_REGULATORY_LARGE_TRANSACTIONS": {
+      "compile_and_read": true,
+      "query_id": "01c83193-030c-d1ca-0035-065b0006459a",
+      "rows": 5478,
+      "semantic_parity": "not evaluated in this seed ticket"
+    }
+  }
+}

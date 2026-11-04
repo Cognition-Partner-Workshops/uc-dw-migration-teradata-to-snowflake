@@ -1,0 +1,1116 @@
+{
+  "as_of": "2026-01-31",
+  "commit": "3b7daf5c4d41cf7c159fbd5e0e8c71b981f60fc6",
+  "deploy_errors": [],
+  "executed_at_utc": "2026-11-04T21:26:45.707841+00:00",
+  "label": "g-harness",
+  "legacy_sha256": {
+    "actual": "f44a03f273961af59a944353a8d3aaa2df87779b90eb9e8f9631649330e4dad4",
+    "expected": "f44a03f273961af59a944353a8d3aaa2df87779b90eb9e8f9631649330e4dad4",
+    "match": true
+  },
+  "outputs": [
+    {
+      "L1": {
+        "actual": 7,
+        "expected": 7,
+        "match": true
+      },
+      "L2": {
+        "actual": {
+          "ROW_COUNT": {
+            "count": 7,
+            "distinct": 7,
+            "max": "50000",
+            "max_length": 5,
+            "min": "10",
+            "nulls": 0,
+            "sum": "62937"
+          },
+          "TABLE_NAME": {
+            "count": 7,
+            "distinct": 7,
+            "max": "FACT_TRANSAC",
+            "max_length": 12,
+            "min": "DIM_ACCOUNT",
+            "nulls": 0,
+            "sum": null
+          }
+        },
+        "expected": {
+          "ROW_COUNT": {
+            "count": 7,
+            "distinct": 7,
+            "max": "50000",
+            "max_length": 5,
+            "min": "10",
+            "nulls": 0,
+            "sum": "62937"
+          },
+          "TABLE_NAME": {
+            "count": 7,
+            "distinct": 7,
+            "max": "FACT_TRANSAC",
+            "max_length": 12,
+            "min": "DIM_ACCOUNT",
+            "nulls": 0,
+            "sum": null
+          }
+        },
+        "match": true,
+        "mismatching_columns": []
+      },
+      "L3": {
+        "actual_sha256": "58a394a5b9e4c26967737b95d842dbf0f99969f7d6476aaca40804d752668560",
+        "expected_sha256": "58a394a5b9e4c26967737b95d842dbf0f99969f7d6476aaca40804d752668560",
+        "keys": 7,
+        "match": true,
+        "match_percent": 100.0,
+        "matching": 7,
+        "vacuous": false
+      },
+      "L4": [],
+      "key": [
+        "TABLE_NAME"
+      ],
+      "name": "q1_row_counts",
+      "query_id": "01c831a6-030c-d212-0035-065b000699ca",
+      "questions": [],
+      "status": "green"
+    },
+    {
+      "L1": {
+        "actual": 1,
+        "expected": 1,
+        "match": true
+      },
+      "L2": {
+        "actual": {
+          "ACTIVE_COUNT": {
+            "count": 1,
+            "distinct": 1,
+            "max": "15",
+            "max_length": 2,
+            "min": "15",
+            "nulls": 0,
+            "sum": "15"
+          },
+          "DISTINCT_CUSTOMERS": {
+            "count": 1,
+            "distinct": 1,
+            "max": "15",
+            "max_length": 2,
+            "min": "15",
+            "nulls": 0,
+            "sum": "15"
+          },
+          "HASH_SUM": {
+            "count": 1,
+            "distinct": 1,
+            "max": "141158072122237418528",
+            "max_length": 21,
+            "min": "141158072122237418528",
+            "nulls": 0,
+            "sum": "141158072122237418528"
+          },
+          "MAX_ONBOARD_DATE": {
+            "count": 1,
+            "distinct": 1,
+            "max": "2026-01-15",
+            "max_length": 10,
+            "min": "2026-01-15",
+            "nulls": 0,
+            "sum": null
+          },
+          "MIN_ONBOARD_DATE": {
+            "count": 1,
+            "distinct": 1,
+            "max": "2005-02-28",
+            "max_length": 10,
+            "min": "2005-02-28",
+            "nulls": 0,
+            "sum": null
+          },
+          "ROW_COUNT": {
+            "count": 1,
+            "distinct": 1,
+            "max": "15",
+            "max_length": 2,
+            "min": "15",
+            "nulls": 0,
+            "sum": "15"
+          }
+        },
+        "expected": {
+          "ACTIVE_COUNT": {
+            "count": 1,
+            "distinct": 1,
+            "max": "15",
+            "max_length": 2,
+            "min": "15",
+            "nulls": 0,
+            "sum": "15"
+          },
+          "DISTINCT_CUSTOMERS": {
+            "count": 1,
+            "distinct": 1,
+            "max": "15",
+            "max_length": 2,
+            "min": "15",
+            "nulls": 0,
+            "sum": "15"
+          },
+          "HASH_SUM": {
+            "count": 1,
+            "distinct": 1,
+            "max": "141158072122237418528",
+            "max_length": 21,
+            "min": "141158072122237418528",
+            "nulls": 0,
+            "sum": "141158072122237418528"
+          },
+          "MAX_ONBOARD_DATE": {
+            "count": 1,
+            "distinct": 1,
+            "max": "2026-01-15",
+            "max_length": 10,
+            "min": "2026-01-15",
+            "nulls": 0,
+            "sum": null
+          },
+          "MIN_ONBOARD_DATE": {
+            "count": 1,
+            "distinct": 1,
+            "max": "2005-02-28",
+            "max_length": 10,
+            "min": "2005-02-28",
+            "nulls": 0,
+            "sum": null
+          },
+          "ROW_COUNT": {
+            "count": 1,
+            "distinct": 1,
+            "max": "15",
+            "max_length": 2,
+            "min": "15",
+            "nulls": 0,
+            "sum": "15"
+          }
+        },
+        "match": true,
+        "mismatching_columns": []
+      },
+      "L3": {
+        "actual_sha256": "82d2047d72c1149716c82bc6f950556756119982dffb6fa35adde7460d453f3c",
+        "expected_sha256": "82d2047d72c1149716c82bc6f950556756119982dffb6fa35adde7460d453f3c",
+        "keys": 1,
+        "match": true,
+        "match_percent": 100.0,
+        "matching": 1,
+        "vacuous": false
+      },
+      "L4": [],
+      "key": [],
+      "name": "q2_dim_customer_checksum",
+      "query_id": "01c831a6-030c-d2f8-0035-065b0006f98e",
+      "questions": [],
+      "status": "green"
+    },
+    {
+      "L1": {
+        "actual": 24,
+        "expected": 24,
+        "match": true
+      },
+      "L2": {
+        "actual": {
+          "CREDIT_COUNT": {
+            "count": 24,
+            "distinct": 21,
+            "max": "452",
+            "max_length": 3,
+            "min": "379",
+            "nulls": 0,
+            "sum": "10034"
+          },
+          "DEBIT_COUNT": {
+            "count": 24,
+            "distinct": 22,
+            "max": "450",
+            "max_length": 3,
+            "min": "373",
+            "nulls": 0,
+            "sum": "9869"
+          },
+          "DISTINCT_ACCOUNTS": {
+            "count": 24,
+            "distinct": 1,
+            "max": "20",
+            "max_length": 2,
+            "min": "20",
+            "nulls": 0,
+            "sum": "480"
+          },
+          "DISTINCT_CUSTOMERS": {
+            "count": 24,
+            "distinct": 1,
+            "max": "10",
+            "max_length": 2,
+            "min": "10",
+            "nulls": 0,
+            "sum": "240"
+          },
+          "INTL_COUNT": {
+            "count": 24,
+            "distinct": 22,
+            "max": "1282",
+            "max_length": 4,
+            "min": "1109",
+            "nulls": 0,
+            "sum": "28610"
+          },
+          "TOTAL_AMOUNT": {
+            "count": 24,
+            "distinct": 24,
+            "max": "51436653.92",
+            "max_length": 11,
+            "min": "34036051.83",
+            "nulls": 0,
+            "sum": "1034014842.38"
+          },
+          "TOTAL_BASE_AMOUNT": {
+            "count": 24,
+            "distinct": 24,
+            "max": "252195497.53",
+            "max_length": 12,
+            "min": "134542171.55",
+            "nulls": 0,
+            "sum": "4723528919.45"
+          },
+          "TXN_COUNT": {
+            "count": 24,
+            "distinct": 22,
+            "max": "2193",
+            "max_length": 4,
+            "min": "1856",
+            "nulls": 0,
+            "sum": "50000"
+          },
+          "TXN_MONTH": {
+            "count": 24,
+            "distinct": 12,
+            "max": "12",
+            "max_length": 2,
+            "min": "1",
+            "nulls": 0,
+            "sum": "156"
+          },
+          "TXN_YEAR": {
+            "count": 24,
+            "distinct": 3,
+            "max": "2026",
+            "max_length": 4,
+            "min": "2024",
+            "nulls": 0,
+            "sum": "48590"
+          }
+        },
+        "expected": {
+          "CREDIT_COUNT": {
+            "count": 24,
+            "distinct": 21,
+            "max": "452",
+            "max_length": 3,
+            "min": "379",
+            "nulls": 0,
+            "sum": "10034"
+          },
+          "DEBIT_COUNT": {
+            "count": 24,
+            "distinct": 22,
+            "max": "450",
+            "max_length": 3,
+            "min": "373",
+            "nulls": 0,
+            "sum": "9869"
+          },
+          "DISTINCT_ACCOUNTS": {
+            "count": 24,
+            "distinct": 1,
+            "max": "20",
+            "max_length": 2,
+            "min": "20",
+            "nulls": 0,
+            "sum": "480"
+          },
+          "DISTINCT_CUSTOMERS": {
+            "count": 24,
+            "distinct": 1,
+            "max": "10",
+            "max_length": 2,
+            "min": "10",
+            "nulls": 0,
+            "sum": "240"
+          },
+          "INTL_COUNT": {
+            "count": 24,
+            "distinct": 22,
+            "max": "1282",
+            "max_length": 4,
+            "min": "1109",
+            "nulls": 0,
+            "sum": "28610"
+          },
+          "TOTAL_AMOUNT": {
+            "count": 24,
+            "distinct": 24,
+            "max": "51436653.92",
+            "max_length": 11,
+            "min": "34036051.83",
+            "nulls": 0,
+            "sum": "1034014842.38"
+          },
+          "TOTAL_BASE_AMOUNT": {
+            "count": 24,
+            "distinct": 24,
+            "max": "252195497.53",
+            "max_length": 12,
+            "min": "134542171.55",
+            "nulls": 0,
+            "sum": "4723528919.45"
+          },
+          "TXN_COUNT": {
+            "count": 24,
+            "distinct": 22,
+            "max": "2193",
+            "max_length": 4,
+            "min": "1856",
+            "nulls": 0,
+            "sum": "50000"
+          },
+          "TXN_MONTH": {
+            "count": 24,
+            "distinct": 12,
+            "max": "12",
+            "max_length": 2,
+            "min": "1",
+            "nulls": 0,
+            "sum": "156"
+          },
+          "TXN_YEAR": {
+            "count": 24,
+            "distinct": 3,
+            "max": "2026",
+            "max_length": 4,
+            "min": "2024",
+            "nulls": 0,
+            "sum": "48590"
+          }
+        },
+        "match": true,
+        "mismatching_columns": []
+      },
+      "L3": {
+        "actual_sha256": "65984177ea4429fba41471c84d46c28cc4b8a4d53d59984a0dc0f5b8a96cb991",
+        "expected_sha256": "65984177ea4429fba41471c84d46c28cc4b8a4d53d59984a0dc0f5b8a96cb991",
+        "keys": 24,
+        "match": true,
+        "match_percent": 100.0,
+        "matching": 24,
+        "vacuous": false
+      },
+      "L4": [],
+      "key": [
+        "TXN_YEAR",
+        "TXN_MONTH"
+      ],
+      "name": "q3_fact_transaction_aggregates",
+      "query_id": "01c831a6-030c-d2f7-0035-065b0006b872",
+      "questions": [],
+      "status": "green"
+    },
+    {
+      "L1": {
+        "actual": 96,
+        "expected": 96,
+        "match": true
+      },
+      "L2": {
+        "actual": {
+          "ACCOUNT_COUNT": {
+            "count": 96,
+            "distinct": 1,
+            "max": "20",
+            "max_length": 2,
+            "min": "20",
+            "nulls": 0,
+            "sum": "1920"
+          },
+          "SNAPSHOT_MONTH_KEY": {
+            "count": 96,
+            "distinct": 96,
+            "max": "202601",
+            "max_length": 6,
+            "min": "201802",
+            "nulls": 0,
+            "sum": "19407824"
+          },
+          "TOTAL_CREDITS": {
+            "count": 96,
+            "distinct": 96,
+            "max": "520364.28",
+            "max_length": 9,
+            "min": "280874.42",
+            "nulls": 0,
+            "sum": "38026738.27"
+          },
+          "TOTAL_DEBITS": {
+            "count": 96,
+            "distinct": 96,
+            "max": "493030.21",
+            "max_length": 9,
+            "min": "245215.73",
+            "nulls": 0,
+            "sum": "37951906.36"
+          },
+          "TOTAL_DEPOSITS": {
+            "count": 96,
+            "distinct": 96,
+            "max": "2678301.71",
+            "max_length": 10,
+            "min": "2139480.86",
+            "nulls": 0,
+            "sum": "228408151.60"
+          },
+          "TOTAL_FEES": {
+            "count": 96,
+            "distinct": 96,
+            "max": "1792.70",
+            "max_length": 7,
+            "min": "1127.58",
+            "nulls": 0,
+            "sum": "143733.93"
+          },
+          "TOTAL_INTEREST": {
+            "count": 96,
+            "distinct": 96,
+            "max": "4139.49",
+            "max_length": 7,
+            "min": "1842.83",
+            "nulls": 0,
+            "sum": "288553.00"
+          }
+        },
+        "expected": {
+          "ACCOUNT_COUNT": {
+            "count": 96,
+            "distinct": 1,
+            "max": "20",
+            "max_length": 2,
+            "min": "20",
+            "nulls": 0,
+            "sum": "1920"
+          },
+          "SNAPSHOT_MONTH_KEY": {
+            "count": 96,
+            "distinct": 96,
+            "max": "202601",
+            "max_length": 6,
+            "min": "201802",
+            "nulls": 0,
+            "sum": "19407824"
+          },
+          "TOTAL_CREDITS": {
+            "count": 96,
+            "distinct": 96,
+            "max": "520364.28",
+            "max_length": 9,
+            "min": "280874.42",
+            "nulls": 0,
+            "sum": "38026738.27"
+          },
+          "TOTAL_DEBITS": {
+            "count": 96,
+            "distinct": 96,
+            "max": "493030.21",
+            "max_length": 9,
+            "min": "245215.73",
+            "nulls": 0,
+            "sum": "37951906.36"
+          },
+          "TOTAL_DEPOSITS": {
+            "count": 96,
+            "distinct": 96,
+            "max": "2678301.71",
+            "max_length": 10,
+            "min": "2139480.86",
+            "nulls": 0,
+            "sum": "228408151.60"
+          },
+          "TOTAL_FEES": {
+            "count": 96,
+            "distinct": 96,
+            "max": "1792.70",
+            "max_length": 7,
+            "min": "1127.58",
+            "nulls": 0,
+            "sum": "143733.93"
+          },
+          "TOTAL_INTEREST": {
+            "count": 96,
+            "distinct": 96,
+            "max": "4139.49",
+            "max_length": 7,
+            "min": "1842.83",
+            "nulls": 0,
+            "sum": "288553.00"
+          }
+        },
+        "match": true,
+        "mismatching_columns": []
+      },
+      "L3": {
+        "actual_sha256": "6d23b5f09c62276a0ddf85f68fdf88df2d9cbc3c70f0a7127a7df3bd6c311457",
+        "expected_sha256": "6d23b5f09c62276a0ddf85f68fdf88df2d9cbc3c70f0a7127a7df3bd6c311457",
+        "keys": 96,
+        "match": true,
+        "match_percent": 100.0,
+        "matching": 96,
+        "vacuous": false
+      },
+      "L4": [],
+      "key": [
+        "SNAPSHOT_MONTH_KEY"
+      ],
+      "name": "q4_monthly_balance_reconciliation",
+      "query_id": "01c831a6-030c-d20d-0035-065b00063942",
+      "questions": [],
+      "status": "green"
+    },
+    {
+      "L1": {
+        "actual": 3,
+        "expected": 3,
+        "match": true
+      },
+      "L2": {
+        "actual": {
+          "CHECK_NAME": {
+            "count": 3,
+            "distinct": 3,
+            "max": "ORPHAN_TXN_CUSTOME",
+            "max_length": 18,
+            "min": "ORPHAN_SNAP_ACCOUN",
+            "nulls": 0,
+            "sum": null
+          },
+          "ORPHAN_COUNT": {
+            "count": 3,
+            "distinct": 1,
+            "max": "0",
+            "max_length": 1,
+            "min": "0",
+            "nulls": 0,
+            "sum": "0"
+          }
+        },
+        "expected": {
+          "CHECK_NAME": {
+            "count": 3,
+            "distinct": 3,
+            "max": "ORPHAN_TXN_CUSTOME",
+            "max_length": 18,
+            "min": "ORPHAN_SNAP_ACCOUN",
+            "nulls": 0,
+            "sum": null
+          },
+          "ORPHAN_COUNT": {
+            "count": 3,
+            "distinct": 1,
+            "max": "0",
+            "max_length": 1,
+            "min": "0",
+            "nulls": 0,
+            "sum": "0"
+          }
+        },
+        "match": true,
+        "mismatching_columns": []
+      },
+      "L3": {
+        "actual_sha256": "293a7e3b32bd7577c3bd457f616c808ef0679f0b63d3195999f0b748969d0b6b",
+        "expected_sha256": "293a7e3b32bd7577c3bd457f616c808ef0679f0b63d3195999f0b748969d0b6b",
+        "keys": 3,
+        "match": true,
+        "match_percent": 100.0,
+        "matching": 3,
+        "vacuous": false
+      },
+      "L4": [],
+      "key": [
+        "CHECK_NAME"
+      ],
+      "name": "q5_orphan_checks",
+      "query_id": "01c831a6-030c-d41e-0035-065b0007589a",
+      "questions": [],
+      "status": "green"
+    }
+  ],
+  "precheck": {
+    "documented_count_gate": {
+      "DIM_ACCOUNT": true,
+      "DIM_BRANCH": true,
+      "DIM_CUSTOMER": true,
+      "DIM_DATE": true,
+      "DIM_PRODUCT": true,
+      "FACT_MONTHLY_ACCOUNT_SNAPSHOT": true,
+      "FACT_TRANSACTION": true
+    },
+    "manifest_sha256": "d7cc94ca5d411df98423d7004f648228f511a88f27f79339f26b41188f87b19a",
+    "schema_contract_errors": [],
+    "status": "green",
+    "supplied_role_verified": true,
+    "tables": {
+      "DIM_ACCOUNT": {
+        "L1": {
+          "actual": 20,
+          "expected": 20,
+          "match": true
+        },
+        "L2": {
+          "match": true
+        },
+        "L3": {
+          "keys": 20,
+          "match_percent": 100.0,
+          "matching": 20,
+          "vacuous": false
+        },
+        "query_id": "01c831a6-030c-d217-0035-065b0006c96a",
+        "status": "green"
+      },
+      "DIM_BRANCH": {
+        "L1": {
+          "actual": 14,
+          "expected": 14,
+          "match": true
+        },
+        "L2": {
+          "match": true
+        },
+        "L3": {
+          "keys": 14,
+          "match_percent": 100.0,
+          "matching": 14,
+          "vacuous": false
+        },
+        "query_id": "01c831a6-030c-d214-0035-065b0006588a",
+        "status": "green"
+      },
+      "DIM_CUSTOMER": {
+        "L1": {
+          "actual": 15,
+          "expected": 15,
+          "match": true
+        },
+        "L2": {
+          "match": true
+        },
+        "L3": {
+          "keys": 15,
+          "match_percent": 100.0,
+          "matching": 15,
+          "vacuous": false
+        },
+        "query_id": "01c831a6-030c-d2f7-0035-065b0006b862",
+        "status": "green"
+      },
+      "DIM_DATE": {
+        "L1": {
+          "actual": 10958,
+          "expected": 10958,
+          "match": true
+        },
+        "L2": {
+          "match": true
+        },
+        "L3": {
+          "keys": 10958,
+          "match_percent": 100.0,
+          "matching": 10958,
+          "vacuous": false
+        },
+        "query_id": "01c831a6-030c-d41e-0035-065b0007588e",
+        "status": "green"
+      },
+      "DIM_EXCHANGE_RATES": {
+        "L1": {
+          "actual": 6,
+          "expected": 6,
+          "match": true
+        },
+        "L2": {
+          "match": true
+        },
+        "L3": {
+          "keys": 6,
+          "match_percent": 100.0,
+          "matching": 6,
+          "vacuous": false
+        },
+        "query_id": "01c831a6-030c-d214-0035-065b00065896",
+        "status": "green"
+      },
+      "DIM_PRODUCT": {
+        "L1": {
+          "actual": 10,
+          "expected": 10,
+          "match": true
+        },
+        "L2": {
+          "match": true
+        },
+        "L3": {
+          "keys": 10,
+          "match_percent": 100.0,
+          "matching": 10,
+          "vacuous": false
+        },
+        "query_id": "01c831a6-030c-d217-0035-065b0006c96e",
+        "status": "green"
+      },
+      "ETL_BATCH_CONTROL": {
+        "L1": {
+          "actual": 1,
+          "expected": 1,
+          "match": true
+        },
+        "L2": {
+          "match": true
+        },
+        "L3": {
+          "keys": 1,
+          "match_percent": 100.0,
+          "matching": 1,
+          "vacuous": false
+        },
+        "query_id": "01c831a6-030c-d2f7-0035-065b0006b86e",
+        "status": "green"
+      },
+      "ETL_LOG": {
+        "L1": {
+          "actual": 0,
+          "expected": 0,
+          "match": true
+        },
+        "L2": {
+          "match": true
+        },
+        "L3": {
+          "keys": 0,
+          "match_percent": 100.0,
+          "matching": 0,
+          "vacuous": true
+        },
+        "query_id": "01c831a6-030c-d2f8-0035-065b0006f986",
+        "status": "green"
+      },
+      "FACT_MONTHLY_ACCOUNT_SNAPSHOT": {
+        "L1": {
+          "actual": 1920,
+          "expected": 1920,
+          "match": true
+        },
+        "L2": {
+          "match": true
+        },
+        "L3": {
+          "keys": 1920,
+          "match_percent": 100.0,
+          "matching": 1920,
+          "vacuous": false
+        },
+        "query_id": "01c831a6-030c-d214-0035-065b00065892",
+        "status": "green"
+      },
+      "FACT_TRANSACTION": {
+        "L1": {
+          "actual": 50000,
+          "expected": 50000,
+          "match": true
+        },
+        "L2": {
+          "match": true
+        },
+        "L3": {
+          "keys": 50000,
+          "match_percent": 100.0,
+          "matching": 50000,
+          "vacuous": false
+        },
+        "query_id": "01c831a6-030c-d217-0035-065b0006c972",
+        "status": "green"
+      },
+      "STG_CUSTOMER": {
+        "L1": {
+          "actual": 5,
+          "expected": 5,
+          "match": true
+        },
+        "L2": {
+          "match": true
+        },
+        "L3": {
+          "keys": 5,
+          "match_percent": 100.0,
+          "matching": 5,
+          "vacuous": false
+        },
+        "query_id": "01c831a6-030c-d2f8-0035-065b0006f982",
+        "status": "green"
+      },
+      "STG_TRANSACTIONS": {
+        "L1": {
+          "actual": 11,
+          "expected": 11,
+          "match": true
+        },
+        "L2": {
+          "match": true
+        },
+        "L3": {
+          "keys": 11,
+          "match_percent": 100.0,
+          "matching": 11,
+          "vacuous": false
+        },
+        "query_id": "01c831a6-030c-d217-0035-065b0006c976",
+        "status": "green"
+      },
+      "STG_TRANSACTION_ERRORS": {
+        "L1": {
+          "actual": 0,
+          "expected": 0,
+          "match": true
+        },
+        "L2": {
+          "match": true
+        },
+        "L3": {
+          "keys": 0,
+          "match_percent": 100.0,
+          "matching": 0,
+          "vacuous": true
+        },
+        "query_id": "01c831a6-030c-d2f7-0035-065b0006b86a",
+        "status": "green"
+      }
+    },
+    "views": {
+      "VW_BRANCH_PERFORMANCE": {
+        "query_id": "01c831a6-030c-d212-0035-065b000699c6",
+        "rows": 250,
+        "semantic_parity": "read only, semantic parity not certified"
+      },
+      "VW_CUSTOMER_360": {
+        "query_id": "01c831a6-030c-d2f8-0035-065b0006f98a",
+        "rows": 15,
+        "semantic_parity": "read only, semantic parity not certified"
+      },
+      "VW_REGULATORY_LARGE_TRANSACTIONS": {
+        "query_id": "01c831a6-030c-d1ca-0035-065b000648ee",
+        "rows": 5478,
+        "semantic_parity": "read only, semantic parity not certified"
+      }
+    }
+  },
+  "reset_seed": false,
+  "spec": {
+    "deploy": [],
+    "derivation": "parity/expected/validation/DERIVATION.md",
+    "legacy_sha256": "f44a03f273961af59a944353a8d3aaa2df87779b90eb9e8f9631649330e4dad4",
+    "legacy_source": "data/validation/checksum_queries.sql",
+    "object": "validation",
+    "outputs": [
+      {
+        "columns": [
+          {
+            "name": "TABLE_NAME",
+            "plain": true,
+            "type": "VARCHAR(30)"
+          },
+          {
+            "name": "ROW_COUNT",
+            "type": "BIGINT"
+          }
+        ],
+        "expected": "parity/expected/validation/q1_row_counts.csv",
+        "key": [
+          "TABLE_NAME"
+        ],
+        "name": "q1_row_counts",
+        "sql": "snowflake/validation/q1_row_counts.sql"
+      },
+      {
+        "columns": [
+          {
+            "name": "ROW_COUNT",
+            "type": "BIGINT"
+          },
+          {
+            "name": "DISTINCT_CUSTOMERS",
+            "type": "BIGINT"
+          },
+          {
+            "name": "HASH_SUM",
+            "type": "DECIMAL(38,0)"
+          },
+          {
+            "name": "MIN_ONBOARD_DATE",
+            "type": "DATE"
+          },
+          {
+            "name": "MAX_ONBOARD_DATE",
+            "type": "DATE"
+          },
+          {
+            "name": "ACTIVE_COUNT",
+            "type": "BIGINT"
+          }
+        ],
+        "expected": "parity/expected/validation/q2_dim_customer_checksum.csv",
+        "key": [],
+        "name": "q2_dim_customer_checksum",
+        "sql": "snowflake/validation/q2_dim_customer_checksum.sql"
+      },
+      {
+        "columns": [
+          {
+            "name": "TXN_YEAR",
+            "type": "INTEGER"
+          },
+          {
+            "name": "TXN_MONTH",
+            "type": "INTEGER"
+          },
+          {
+            "name": "TXN_COUNT",
+            "type": "BIGINT"
+          },
+          {
+            "name": "TOTAL_AMOUNT",
+            "type": "DECIMAL(18,2)"
+          },
+          {
+            "name": "TOTAL_BASE_AMOUNT",
+            "type": "DECIMAL(18,2)"
+          },
+          {
+            "name": "DISTINCT_ACCOUNTS",
+            "type": "BIGINT"
+          },
+          {
+            "name": "DISTINCT_CUSTOMERS",
+            "type": "BIGINT"
+          },
+          {
+            "name": "DEBIT_COUNT",
+            "type": "BIGINT"
+          },
+          {
+            "name": "CREDIT_COUNT",
+            "type": "BIGINT"
+          },
+          {
+            "name": "INTL_COUNT",
+            "type": "BIGINT"
+          }
+        ],
+        "expected": "parity/expected/validation/q3_fact_transaction_aggregates.csv",
+        "key": [
+          "TXN_YEAR",
+          "TXN_MONTH"
+        ],
+        "name": "q3_fact_transaction_aggregates",
+        "sql": "snowflake/validation/q3_fact_transaction_aggregates.sql"
+      },
+      {
+        "columns": [
+          {
+            "name": "SNAPSHOT_MONTH_KEY",
+            "type": "INTEGER"
+          },
+          {
+            "name": "TOTAL_DEPOSITS",
+            "type": "DECIMAL(18,2)"
+          },
+          {
+            "name": "TOTAL_DEBITS",
+            "type": "DECIMAL(18,2)"
+          },
+          {
+            "name": "TOTAL_CREDITS",
+            "type": "DECIMAL(18,2)"
+          },
+          {
+            "name": "TOTAL_INTEREST",
+            "type": "DECIMAL(18,2)"
+          },
+          {
+            "name": "TOTAL_FEES",
+            "type": "DECIMAL(18,2)"
+          },
+          {
+            "name": "ACCOUNT_COUNT",
+            "type": "BIGINT"
+          }
+        ],
+        "expected": "parity/expected/validation/q4_monthly_balance_reconciliation.csv",
+        "key": [
+          "SNAPSHOT_MONTH_KEY"
+        ],
+        "name": "q4_monthly_balance_reconciliation",
+        "sql": "snowflake/validation/q4_monthly_balance_reconciliation.sql"
+      },
+      {
+        "columns": [
+          {
+            "name": "CHECK_NAME",
+            "plain": true,
+            "type": "VARCHAR(30)"
+          },
+          {
+            "name": "ORPHAN_COUNT",
+            "type": "BIGINT"
+          }
+        ],
+        "expected": "parity/expected/validation/q5_orphan_checks.csv",
+        "key": [
+          "CHECK_NAME"
+        ],
+        "name": "q5_orphan_checks",
+        "sql": "snowflake/validation/q5_orphan_checks.sql"
+      }
+    ],
+    "questions": [],
+    "seed": "verify",
+    "title": "Repository validation queries (data/validation/checksum_queries.sql), ported to Snowflake",
+    "waivers": [
+      {
+        "approver_role": "Migration lead (comparison-method change; no business value involved)",
+        "change": "SUM(HASHROW(CUSTOMER_ID, FIRST_NAME, LAST_NAME, CUSTOMER_SEGMENT)) replaced by the sum of the first 64 bits of SHA-256 over a canonical string, computed identically in the derived reference and the Snowflake port.",
+        "columns": [
+          "HASH_SUM"
+        ],
+        "id": "W1-hashrow",
+        "outputs": [
+          "q2_dim_customer_checksum"
+        ],
+        "reason": "HASHROW is Teradata's AMP row-distribution hash (BYTE(4)); it has no Snowflake equivalent and its values cannot be reproduced on another engine. The replacement is case- and whitespace-preserving, so it is stricter than HASHROW on NOT CASESPECIFIC columns.",
+        "status": "documented"
+      }
+    ]
+  },
+  "spec_sha256": "5feeee16dfe8c1274b0313de390786f1399304efa008a692d58a877fce946d28",
+  "status": "green"
+}

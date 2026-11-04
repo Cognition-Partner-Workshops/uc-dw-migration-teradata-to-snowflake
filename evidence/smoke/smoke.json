@@ -1,0 +1,275 @@
+{
+  "as_of": "2026-01-31",
+  "commit": "3b7daf5c4d41cf7c159fbd5e0e8c71b981f60fc6",
+  "executed_at_utc": "2026-11-04T21:26:30.510297+00:00",
+  "label": "smoke",
+  "precheck": {
+    "documented_count_gate": {
+      "DIM_ACCOUNT": true,
+      "DIM_BRANCH": true,
+      "DIM_CUSTOMER": true,
+      "DIM_DATE": true,
+      "DIM_PRODUCT": true,
+      "FACT_MONTHLY_ACCOUNT_SNAPSHOT": true,
+      "FACT_TRANSACTION": true
+    },
+    "manifest_sha256": "d7cc94ca5d411df98423d7004f648228f511a88f27f79339f26b41188f87b19a",
+    "schema_contract_errors": [],
+    "status": "green",
+    "supplied_role_verified": true,
+    "tables": {
+      "DIM_ACCOUNT": {
+        "L1": {
+          "actual": 20,
+          "expected": 20,
+          "match": true
+        },
+        "L2": {
+          "match": true
+        },
+        "L3": {
+          "keys": 20,
+          "match_percent": 100.0,
+          "matching": 20,
+          "vacuous": false
+        },
+        "query_id": "01c831a6-030c-d20e-0035-065b0006d912",
+        "status": "green"
+      },
+      "DIM_BRANCH": {
+        "L1": {
+          "actual": 14,
+          "expected": 14,
+          "match": true
+        },
+        "L2": {
+          "match": true
+        },
+        "L3": {
+          "keys": 14,
+          "match_percent": 100.0,
+          "matching": 14,
+          "vacuous": false
+        },
+        "query_id": "01c831a6-030c-d212-0035-065b0006999e",
+        "status": "green"
+      },
+      "DIM_CUSTOMER": {
+        "L1": {
+          "actual": 15,
+          "expected": 15,
+          "match": true
+        },
+        "L2": {
+          "match": true
+        },
+        "L3": {
+          "keys": 15,
+          "match_percent": 100.0,
+          "matching": 15,
+          "vacuous": false
+        },
+        "query_id": "01c831a6-030c-d41e-0035-065b00075872",
+        "status": "green"
+      },
+      "DIM_DATE": {
+        "L1": {
+          "actual": 10958,
+          "expected": 10958,
+          "match": true
+        },
+        "L2": {
+          "match": true
+        },
+        "L3": {
+          "keys": 10958,
+          "match_percent": 100.0,
+          "matching": 10958,
+          "vacuous": false
+        },
+        "query_id": "01c831a6-030c-d41e-0035-065b00075876",
+        "status": "green"
+      },
+      "DIM_EXCHANGE_RATES": {
+        "L1": {
+          "actual": 6,
+          "expected": 6,
+          "match": true
+        },
+        "L2": {
+          "match": true
+        },
+        "L3": {
+          "keys": 6,
+          "match_percent": 100.0,
+          "matching": 6,
+          "vacuous": false
+        },
+        "query_id": "01c831a6-030c-d212-0035-065b000699b2",
+        "status": "green"
+      },
+      "DIM_PRODUCT": {
+        "L1": {
+          "actual": 10,
+          "expected": 10,
+          "match": true
+        },
+        "L2": {
+          "match": true
+        },
+        "L3": {
+          "keys": 10,
+          "match_percent": 100.0,
+          "matching": 10,
+          "vacuous": false
+        },
+        "query_id": "01c831a6-030c-d2f7-0035-065b0006b846",
+        "status": "green"
+      },
+      "ETL_BATCH_CONTROL": {
+        "L1": {
+          "actual": 1,
+          "expected": 1,
+          "match": true
+        },
+        "L2": {
+          "match": true
+        },
+        "L3": {
+          "keys": 1,
+          "match_percent": 100.0,
+          "matching": 1,
+          "vacuous": false
+        },
+        "query_id": "01c831a6-030c-d217-0035-065b0006c95a",
+        "status": "green"
+      },
+      "ETL_LOG": {
+        "L1": {
+          "actual": 0,
+          "expected": 0,
+          "match": true
+        },
+        "L2": {
+          "match": true
+        },
+        "L3": {
+          "keys": 0,
+          "match_percent": 100.0,
+          "matching": 0,
+          "vacuous": true
+        },
+        "query_id": "01c831a6-030c-d2f7-0035-065b0006b852",
+        "status": "green"
+      },
+      "FACT_MONTHLY_ACCOUNT_SNAPSHOT": {
+        "L1": {
+          "actual": 1920,
+          "expected": 1920,
+          "match": true
+        },
+        "L2": {
+          "match": true
+        },
+        "L3": {
+          "keys": 1920,
+          "match_percent": 100.0,
+          "matching": 1920,
+          "vacuous": false
+        },
+        "query_id": "01c831a6-030c-d217-0035-065b0006c952",
+        "status": "green"
+      },
+      "FACT_TRANSACTION": {
+        "L1": {
+          "actual": 50000,
+          "expected": 50000,
+          "match": true
+        },
+        "L2": {
+          "match": true
+        },
+        "L3": {
+          "keys": 50000,
+          "match_percent": 100.0,
+          "matching": 50000,
+          "vacuous": false
+        },
+        "query_id": "01c831a6-030c-d212-0035-065b000699a2",
+        "status": "green"
+      },
+      "STG_CUSTOMER": {
+        "L1": {
+          "actual": 5,
+          "expected": 5,
+          "match": true
+        },
+        "L2": {
+          "match": true
+        },
+        "L3": {
+          "keys": 5,
+          "match_percent": 100.0,
+          "matching": 5,
+          "vacuous": false
+        },
+        "query_id": "01c831a6-030c-d212-0035-065b000699ae",
+        "status": "green"
+      },
+      "STG_TRANSACTIONS": {
+        "L1": {
+          "actual": 11,
+          "expected": 11,
+          "match": true
+        },
+        "L2": {
+          "match": true
+        },
+        "L3": {
+          "keys": 11,
+          "match_percent": 100.0,
+          "matching": 11,
+          "vacuous": false
+        },
+        "query_id": "01c831a6-030c-d217-0035-065b0006c956",
+        "status": "green"
+      },
+      "STG_TRANSACTION_ERRORS": {
+        "L1": {
+          "actual": 0,
+          "expected": 0,
+          "match": true
+        },
+        "L2": {
+          "match": true
+        },
+        "L3": {
+          "keys": 0,
+          "match_percent": 100.0,
+          "matching": 0,
+          "vacuous": true
+        },
+        "query_id": "01c831a6-030c-d2f7-0035-065b0006b84e",
+        "status": "green"
+      }
+    },
+    "views": {
+      "VW_BRANCH_PERFORMANCE": {
+        "query_id": "01c831a6-030c-d214-0035-065b0006587e",
+        "rows": 250,
+        "semantic_parity": "read only, semantic parity not certified"
+      },
+      "VW_CUSTOMER_360": {
+        "query_id": "01c831a6-030c-d2f7-0035-065b0006b856",
+        "rows": 15,
+        "semantic_parity": "read only, semantic parity not certified"
+      },
+      "VW_REGULATORY_LARGE_TRANSACTIONS": {
+        "query_id": "01c831a6-030c-d217-0035-065b0006c95e",
+        "rows": 5478,
+        "semantic_parity": "read only, semantic parity not certified"
+      }
+    }
+  },
+  "status": "green"
+}
