@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "frozen_timestamp": "2026-01-31 00:00:00",
+  "date_start": "2000-01-01",
+  "date_end": "2029-12-31",
+  "source_sha256": {
+    "dim_account_sample.csv": "e78690bdf1c2a98660223fce972faa52caea81e82520c583608254d2475bed08",
+    "dim_branch_sample.csv": "dba512984d8167d3e148e297f2043891dc91132d6d99eed0467811be9e0a31a1",
+    "dim_customer_sample.csv": "0e6b26f3b2159012e5a1925748ae79b2b349b20f799a770ed99bfeea5b5aa7d1",
+    "dim_product_sample.csv": "75111a371c0ed443b7b20df17d895edc9a4061c40b8234389f524308c6244543"
+  }
+}
