@@ -1,0 +1,25 @@
+name: td_macros
+version: '1.0.0'
+config-version: 2
+require-dbt-version: ">=1.9.0,<1.10.0"
+
+profile: td_macros
+model-paths: ["models"]
+macro-paths: ["dbt_macros"]
+clean-targets: ["target", "dbt_packages"]
+
+vars:
+  td_core_schema: td_src_macros
+  aml_screening_date: '2026-01-31'
+  aml_lookback_days: 30
+  aml_amount_threshold: 50000
+  customer_txn_history_customer_id: 1010
+  customer_txn_history_start_date: '2026-01-01'
+  customer_txn_history_end_date: '2026-01-31'
+  customer_txn_history_txn_type: ALL
+  daily_balance_check_date: '2026-01-31'
+
+models:
+  td_macros:
+    +materialized: table
+    +schema: main
