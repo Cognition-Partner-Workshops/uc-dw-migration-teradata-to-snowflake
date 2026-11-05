@@ -1,0 +1,9 @@
+version: 2
+
+sources:
+  - name: td_core
+    schema: "{{ var('td_core_schema', 'td_src_macros') }}"
+    tables:
+      - name: DIM_ACCOUNT
+      - name: DIM_CUSTOMER
+      - name: FACT_TRANSACTION
