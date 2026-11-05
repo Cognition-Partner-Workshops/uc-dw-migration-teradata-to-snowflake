@@ -17,7 +17,7 @@ from sf_common import connect, identifier
 
 
 def normalize(value, kind):
-    if value is None or value == r'\N':
+    if value is None:
         return None
     text = str(value)
     if any(t in kind.upper() for t in ['INT', 'DECIMAL', 'NUMBER', 'DOUBLE', 'FLOAT']):
@@ -57,7 +57,8 @@ def equal(a, b, tolerance):
 
 def read_baseline(path):
     with path.open(newline='') as stream:
-        return list(csv.DictReader(stream))
+        return [{column: None if value == r'\N' else value for column, value in row.items()}
+                for row in csv.DictReader(stream)]
 
 
 def compare(expected, actual, types, keys, tolerance=Decimal('0.000001'), actual_columns=None):

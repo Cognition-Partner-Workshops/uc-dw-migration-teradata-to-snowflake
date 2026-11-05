@@ -15,13 +15,14 @@ from sf_common import column_identifier
 
 def test_normalization_and_tolerance():
     types = {'ID': 'BIGINT', 'AMOUNT': 'DECIMAL(15,2)', 'DAY': 'DATE', 'TS': 'TIMESTAMP', 'TEXT': 'VARCHAR'}
-    expected = [dict(ID='1', AMOUNT='1.000000', DAY='2026-01-31', TS='2026-01-31 06:00:00', TEXT=r'\N')]
+    expected = [dict(ID='1', AMOUNT='1.000000', DAY='2026-01-31', TS='2026-01-31 06:00:00', TEXT=None)]
     actual = [dict(id=1, amount=Decimal('1.0000001'), day='2026-01-31T00:00:00', ts='2026-01-31T07:00:00+01:00', text=None)]
     assert compare(expected, actual, types, ['ID'])['status'] == 'GREEN'
     actual[0]['amount'] = Decimal('1.01')
     assert compare(expected, actual, types, ['ID'])['column_differences'] == {'AMOUNT': 1}
     assert normalize(datetime(9999, 12, 31, 23, 59, 59), 'TIMESTAMP') == datetime(9999, 12, 31, 23, 59, 59)
     assert normalize('2026-01-31garbage', 'DATE') == '2026-01-31garbage'
+    assert normalize(r'\N', 'VARCHAR') == r'\N'
 
 
 def test_empty_missing_extra_and_column_errors():
@@ -94,3 +95,17 @@ def test_manifest_key_coverage_error(tmp_path):
             assert 'exactly the same objects' in str(exc)
         else:
             raise AssertionError('Incomplete coverage accepted')
+
+
+def test_literal_null_marker_in_target_does_not_match_baseline_null(tmp_path):
+    (tmp_path / 'manifest.json').write_text(json.dumps({'EXAMPLE': {'columns': {'ID': 'BIGINT', 'VALUE': 'VARCHAR'}, 'rows': 1}}))
+    (tmp_path / 'EXAMPLE.csv').write_text('ID,VALUE\n1,\\N\n')
+    with duckdb.connect() as con:
+        con.execute('CREATE TABLE EXAMPLE (ID BIGINT, VALUE VARCHAR)')
+        con.execute('INSERT INTO EXAMPLE VALUES (1, ?)', [r'\N'])
+        report = reconcile(tmp_path, con, 'main', {'EXAMPLE': ['ID']})
+        assert not report['full_match']
+        assert report['tables']['EXAMPLE']['status'] == 'RED'
+        assert report['tables']['EXAMPLE']['column_differences'] == {'VALUE': 1}
+        con.execute('UPDATE EXAMPLE SET VALUE=NULL')
+        assert reconcile(tmp_path, con, 'main', {'EXAMPLE': ['ID']})['full_match']
