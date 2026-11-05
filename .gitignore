@@ -12,3 +12,9 @@ Thumbs.db
 # Temp files
 *.tmp
 *.bak
+
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+.warehouse-exit/
+*.duckdb

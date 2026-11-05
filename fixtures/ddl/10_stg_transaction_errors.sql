@@ -1,0 +1,25 @@
+-- Inferred contract; see docs/inferred_ddl.md.
+CREATE MULTISET TABLE BANKING_DW.STG_TRANSACTION_ERRORS
+(
+    TRANSACTION_ID         BIGINT            NOT NULL,
+    ACCOUNT_ID             VARCHAR(20)       NOT NULL,
+    TRANSACTION_DATE       DATE              NOT NULL,
+    TRANSACTION_TIME       TIME(0)           ,
+    TRANSACTION_TYPE       VARCHAR(20)       NOT CASESPECIFIC NOT NULL,
+    TRANSACTION_SUBTYPE    VARCHAR(30)       NOT CASESPECIFIC,
+    CHANNEL                VARCHAR(20)       NOT CASESPECIFIC,
+    TRANSACTION_AMOUNT     DECIMAL(15,2)     NOT NULL,
+    CURRENCY_CODE          CHAR(3)           NOT CASESPECIFIC,
+    MERCHANT_ID            VARCHAR(20)       ,
+    MERCHANT_NAME          VARCHAR(100)      NOT CASESPECIFIC,
+    MERCHANT_CATEGORY      VARCHAR(4)        ,
+    COUNTERPARTY_ACCT      VARCHAR(20)       ,
+    REFERENCE_NUMBER       VARCHAR(30)       ,
+    DESCRIPTION_TEXT       VARCHAR(200)      NOT CASESPECIFIC,
+    POSTING_DATE           DATE              ,
+    VALUE_DATE             DATE              ,
+    LOAD_DATE              DATE              NOT NULL,
+    ERROR_REASON           VARCHAR(50)       ,
+    BATCH_ID               BIGINT
+)
+PRIMARY INDEX (BATCH_ID, TRANSACTION_ID);

@@ -1,0 +1,538 @@
+{
+  "AML_SCREENING_1": {
+    "columns": {
+      "ACCOUNT_ID": "VARCHAR",
+      "AVG_AMOUNT": "DOUBLE",
+      "CUSTOMER_ID": "INTEGER",
+      "CUSTOMER_NAME": "VARCHAR",
+      "KYC_STATUS": "VARCHAR",
+      "LAST_TXN_DATE": "DATE",
+      "PATTERN_TYPE": "VARCHAR",
+      "TOTAL_AMOUNT": "DECIMAL(38,2)",
+      "TXN_COUNT": "BIGINT"
+    },
+    "rows": 1
+  },
+  "AML_SCREENING_2": {
+    "columns": {
+      "ACCOUNT_ID": "VARCHAR",
+      "CREDIT_AMOUNT": "DECIMAL(15,2)",
+      "CREDIT_DATE": "DATE",
+      "CUSTOMER_ID": "INTEGER",
+      "CUSTOMER_NAME": "VARCHAR",
+      "DAYS_BETWEEN": "BIGINT",
+      "DEBIT_AMOUNT": "DECIMAL(15,2)",
+      "DEBIT_DATE": "DATE",
+      "PATTERN_TYPE": "VARCHAR"
+    },
+    "rows": 12
+  },
+  "AML_SCREENING_3": {
+    "columns": {
+      "CUSTOMER_ID": "INTEGER",
+      "CUSTOMER_NAME": "VARCHAR",
+      "DAYS_SINCE_ONBOARD": "BIGINT",
+      "INTL_TXN_COUNT": "BIGINT",
+      "KYC_STATUS": "VARCHAR",
+      "ONBOARDING_DATE": "DATE",
+      "PATTERN_TYPE": "VARCHAR",
+      "TOTAL_INTL_AMOUNT": "DECIMAL(38,2)"
+    },
+    "rows": 1
+  },
+  "BTEQ_AML_SCREENING_1": {
+    "columns": {
+      "ACCOUNT_ID": "VARCHAR",
+      "AVG_AMOUNT": "DOUBLE",
+      "CUSTOMER_ID": "INTEGER",
+      "CUSTOMER_NAME": "VARCHAR",
+      "KYC_STATUS": "VARCHAR",
+      "LAST_TXN_DATE": "DATE",
+      "PATTERN_TYPE": "VARCHAR",
+      "TOTAL_AMOUNT": "DECIMAL(38,2)",
+      "TXN_COUNT": "BIGINT"
+    },
+    "rows": 1
+  },
+  "BTEQ_AML_SCREENING_2": {
+    "columns": {
+      "ACCOUNT_ID": "VARCHAR",
+      "CREDIT_AMOUNT": "DECIMAL(15,2)",
+      "CREDIT_DATE": "DATE",
+      "CUSTOMER_ID": "INTEGER",
+      "CUSTOMER_NAME": "VARCHAR",
+      "DAYS_BETWEEN": "BIGINT",
+      "DEBIT_AMOUNT": "DECIMAL(15,2)",
+      "DEBIT_DATE": "DATE",
+      "PATTERN_TYPE": "VARCHAR"
+    },
+    "rows": 12
+  },
+  "BTEQ_AML_SCREENING_3": {
+    "columns": {
+      "CUSTOMER_ID": "INTEGER",
+      "CUSTOMER_NAME": "VARCHAR",
+      "DAYS_SINCE_ONBOARD": "BIGINT",
+      "INTL_TXN_COUNT": "BIGINT",
+      "KYC_STATUS": "VARCHAR",
+      "ONBOARDING_DATE": "DATE",
+      "PATTERN_TYPE": "VARCHAR",
+      "TOTAL_INTL_AMOUNT": "DECIMAL(38,2)"
+    },
+    "rows": 1
+  },
+  "BTEQ_BRANCH_PERFORMANCE": {
+    "columns": {
+      "% REGION": "DOUBLE",
+      "ACCOUNTS": "BIGINT",
+      "BRANCH": "VARCHAR",
+      "FEES EARNED": "DECIMAL(38,2)",
+      "MONTH": "VARCHAR",
+      "RANK": "BIGINT",
+      "REGION": "VARCHAR",
+      "TOTAL DEPOSITS (NOK)": "DECIMAL(38,2)"
+    },
+    "rows": 10
+  },
+  "BTEQ_LARGE_TXN_REPORT": {
+    "columns": {
+      "ACCOUNT_ID": "VARCHAR",
+      "ACCOUNT_TYPE": "VARCHAR",
+      "BASE_CURRENCY_AMOUNT": "DECIMAL(15,2)",
+      "CUSTOMER_ID": "INTEGER",
+      "FIRST_NAME": "VARCHAR",
+      "IS_INTERNATIONAL": "SMALLINT",
+      "KYC_STATUS": "VARCHAR",
+      "LAST_NAME": "VARCHAR",
+      "MERCHANT_NAME": "VARCHAR",
+      "REFERENCE_NUMBER": "VARCHAR",
+      "REPORTING_CATEGORY": "VARCHAR",
+      "TRANSACTION_AMOUNT": "DECIMAL(15,2)",
+      "TRANSACTION_CURRENCY": "VARCHAR",
+      "TRANSACTION_DATE": "DATE",
+      "TRANSACTION_ID": "BIGINT",
+      "TRANSACTION_TYPE": "VARCHAR"
+    },
+    "rows": 228
+  },
+  "CUSTOMER_TXN_HISTORY": {
+    "columns": {
+      "ACCOUNT_ID": "VARCHAR",
+      "ACCOUNT_TYPE": "VARCHAR",
+      "AMOUNT": "DECIMAL(15,2)",
+      "BALANCE": "DECIMAL(15,2)",
+      "CCY": "VARCHAR",
+      "CHANNEL": "VARCHAR",
+      "DESCRIPTION": "VARCHAR",
+      "PAYEE": "VARCHAR",
+      "REF_NO": "VARCHAR",
+      "TRANSACTION_SUBTYPE": "VARCHAR",
+      "TRANSACTION_TYPE": "VARCHAR",
+      "TXN_DATE": "DATE",
+      "TXN_TIME": "TIME"
+    },
+    "rows": 227
+  },
+  "DAILY_BALANCE_CHECK_1": {
+    "columns": {
+      "ACCOUNT_COUNT": "BIGINT",
+      "ACCOUNT_TYPE": "VARCHAR",
+      "AVG_BALANCE": "DOUBLE",
+      "CHECK_TYPE": "VARCHAR",
+      "CURRENCY_CODE": "VARCHAR",
+      "MAX_BALANCE": "DECIMAL(15,2)",
+      "MIN_BALANCE": "DECIMAL(15,2)",
+      "TOTAL_BALANCE": "DECIMAL(38,2)"
+    },
+    "rows": 8
+  },
+  "DAILY_BALANCE_CHECK_2": {
+    "columns": {
+      "ACCOUNT_ID": "VARCHAR",
+      "ACCOUNT_TYPE": "VARCHAR",
+      "CHECK_TYPE": "VARCHAR",
+      "CURRENT_BALANCE": "DECIMAL(15,2)",
+      "CUSTOMER_NAME": "VARCHAR",
+      "OVERDRAFT_LIMIT": "DECIMAL(15,2)",
+      "OVER_LIMIT_AMOUNT": "DECIMAL(16,2)"
+    },
+    "rows": 1
+  },
+  "DIM_ACCOUNT": {
+    "columns": {
+      "ACCOUNT_ID": "VARCHAR",
+      "ACCOUNT_KEY": "BIGINT",
+      "ACCOUNT_STATUS": "VARCHAR",
+      "ACCOUNT_SUBTYPE": "VARCHAR",
+      "ACCOUNT_TYPE": "VARCHAR",
+      "BRANCH_ID": "INTEGER",
+      "CLOSING_DATE": "DATE",
+      "CREDIT_LIMIT": "DECIMAL(15,2)",
+      "CURRENCY_CODE": "VARCHAR",
+      "CURRENT_FLAG": "VARCHAR",
+      "CUSTOMER_ID": "INTEGER",
+      "EFFECTIVE_FROM": "TIMESTAMP",
+      "EFFECTIVE_TO": "TIMESTAMP",
+      "ETL_BATCH_ID": "BIGINT",
+      "ETL_INSERT_TS": "TIMESTAMP",
+      "ETL_UPDATE_TS": "TIMESTAMP",
+      "INTEREST_RATE": "DECIMAL(7,4)",
+      "IS_JOINT_ACCOUNT": "SMALLINT",
+      "OPENING_DATE": "DATE",
+      "OVERDRAFT_LIMIT": "DECIMAL(15,2)",
+      "PRODUCT_ID": "INTEGER",
+      "RELATIONSHIP_MGR_ID": "INTEGER",
+      "TAX_REPORTING_FLAG": "SMALLINT"
+    },
+    "rows": 20
+  },
+  "DIM_BRANCH": {
+    "columns": {
+      "ADDRESS_LINE_1": "VARCHAR",
+      "BRANCH_CODE": "VARCHAR",
+      "BRANCH_ID": "INTEGER",
+      "BRANCH_NAME": "VARCHAR",
+      "BRANCH_TYPE": "VARCHAR",
+      "CITY": "VARCHAR",
+      "CLOSING_DATE": "DATE",
+      "COUNTRY_CODE": "VARCHAR",
+      "COUNTY": "VARCHAR",
+      "EMPLOYEE_COUNT": "SMALLINT",
+      "ETL_BATCH_ID": "BIGINT",
+      "ETL_INSERT_TS": "TIMESTAMP",
+      "IS_ACTIVE": "SMALLINT",
+      "LATITUDE": "DECIMAL(10,7)",
+      "LONGITUDE": "DECIMAL(10,7)",
+      "MANAGER_ID": "INTEGER",
+      "OPENING_DATE": "DATE",
+      "POSTAL_CODE": "VARCHAR",
+      "REGION": "VARCHAR"
+    },
+    "rows": 14
+  },
+  "DIM_CUSTOMER": {
+    "columns": {
+      "ADDRESS_LINE_1": "VARCHAR",
+      "ADDRESS_LINE_2": "VARCHAR",
+      "CITY": "VARCHAR",
+      "COUNTRY_CODE": "VARCHAR",
+      "CREDIT_RATING": "VARCHAR",
+      "CURRENT_FLAG": "VARCHAR",
+      "CUSTOMER_ID": "INTEGER",
+      "CUSTOMER_KEY": "BIGINT",
+      "CUSTOMER_SEGMENT": "VARCHAR",
+      "DATE_OF_BIRTH": "DATE",
+      "EFFECTIVE_FROM": "TIMESTAMP",
+      "EFFECTIVE_TO": "TIMESTAMP",
+      "EMAIL_ADDRESS": "VARCHAR",
+      "ETL_BATCH_ID": "BIGINT",
+      "ETL_INSERT_TS": "TIMESTAMP",
+      "ETL_UPDATE_TS": "TIMESTAMP",
+      "FIRST_NAME": "VARCHAR",
+      "GENDER": "VARCHAR",
+      "IS_ACTIVE": "SMALLINT",
+      "KYC_STATUS": "VARCHAR",
+      "LAST_NAME": "VARCHAR",
+      "LAST_REVIEW_DATE": "DATE",
+      "MARITAL_STATUS": "VARCHAR",
+      "ONBOARDING_DATE": "DATE",
+      "PHONE_NUMBER": "VARCHAR",
+      "POSTAL_CODE": "VARCHAR",
+      "RISK_SCORE": "DECIMAL(5,2)",
+      "STATE_PROVINCE": "VARCHAR"
+    },
+    "rows": 17
+  },
+  "DIM_DATE": {
+    "columns": {
+      "CALENDAR_DATE": "DATE",
+      "CALENDAR_YEAR": "SMALLINT",
+      "DATE_KEY": "INTEGER",
+      "DAY_NAME": "VARCHAR",
+      "DAY_OF_MONTH": "SMALLINT",
+      "DAY_OF_WEEK": "SMALLINT",
+      "DAY_OF_YEAR": "SMALLINT",
+      "FISCAL_QUARTER": "SMALLINT",
+      "FISCAL_YEAR": "SMALLINT",
+      "HALF_YEAR": "SMALLINT",
+      "HOLIDAY_NAME": "VARCHAR",
+      "ISO_WEEK": "SMALLINT",
+      "IS_BUSINESS_DAY": "SMALLINT",
+      "IS_MONTH_END": "SMALLINT",
+      "IS_NORWEGIAN_HOLIDAY": "SMALLINT",
+      "IS_QUARTER_END": "SMALLINT",
+      "IS_WEEKEND": "SMALLINT",
+      "IS_YEAR_END": "SMALLINT",
+      "MONTH_NAME": "VARCHAR",
+      "MONTH_NUM": "SMALLINT",
+      "MONTH_SHORT": "VARCHAR",
+      "NEXT_DAY_DATE": "DATE",
+      "PRIOR_DAY_DATE": "DATE",
+      "QUARTER_NAME": "VARCHAR",
+      "QUARTER_NUM": "SMALLINT",
+      "SAME_DAY_PREV_YEAR": "DATE",
+      "WEEK_OF_YEAR": "SMALLINT"
+    },
+    "rows": 10958
+  },
+  "DIM_EXCHANGE_RATES": {
+    "columns": {
+      "EXCHANGE_RATE": "DECIMAL(12,6)",
+      "FROM_CURRENCY": "VARCHAR",
+      "RATE_DATE": "DATE",
+      "TO_CURRENCY": "VARCHAR"
+    },
+    "rows": 6
+  },
+  "DIM_PRODUCT": {
+    "columns": {
+      "BASE_INTEREST_RATE": "DECIMAL(7,4)",
+      "DISCONTINUE_DATE": "DATE",
+      "ETL_BATCH_ID": "BIGINT",
+      "ETL_INSERT_TS": "TIMESTAMP",
+      "FEE_STRUCTURE": "VARCHAR",
+      "IS_ACTIVE": "SMALLINT",
+      "IS_REGULATED": "SMALLINT",
+      "LAUNCH_DATE": "DATE",
+      "MAX_BALANCE": "DECIMAL(15,2)",
+      "MIN_BALANCE": "DECIMAL(15,2)",
+      "MONTHLY_FEE": "DECIMAL(10,2)",
+      "PRODUCT_CATEGORY": "VARCHAR",
+      "PRODUCT_CODE": "VARCHAR",
+      "PRODUCT_ID": "INTEGER",
+      "PRODUCT_NAME": "VARCHAR",
+      "PRODUCT_SUBCATEGORY": "VARCHAR",
+      "REGULATORY_CODE": "VARCHAR"
+    },
+    "rows": 10
+  },
+  "ETL_BATCH_CONTROL": {
+    "columns": {
+      "BATCH_DATE": "DATE",
+      "BATCH_ID": "BIGINT",
+      "BATCH_STATUS": "VARCHAR",
+      "END_TS": "TIMESTAMP",
+      "START_TS": "TIMESTAMP"
+    },
+    "rows": 2
+  },
+  "ETL_LOG": {
+    "columns": {
+      "BATCH_ID": "BIGINT",
+      "LOG_LEVEL": "VARCHAR",
+      "LOG_MESSAGE": "VARCHAR",
+      "LOG_TS": "TIMESTAMP",
+      "PROCEDURE_NAME": "VARCHAR"
+    },
+    "rows": 2
+  },
+  "FACT_MONTHLY_ACCOUNT_SNAPSHOT": {
+    "columns": {
+      "ACCOUNT_KEY": "BIGINT",
+      "AVERAGE_BALANCE": "DECIMAL(15,2)",
+      "BASE_CURRENCY_CLOSING": "DECIMAL(15,2)",
+      "BRANCH_ID": "INTEGER",
+      "CLOSING_BALANCE": "DECIMAL(15,2)",
+      "CREDIT_COUNT": "INTEGER",
+      "CURRENCY_CODE": "VARCHAR",
+      "CUSTOMER_KEY": "BIGINT",
+      "DAYS_DORMANT": "SMALLINT",
+      "DAYS_IN_OVERDRAFT": "SMALLINT",
+      "DEBIT_COUNT": "INTEGER",
+      "ETL_BATCH_ID": "BIGINT",
+      "ETL_INSERT_TS": "TIMESTAMP",
+      "FEES_CHARGED": "DECIMAL(12,2)",
+      "INTEREST_CHARGED": "DECIMAL(12,2)",
+      "INTEREST_EARNED": "DECIMAL(12,2)",
+      "MAXIMUM_BALANCE": "DECIMAL(15,2)",
+      "MINIMUM_BALANCE": "DECIMAL(15,2)",
+      "OPENING_BALANCE": "DECIMAL(15,2)",
+      "PRODUCT_ID": "INTEGER",
+      "SNAPSHOT_DATE": "DATE",
+      "SNAPSHOT_MONTH_KEY": "INTEGER",
+      "TOTAL_CREDITS": "DECIMAL(15,2)",
+      "TOTAL_DEBITS": "DECIMAL(15,2)"
+    },
+    "rows": 1920
+  },
+  "FACT_TRANSACTION": {
+    "columns": {
+      "ACCOUNT_KEY": "BIGINT",
+      "BASE_CURRENCY_AMOUNT": "DECIMAL(15,2)",
+      "BRANCH_ID": "INTEGER",
+      "CHANNEL": "VARCHAR",
+      "COUNTERPARTY_ACCT": "VARCHAR",
+      "CUSTOMER_KEY": "BIGINT",
+      "DATE_KEY": "INTEGER",
+      "DESCRIPTION_TEXT": "VARCHAR",
+      "ETL_BATCH_ID": "BIGINT",
+      "ETL_INSERT_TS": "TIMESTAMP",
+      "EXCHANGE_RATE": "DECIMAL(12,6)",
+      "FLAG_REASON": "VARCHAR",
+      "IS_FLAGGED": "SMALLINT",
+      "IS_INTERNATIONAL": "SMALLINT",
+      "MERCHANT_CATEGORY": "VARCHAR",
+      "MERCHANT_ID": "VARCHAR",
+      "MERCHANT_NAME": "VARCHAR",
+      "POSTING_DATE": "DATE",
+      "PRODUCT_ID": "INTEGER",
+      "REFERENCE_NUMBER": "VARCHAR",
+      "RUNNING_BALANCE": "DECIMAL(15,2)",
+      "TRANSACTION_AMOUNT": "DECIMAL(15,2)",
+      "TRANSACTION_CURRENCY": "VARCHAR",
+      "TRANSACTION_DATE": "DATE",
+      "TRANSACTION_ID": "BIGINT",
+      "TRANSACTION_SUBTYPE": "VARCHAR",
+      "TRANSACTION_TIME": "TIME",
+      "TRANSACTION_TS": "TIMESTAMP",
+      "TRANSACTION_TYPE": "VARCHAR",
+      "VALUE_DATE": "DATE"
+    },
+    "rows": 50009
+  },
+  "STG_CUSTOMER": {
+    "columns": {
+      "ADDRESS_LINE_1": "VARCHAR",
+      "ADDRESS_LINE_2": "VARCHAR",
+      "CITY": "VARCHAR",
+      "COUNTRY_CODE": "VARCHAR",
+      "CREDIT_RATING": "VARCHAR",
+      "CUSTOMER_ID": "INTEGER",
+      "CUSTOMER_SEGMENT": "VARCHAR",
+      "DATE_OF_BIRTH": "DATE",
+      "EMAIL_ADDRESS": "VARCHAR",
+      "FIRST_NAME": "VARCHAR",
+      "GENDER": "VARCHAR",
+      "KYC_STATUS": "VARCHAR",
+      "LAST_NAME": "VARCHAR",
+      "MARITAL_STATUS": "VARCHAR",
+      "PHONE_NUMBER": "VARCHAR",
+      "POSTAL_CODE": "VARCHAR",
+      "RISK_SCORE": "DECIMAL(5,2)",
+      "STATE_PROVINCE": "VARCHAR"
+    },
+    "rows": 5
+  },
+  "STG_TRANSACTIONS": {
+    "columns": {
+      "ACCOUNT_ID": "VARCHAR",
+      "CHANNEL": "VARCHAR",
+      "COUNTERPARTY_ACCT": "VARCHAR",
+      "CURRENCY_CODE": "VARCHAR",
+      "DESCRIPTION_TEXT": "VARCHAR",
+      "LOAD_DATE": "DATE",
+      "MERCHANT_CATEGORY": "VARCHAR",
+      "MERCHANT_ID": "VARCHAR",
+      "MERCHANT_NAME": "VARCHAR",
+      "POSTING_DATE": "DATE",
+      "REFERENCE_NUMBER": "VARCHAR",
+      "TRANSACTION_AMOUNT": "DECIMAL(15,2)",
+      "TRANSACTION_DATE": "DATE",
+      "TRANSACTION_ID": "BIGINT",
+      "TRANSACTION_SUBTYPE": "VARCHAR",
+      "TRANSACTION_TIME": "TIME",
+      "TRANSACTION_TYPE": "VARCHAR",
+      "VALUE_DATE": "DATE"
+    },
+    "rows": 11
+  },
+  "STG_TRANSACTION_ERRORS": {
+    "columns": {
+      "ACCOUNT_ID": "VARCHAR",
+      "BATCH_ID": "BIGINT",
+      "CHANNEL": "VARCHAR",
+      "COUNTERPARTY_ACCT": "VARCHAR",
+      "CURRENCY_CODE": "VARCHAR",
+      "DESCRIPTION_TEXT": "VARCHAR",
+      "ERROR_REASON": "VARCHAR",
+      "LOAD_DATE": "DATE",
+      "MERCHANT_CATEGORY": "VARCHAR",
+      "MERCHANT_ID": "VARCHAR",
+      "MERCHANT_NAME": "VARCHAR",
+      "POSTING_DATE": "DATE",
+      "REFERENCE_NUMBER": "VARCHAR",
+      "TRANSACTION_AMOUNT": "DECIMAL(15,2)",
+      "TRANSACTION_DATE": "DATE",
+      "TRANSACTION_ID": "BIGINT",
+      "TRANSACTION_SUBTYPE": "VARCHAR",
+      "TRANSACTION_TIME": "TIME",
+      "TRANSACTION_TYPE": "VARCHAR",
+      "VALUE_DATE": "DATE"
+    },
+    "rows": 2
+  },
+  "VW_BRANCH_PERFORMANCE": {
+    "columns": {
+      "ACCOUNTS_SERVICED": "BIGINT",
+      "AVG_ACCOUNT_BALANCE": "DOUBLE",
+      "BRANCH_ID": "INTEGER",
+      "BRANCH_NAME": "VARCHAR",
+      "BRANCH_TYPE": "VARCHAR",
+      "CITY": "VARCHAR",
+      "CUMULATIVE_FEES_YTD": "DECIMAL(38,2)",
+      "CUSTOMERS_SERVICED": "BIGINT",
+      "MONTH_LABEL": "VARCHAR",
+      "MOVING_AVG_VOLUME_3M": "DOUBLE",
+      "PCT_OF_REGION_DEPOSITS": "DOUBLE",
+      "REGION": "VARCHAR",
+      "REGION_DEPOSIT_RANK": "BIGINT",
+      "SNAPSHOT_MONTH_KEY": "INTEGER",
+      "TOTAL_DEPOSITS": "DECIMAL(38,2)",
+      "TOTAL_FEES_EARNED": "DECIMAL(38,2)",
+      "TOTAL_INTEREST_INCOME": "DECIMAL(38,2)",
+      "TOTAL_VOLUME": "DECIMAL(38,2)"
+    },
+    "rows": 250
+  },
+  "VW_CUSTOMER_360": {
+    "columns": {
+      "ACTIVE_ACCOUNTS": "HUGEINT",
+      "CITY": "VARCHAR",
+      "COUNTRY_CODE": "VARCHAR",
+      "CREDIT_RATING": "VARCHAR",
+      "CUSTOMER_ID": "INTEGER",
+      "CUSTOMER_SEGMENT": "VARCHAR",
+      "FULL_NAME": "VARCHAR",
+      "KYC_STATUS": "VARCHAR",
+      "LAST_TXN_DATE": "DATE",
+      "ONBOARDING_DATE": "DATE",
+      "PRIMARY_CHANNEL": "VARCHAR",
+      "RISK_SCORE": "DECIMAL(5,2)",
+      "TENURE_YEARS": "DECIMAL(5,1)",
+      "TOTAL_ACCOUNTS": "BIGINT",
+      "TOTAL_BALANCE": "DECIMAL(38,2)",
+      "TXN_AMOUNT_LAST_90_DAYS": "DECIMAL(38,2)",
+      "TXN_COUNT_LAST_90_DAYS": "BIGINT"
+    },
+    "rows": 16
+  },
+  "VW_REGULATORY_LARGE_TRANSACTIONS": {
+    "columns": {
+      "ACCOUNT_ID": "VARCHAR",
+      "ACCOUNT_TYPE": "VARCHAR",
+      "BASE_CURRENCY_AMOUNT": "DECIMAL(15,2)",
+      "BRANCH_NAME": "VARCHAR",
+      "COUNTERPARTY_ACCT": "VARCHAR",
+      "CUSTOMER_ID": "INTEGER",
+      "DESCRIPTION_TEXT": "VARCHAR",
+      "ETL_BATCH_ID": "BIGINT",
+      "FIRST_NAME": "VARCHAR",
+      "IS_INTERNATIONAL": "SMALLINT",
+      "KYC_STATUS": "VARCHAR",
+      "LAST_NAME": "VARCHAR",
+      "MERCHANT_NAME": "VARCHAR",
+      "REFERENCE_NUMBER": "VARCHAR",
+      "REGION": "VARCHAR",
+      "REPORTING_CATEGORY": "VARCHAR",
+      "ROW_HASH": "VARCHAR",
+      "TRANSACTION_AMOUNT": "DECIMAL(15,2)",
+      "TRANSACTION_CURRENCY": "VARCHAR",
+      "TRANSACTION_DATE": "DATE",
+      "TRANSACTION_ID": "BIGINT",
+      "TRANSACTION_SUBTYPE": "VARCHAR",
+      "TRANSACTION_TS": "TIMESTAMP",
+      "TRANSACTION_TYPE": "VARCHAR"
+    },
+    "rows": 4939
+  }
+}

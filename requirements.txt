@@ -1,0 +1,7 @@
+duckdb==1.4.1
+pandas==2.3.3
+pyarrow==21.0.0
+snowflake-connector-python==3.18.0
+cryptography==45.0.7
+pytest==8.4.2
+ruff==0.14.3
