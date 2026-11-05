@@ -61,6 +61,17 @@ These features require explicit conversion when migrating to Snowflake:
 4. **Validate** with row counts, checksums, and business-level reconciliations
 5. **Document** translation decisions in `SQL_TRANSLATION_NOTES.md`
 
+## Frozen warehouse fixture
+
+Install `requirements.txt`, then run `python tools/generate_seed.py --check`
+and `python tools/td_baseline.py --check`. Frozen inputs live in
+`fixtures/frozen/`; `baseline/teradata/README.md` records the derived legacy
+semantics and unresolved native-engine assumptions. `tools/reconcile.py`
+compares every target row and `tools/licence_status.py` gates the synthetic
+ledger. `tools/sf_landing.py` and `tools/sf_teardown.py` support token-scoped
+Snowflake setup and cleanup with offline `--dry-run` previews. The repository
+skill at `.agents/skills/warehouse-exit/SKILL.md` lists the commands.
+
 ## License
 
 This is synthetic sample data created for workshop purposes. MIT License.

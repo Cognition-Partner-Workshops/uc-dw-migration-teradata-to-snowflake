@@ -1,0 +1,9 @@
+-- Inferred contract; see docs/inferred_ddl.md.
+CREATE MULTISET TABLE BANKING_DW.DIM_EXCHANGE_RATES
+(
+    FROM_CURRENCY          CHAR(3)           NOT CASESPECIFIC NOT NULL,
+    TO_CURRENCY            CHAR(3)           NOT CASESPECIFIC NOT NULL,
+    RATE_DATE              DATE              NOT NULL,
+    EXCHANGE_RATE          DECIMAL(12,6)
+)
+PRIMARY INDEX (FROM_CURRENCY, TO_CURRENCY, RATE_DATE);

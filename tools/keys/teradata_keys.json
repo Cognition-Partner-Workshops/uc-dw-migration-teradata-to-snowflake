@@ -1,0 +1,110 @@
+{
+  "DIM_CUSTOMER": [
+    "CUSTOMER_KEY"
+  ],
+  "DIM_ACCOUNT": [
+    "ACCOUNT_KEY"
+  ],
+  "DIM_BRANCH": [
+    "BRANCH_ID"
+  ],
+  "DIM_PRODUCT": [
+    "PRODUCT_ID"
+  ],
+  "DIM_DATE": [
+    "DATE_KEY"
+  ],
+  "DIM_EXCHANGE_RATES": [
+    "FROM_CURRENCY",
+    "TO_CURRENCY",
+    "RATE_DATE"
+  ],
+  "FACT_TRANSACTION": [
+    "TRANSACTION_ID",
+    "ETL_BATCH_ID"
+  ],
+  "FACT_MONTHLY_ACCOUNT_SNAPSHOT": [
+    "ACCOUNT_KEY",
+    "SNAPSHOT_MONTH_KEY"
+  ],
+  "STG_CUSTOMER": [
+    "CUSTOMER_ID"
+  ],
+  "STG_TRANSACTIONS": [
+    "TRANSACTION_ID"
+  ],
+  "STG_TRANSACTION_ERRORS": [
+    "TRANSACTION_ID",
+    "BATCH_ID"
+  ],
+  "ETL_BATCH_CONTROL": [
+    "BATCH_ID"
+  ],
+  "ETL_LOG": [
+    "BATCH_ID",
+    "PROCEDURE_NAME",
+    "LOG_LEVEL",
+    "LOG_TS",
+    "LOG_MESSAGE"
+  ],
+  "VW_CUSTOMER_360": [
+    "CUSTOMER_ID"
+  ],
+  "VW_REGULATORY_LARGE_TRANSACTIONS": [
+    "TRANSACTION_ID"
+  ],
+  "VW_BRANCH_PERFORMANCE": [
+    "BRANCH_ID",
+    "SNAPSHOT_MONTH_KEY"
+  ],
+  "DAILY_BALANCE_CHECK_1": [
+    "ACCOUNT_TYPE",
+    "CURRENCY_CODE"
+  ],
+  "DAILY_BALANCE_CHECK_2": [
+    "ACCOUNT_ID"
+  ],
+  "CUSTOMER_TXN_HISTORY": [
+    "ACCOUNT_ID",
+    "TXN_DATE",
+    "TXN_TIME",
+    "REF_NO"
+  ],
+  "BTEQ_BRANCH_PERFORMANCE": [
+    "BRANCH",
+    "MONTH"
+  ],
+  "BTEQ_LARGE_TXN_REPORT": [
+    "TRANSACTION_ID"
+  ],
+  "AML_SCREENING_1": [
+    "CUSTOMER_ID",
+    "ACCOUNT_ID"
+  ],
+  "AML_SCREENING_2": [
+    "CUSTOMER_ID",
+    "ACCOUNT_ID",
+    "CREDIT_DATE",
+    "CREDIT_AMOUNT",
+    "DEBIT_DATE",
+    "DEBIT_AMOUNT"
+  ],
+  "AML_SCREENING_3": [
+    "CUSTOMER_ID"
+  ],
+  "BTEQ_AML_SCREENING_1": [
+    "CUSTOMER_ID",
+    "ACCOUNT_ID"
+  ],
+  "BTEQ_AML_SCREENING_2": [
+    "CUSTOMER_ID",
+    "ACCOUNT_ID",
+    "CREDIT_DATE",
+    "CREDIT_AMOUNT",
+    "DEBIT_DATE",
+    "DEBIT_AMOUNT"
+  ],
+  "BTEQ_AML_SCREENING_3": [
+    "CUSTOMER_ID"
+  ]
+}
