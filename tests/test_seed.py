@@ -80,7 +80,7 @@ def test_calendar_edges_and_norwegian_holidays(tables):
 @pytest.mark.parametrize("path", sorted((seed.ROOT / "snowflake/ddl").glob("*.sql")))
 def test_ddl_snowflake_syntax_and_column_parity(path):
     sql = path.read_text()
-    statements = sqlglot.parse(sql, read="snowflake", error_level="RAISE")
+    statements = sqlglot.parse(sql, read="snowflake", error_level=sqlglot.ErrorLevel.RAISE)
     assert statements and isinstance(statements[0], sqlglot.exp.Create)
     assert not re.search(r"\b(COMPRESS|CASESPECIFIC|FALLBACK|JOURNAL|COLLECT STATISTICS|PRIMARY INDEX|RANGE_N)\b", sql)
     assert sf.RUN_TOKEN in sql and sf.EXPIRES in sql
@@ -133,3 +133,57 @@ def test_attribution_tag_and_unique_run_ids():
     tag = json.loads(params["session_parameters"]["QUERY_TAG"])
     assert list(tag) == ["csid", "workload", "phase", "commit", "run_id", "session_url"]
     assert params["application"] == "Devin_Demo"
+
+
+def test_seed_keys_unique_and_required_columns_present(tables):
+    for table in seed.KEYS:
+        rows = tables[table]
+        if table.startswith("DIM_"):
+            assert len({r[seed.KEYS[table]] for r in rows}) == len(rows)
+        required = [c for c, definition in seed.columns(table) if "NOT NULL" in definition]
+        assert all(row.get(c) is not None for row in rows for c in required)
+        assert all(set(row) == {c for c, _ in seed.columns(table)} for row in rows)
+
+
+def test_transaction_rolls_back_on_insert_error(tables):
+    class FailureRunner(load_seed.Runner):
+        def __init__(self):
+            super().__init__(None)
+            self.calls = []
+
+        def command(self, label, sql, params=None):
+            self.calls.append(label)
+            if label.startswith("seed_load:"):
+                raise RuntimeError("injected insert failure")
+
+    runner = FailureRunner()
+    with pytest.raises(RuntimeError, match="injected insert failure"):
+        runner.load(tables, 1)
+    assert runner.calls[0] == "begin:1"
+    assert runner.calls[-1] == "rollback:1"
+    assert not any(label.startswith("commit:") for label in runner.calls)
+
+
+def test_verify_suspends_warehouse_on_load_failure():
+    class FailureRunner(GuardRunner):
+        def deploy(self):
+            self.calls.append("deploy")
+
+        def command(self, label, sql, params=None):
+            self.calls.append(label)
+
+        def load(self, tables, iteration):
+            raise RuntimeError("injected failure")
+
+        def show(self, label, sql):
+            if label.startswith("warehouse_before"):
+                return [{"name": load_seed.WAREHOUSE, "state": "STARTED"}]
+            if label.startswith("warehouse_after"):
+                return [{"name": load_seed.WAREHOUSE, "state": "SUSPENDED"}]
+            return super().show(label, sql)
+
+    runner = FailureRunner()
+    with pytest.raises(RuntimeError, match="injected failure"):
+        runner.verify({})
+    assert "warehouse_suspend" in runner.calls
+    assert runner.evidence["warehouse_after"][0]["state"] == "SUSPENDED"
