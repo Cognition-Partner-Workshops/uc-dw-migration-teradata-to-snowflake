@@ -38,6 +38,7 @@ def test_reporting_contract(empty):
             sql = (PROJECT / 'models' / f'{name}.sql').read_text()
             sql = re.sub(r"\{\{ source\('core', '(\w+)'\) \}\}", r'\1', sql)
             sql = re.sub(r"\{\{ ref\('(\w+)'\) \}\}", r'\1', sql)
+            sql = sql.replace('{{ var("as_of_date") }}', '2026-01-31')
             sql = sql.replace("to_char(ft.TRANSACTION_DATE, 'YYYY-MM-DD')",
                               'cast(ft.TRANSACTION_DATE AS VARCHAR)')
             con.execute(f'CREATE TABLE {name} AS {sql}')

@@ -6,7 +6,7 @@ SELECT
     c.CREDIT_RATING,
     c.KYC_STATUS,
     c.ONBOARDING_DATE,
-    CAST((DATE '2026-01-31' - c.ONBOARDING_DATE) / 365.25 AS DECIMAL(5,1)) AS TENURE_YEARS,
+    CAST((DATE '{{ var("as_of_date") }}' - c.ONBOARDING_DATE) / 365.25 AS DECIMAL(5,1)) AS TENURE_YEARS,
     coalesce(acct_summary.TOTAL_ACCOUNTS, 0) AS TOTAL_ACCOUNTS,
     coalesce(acct_summary.ACTIVE_ACCOUNTS, 0) AS ACTIVE_ACCOUNTS,
     coalesce(acct_summary.TOTAL_BALANCE, 0) AS TOTAL_BALANCE,
@@ -39,7 +39,7 @@ LEFT JOIN (
         MAX(ft.TRANSACTION_DATE) AS LAST_TXN_DATE,
         MAX(ft.CHANNEL) AS PRIMARY_CHANNEL
     FROM {{ source('core', 'FACT_TRANSACTION') }} ft
-    WHERE ft.TRANSACTION_DATE >= DATE '2026-01-31' - 90
+    WHERE ft.TRANSACTION_DATE >= DATE '{{ var("as_of_date") }}' - 90
     GROUP BY 1
 ) txn_summary
     ON c.CUSTOMER_KEY = txn_summary.CUSTOMER_KEY
