@@ -1,0 +1,12 @@
+version: 2
+sources:
+  - name: core
+    database: FSX_20261105_DB
+    schema: "{{ var('core_schema', 'TD_TARGET') }}"
+    tables:
+      - name: DIM_ACCOUNT
+      - name: DIM_BRANCH
+      - name: DIM_CUSTOMER
+      - name: DIM_DATE
+      - name: FACT_MONTHLY_ACCOUNT_SNAPSHOT
+      - name: FACT_TRANSACTION
