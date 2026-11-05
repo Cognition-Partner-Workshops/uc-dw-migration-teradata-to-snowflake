@@ -79,9 +79,9 @@ class Runner:
         monitor = exact[0]
         self.evidence["monitor_read_back"] = monitor
         if (float(monitor["credit_quota"] or 0) <= 0 or
-                str(monitor.get("frequency", "")).upper() != "MONTHLY" or
+                str(monitor.get("frequency", "")).upper() not in ("MONTHLY", "NEVER") or
                 not monitor.get("suspend_at") or not monitor.get("suspend_immediately_at")):
-            raise RuntimeError("monitor needs a positive monthly quota and suspend triggers")
+            raise RuntimeError("monitor needs a positive quota and suspend triggers")
         warehouses = self.show("warehouse_read_back", f"SHOW WAREHOUSES LIKE '{WAREHOUSE}'")
         exact = [r for r in warehouses if r["name"] == WAREHOUSE]
         if len(exact) != 1 or exact[0].get("resource_monitor") != MONITOR:

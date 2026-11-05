@@ -50,7 +50,7 @@ def fingerprint(rows: list[dict]) -> dict:
 
 def columns(table: str) -> list[tuple[str, str]]:
     for path in (ROOT / "snowflake/ddl").glob("*.sql"):
-        if f"BANKING_DW.{table} (" in path.read_text():
+        if path.read_text().startswith(f"CREATE TABLE IF NOT EXISTS BANKING_DW.{table} ("):
             return [(name, definition.rstrip(",")) for name, definition in
                     re.findall(r"^    (\w+) (.+)$", path.read_text(), re.M)
                     if name not in ("PRIMARY", "FOREIGN", "CONSTRAINT")]
@@ -60,6 +60,7 @@ def columns(table: str) -> list[tuple[str, str]]:
 def defaults(table: str) -> dict:
     result: dict = {}
     for name, definition in columns(table):
+        value: str | None
         if "CURRENT_TIMESTAMP" in definition:
             value = STAMP
         elif "DEFAULT" in definition:
@@ -85,9 +86,9 @@ def easter(year: int) -> date:
     g = (b - f + 1) // 3
     h = (19 * a + b - d - g + 15) % 30
     i, k = c // 4, c % 4
-    l = (32 + 2 * e + 2 * i - h - k) % 7
-    m = (a + 11 * h + 22 * l) // 451
-    n = h + l - 7 * m + 114
+    correction = (32 + 2 * e + 2 * i - h - k) % 7
+    m = (a + 11 * h + 22 * correction) // 451
+    n = h + correction - 7 * m + 114
     return date(year, n // 31, n % 31 + 1)
 
 

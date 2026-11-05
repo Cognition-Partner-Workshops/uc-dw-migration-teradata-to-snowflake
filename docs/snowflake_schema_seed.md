@@ -73,7 +73,7 @@ Application `Devin_Demo` is **unregistered**. Every query inherits compact JSON
 `csid,workload,phase,commit,run_id,session_url` from connection establishment.
 
 Before any compute, the loader reads back
-`RM_SFEXT_20261105A_20261119_MIG_TD_SCHEMA`, validates its monthly quota and suspend
+`RM_SFEXT_20261105A_20261119_MIG_TD_SCHEMA`, validates its positive quota and suspend
 triggers, and verifies its attachment to the single-cluster XSMALL warehouse
 `WH_MIG_TD_SCHEMA_SEED_SFEXT_20261105A` with auto-suspend <= 60 seconds.
 Missing/misattached controls stop execution before DML. Only ACCOUNTADMIN may attach
@@ -81,6 +81,9 @@ the monitor; this loader does not try to bypass that restriction or create a sub
 All objects are contained in `DB_MIG_TD_SCHEMA_SEED_SFEXT_20261105A.BANKING_DW`
 and carry comments with run token and expiry `2026-11-19` (including every table).
 Objects are for EXT verification only; the expiry is a cleanup marker, not automatic deletion.
+The ticket-designated, administrator-provisioned monitor uses `FREQUENCY=NEVER`
+(a total run-lifetime cap, with an end time), rather than the library's generic
+monthly monitor policy; the loader accepts this stricter non-resetting budget.
 
 Each load transaction deletes then inserts **all** target tables, including empty
 facts and exceptions. Run only in this dedicated seed database, never against live data.
