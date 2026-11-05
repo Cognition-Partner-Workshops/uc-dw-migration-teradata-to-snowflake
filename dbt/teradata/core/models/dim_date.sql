@@ -1,0 +1,31 @@
+{{ config(alias='DIM_DATE') }}
+
+select
+    cast(DATE_KEY as NUMBER(10,0)) as DATE_KEY,
+    cast(CALENDAR_DATE as DATE) as CALENDAR_DATE,
+    cast(DAY_OF_WEEK as NUMBER(5,0)) as DAY_OF_WEEK,
+    cast(DAY_NAME as VARCHAR(10)) as DAY_NAME,
+    cast(DAY_OF_MONTH as NUMBER(5,0)) as DAY_OF_MONTH,
+    cast(DAY_OF_YEAR as NUMBER(5,0)) as DAY_OF_YEAR,
+    cast(WEEK_OF_YEAR as NUMBER(5,0)) as WEEK_OF_YEAR,
+    cast(ISO_WEEK as NUMBER(5,0)) as ISO_WEEK,
+    cast(MONTH_NUM as NUMBER(5,0)) as MONTH_NUM,
+    cast(MONTH_NAME as VARCHAR(15)) as MONTH_NAME,
+    cast(MONTH_SHORT as CHAR(3)) as MONTH_SHORT,
+    cast(QUARTER_NUM as NUMBER(5,0)) as QUARTER_NUM,
+    cast(QUARTER_NAME as CHAR(2)) as QUARTER_NAME,
+    cast(HALF_YEAR as NUMBER(5,0)) as HALF_YEAR,
+    cast(CALENDAR_YEAR as NUMBER(5,0)) as CALENDAR_YEAR,
+    cast(FISCAL_YEAR as NUMBER(5,0)) as FISCAL_YEAR,
+    cast(FISCAL_QUARTER as NUMBER(5,0)) as FISCAL_QUARTER,
+    cast(IS_WEEKEND as NUMBER(5,0)) as IS_WEEKEND,
+    cast(IS_NORWEGIAN_HOLIDAY as NUMBER(5,0)) as IS_NORWEGIAN_HOLIDAY,
+    cast(HOLIDAY_NAME as VARCHAR(50)) as HOLIDAY_NAME,
+    cast(IS_BUSINESS_DAY as NUMBER(5,0)) as IS_BUSINESS_DAY,
+    cast(IS_MONTH_END as NUMBER(5,0)) as IS_MONTH_END,
+    cast(IS_QUARTER_END as NUMBER(5,0)) as IS_QUARTER_END,
+    cast(IS_YEAR_END as NUMBER(5,0)) as IS_YEAR_END,
+    cast(PRIOR_DAY_DATE as DATE) as PRIOR_DAY_DATE,
+    cast(NEXT_DAY_DATE as DATE) as NEXT_DAY_DATE,
+    cast(SAME_DAY_PREV_YEAR as DATE) as SAME_DAY_PREV_YEAR
+from {{ source('td_source', 'DIM_DATE') }}

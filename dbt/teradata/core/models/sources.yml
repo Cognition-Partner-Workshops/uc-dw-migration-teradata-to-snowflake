@@ -1,0 +1,19 @@
+version: 2
+sources:
+  - name: td_source
+    database: FSX_20261105_DB
+    schema: TD_SOURCE
+    tables:
+      - name: DIM_CUSTOMER
+      - name: DIM_ACCOUNT
+      - name: DIM_PRODUCT
+      - name: DIM_BRANCH
+      - name: DIM_DATE
+      - name: FACT_TRANSACTION
+      - name: FACT_MONTHLY_ACCOUNT_SNAPSHOT
+      - name: STG_TRANSACTIONS
+      - name: STG_CUSTOMER
+      - name: STG_TRANSACTION_ERRORS
+      - name: ETL_BATCH_CONTROL
+      - name: ETL_LOG
+      - name: DIM_EXCHANGE_RATES
