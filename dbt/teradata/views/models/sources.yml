@@ -1,0 +1,12 @@
+version: 2
+
+sources:
+  - name: td_core
+    schema: "{{ var('td_core_schema', 'td_src_views') }}"
+    tables:
+      - name: DIM_CUSTOMER
+      - name: DIM_ACCOUNT
+      - name: FACT_TRANSACTION
+      - name: FACT_MONTHLY_ACCOUNT_SNAPSHOT
+      - name: DIM_BRANCH
+      - name: DIM_DATE

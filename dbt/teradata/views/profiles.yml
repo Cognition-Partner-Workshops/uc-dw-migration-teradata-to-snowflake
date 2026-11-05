@@ -1,0 +1,7 @@
+td_views:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: "{{ env_var('TD_DUCKDB_PATH', 'target/td.duckdb') }}"
+      threads: 1

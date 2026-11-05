@@ -5,3 +5,5 @@ snowflake-connector-python==3.18.0
 cryptography==45.0.7
 pytest==8.4.2
 ruff==0.14.3
+dbt-core==1.9.11
+dbt-duckdb==1.9.6

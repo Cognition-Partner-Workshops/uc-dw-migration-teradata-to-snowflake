@@ -1,0 +1,175 @@
+{
+  "full_match": false,
+  "tables": {
+    "AML_SCREENING_1": {
+      "baseline_rows": 1,
+      "error": "CatalogException",
+      "status": "RED"
+    },
+    "AML_SCREENING_2": {
+      "baseline_rows": 12,
+      "error": "CatalogException",
+      "status": "RED"
+    },
+    "AML_SCREENING_3": {
+      "baseline_rows": 1,
+      "error": "CatalogException",
+      "status": "RED"
+    },
+    "BTEQ_AML_SCREENING_1": {
+      "baseline_rows": 1,
+      "error": "CatalogException",
+      "status": "RED"
+    },
+    "BTEQ_AML_SCREENING_2": {
+      "baseline_rows": 12,
+      "error": "CatalogException",
+      "status": "RED"
+    },
+    "BTEQ_AML_SCREENING_3": {
+      "baseline_rows": 1,
+      "error": "CatalogException",
+      "status": "RED"
+    },
+    "BTEQ_BRANCH_PERFORMANCE": {
+      "actual_rows": 10,
+      "baseline_rows": 10,
+      "column_differences": {},
+      "extra_columns": [],
+      "extra_keys": [],
+      "matched_rows": 10,
+      "missing_columns": [],
+      "missing_keys": [],
+      "repeated_keys": [],
+      "status": "GREEN"
+    },
+    "BTEQ_LARGE_TXN_REPORT": {
+      "actual_rows": 228,
+      "baseline_rows": 228,
+      "column_differences": {},
+      "extra_columns": [],
+      "extra_keys": [],
+      "matched_rows": 228,
+      "missing_columns": [],
+      "missing_keys": [],
+      "repeated_keys": [],
+      "status": "GREEN"
+    },
+    "CUSTOMER_TXN_HISTORY": {
+      "baseline_rows": 227,
+      "error": "CatalogException",
+      "status": "RED"
+    },
+    "DAILY_BALANCE_CHECK_1": {
+      "baseline_rows": 8,
+      "error": "CatalogException",
+      "status": "RED"
+    },
+    "DAILY_BALANCE_CHECK_2": {
+      "baseline_rows": 1,
+      "error": "CatalogException",
+      "status": "RED"
+    },
+    "DIM_ACCOUNT": {
+      "baseline_rows": 20,
+      "error": "CatalogException",
+      "status": "RED"
+    },
+    "DIM_BRANCH": {
+      "baseline_rows": 14,
+      "error": "CatalogException",
+      "status": "RED"
+    },
+    "DIM_CUSTOMER": {
+      "baseline_rows": 17,
+      "error": "CatalogException",
+      "status": "RED"
+    },
+    "DIM_DATE": {
+      "baseline_rows": 10958,
+      "error": "CatalogException",
+      "status": "RED"
+    },
+    "DIM_EXCHANGE_RATES": {
+      "baseline_rows": 6,
+      "error": "CatalogException",
+      "status": "RED"
+    },
+    "DIM_PRODUCT": {
+      "baseline_rows": 10,
+      "error": "CatalogException",
+      "status": "RED"
+    },
+    "ETL_BATCH_CONTROL": {
+      "baseline_rows": 2,
+      "error": "CatalogException",
+      "status": "RED"
+    },
+    "ETL_LOG": {
+      "baseline_rows": 2,
+      "error": "CatalogException",
+      "status": "RED"
+    },
+    "FACT_MONTHLY_ACCOUNT_SNAPSHOT": {
+      "baseline_rows": 1920,
+      "error": "CatalogException",
+      "status": "RED"
+    },
+    "FACT_TRANSACTION": {
+      "baseline_rows": 50009,
+      "error": "CatalogException",
+      "status": "RED"
+    },
+    "STG_CUSTOMER": {
+      "baseline_rows": 5,
+      "error": "CatalogException",
+      "status": "RED"
+    },
+    "STG_TRANSACTIONS": {
+      "baseline_rows": 11,
+      "error": "CatalogException",
+      "status": "RED"
+    },
+    "STG_TRANSACTION_ERRORS": {
+      "baseline_rows": 2,
+      "error": "CatalogException",
+      "status": "RED"
+    },
+    "VW_BRANCH_PERFORMANCE": {
+      "actual_rows": 250,
+      "baseline_rows": 250,
+      "column_differences": {},
+      "extra_columns": [],
+      "extra_keys": [],
+      "matched_rows": 250,
+      "missing_columns": [],
+      "missing_keys": [],
+      "repeated_keys": [],
+      "status": "GREEN"
+    },
+    "VW_CUSTOMER_360": {
+      "actual_rows": 16,
+      "baseline_rows": 16,
+      "column_differences": {},
+      "extra_columns": [],
+      "extra_keys": [],
+      "matched_rows": 16,
+      "missing_columns": [],
+      "missing_keys": [],
+      "repeated_keys": [],
+      "status": "GREEN"
+    },
+    "VW_REGULATORY_LARGE_TRANSACTIONS": {
+      "actual_rows": 4939,
+      "baseline_rows": 4939,
+      "column_differences": {},
+      "extra_columns": [],
+      "extra_keys": [],
+      "matched_rows": 4939,
+      "missing_columns": [],
+      "missing_keys": [],
+      "repeated_keys": [],
+      "status": "GREEN"
+    }
+  }
+}
