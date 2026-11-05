@@ -1,0 +1,9 @@
+SELECT
+    CAST(BATCH_ID AS BIGINT) AS BATCH_ID,
+    CAST(BATCH_DATE AS DATE) AS BATCH_DATE,
+    CAST(BATCH_STATUS AS VARCHAR(20)) AS BATCH_STATUS,
+    CAST(START_TS AS TIMESTAMP) AS START_TS,
+    CAST(END_TS AS TIMESTAMP) AS END_TS
+FROM {{ source('td_src_core', 'ETL_BATCH_CONTROL') }}
+UNION ALL
+SELECT CAST({{ var("batch_id") }} AS BIGINT), DATE '{{ var("as_of_date") }}', CAST('COMPLETED' AS VARCHAR), TIMESTAMP '{{ var("load_timestamp") }}', TIMESTAMP '{{ var("load_timestamp") }}'
