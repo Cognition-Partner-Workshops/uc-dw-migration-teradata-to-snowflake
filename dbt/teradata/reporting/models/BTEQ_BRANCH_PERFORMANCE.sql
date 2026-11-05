@@ -1,0 +1,13 @@
+SELECT
+    BRANCH_NAME AS "Branch",
+    REGION AS "Region",
+    MONTH_LABEL AS "Month",
+    ACCOUNTS_SERVICED AS "Accounts",
+    TOTAL_DEPOSITS AS "Total Deposits (NOK)",
+    TOTAL_FEES_EARNED AS "Fees Earned",
+    REGION_DEPOSIT_RANK AS "Rank",
+    PCT_OF_REGION_DEPOSITS AS "% Region"
+FROM {{ ref('VW_BRANCH_PERFORMANCE') }}
+WHERE SNAPSHOT_MONTH_KEY = (EXTRACT(YEAR FROM (DATE '{{ var("as_of_date") }}' + INTERVAL '-1 MONTH')) * 100)
+                          + EXTRACT(MONTH FROM (DATE '{{ var("as_of_date") }}' + INTERVAL '-1 MONTH'))
+ORDER BY REGION, REGION_DEPOSIT_RANK

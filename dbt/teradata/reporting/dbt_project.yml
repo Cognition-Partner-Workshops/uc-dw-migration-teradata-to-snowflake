@@ -1,0 +1,13 @@
+name: td_reporting
+version: '1.0.0'
+config-version: 2
+profile: td_reporting
+vars:
+  as_of_date: '2026-01-31'
+model-paths: [models]
+macro-paths: [macros]
+test-paths: [tests]
+models:
+  td_reporting:
+    +materialized: table
+    +schema: TD_TARGET

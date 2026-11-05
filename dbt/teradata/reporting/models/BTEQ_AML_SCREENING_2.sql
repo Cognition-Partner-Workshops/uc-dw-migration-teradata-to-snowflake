@@ -1,0 +1,1 @@
+SELECT * FROM {{ ref('AML_SCREENING_2') }}
