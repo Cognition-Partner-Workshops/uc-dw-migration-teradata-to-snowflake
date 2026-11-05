@@ -1,0 +1,23 @@
+{{ config(alias='DIM_BRANCH') }}
+
+select
+    cast(BRANCH_ID as NUMBER(10,0)) as BRANCH_ID,
+    cast(BRANCH_CODE as CHAR(6)) as BRANCH_CODE,
+    cast(BRANCH_NAME as VARCHAR(100)) as BRANCH_NAME,
+    cast(BRANCH_TYPE as VARCHAR(20)) as BRANCH_TYPE,
+    cast(ADDRESS_LINE_1 as VARCHAR(100)) as ADDRESS_LINE_1,
+    cast(CITY as VARCHAR(50)) as CITY,
+    cast(COUNTY as VARCHAR(50)) as COUNTY,
+    cast(REGION as VARCHAR(50)) as REGION,
+    cast(POSTAL_CODE as VARCHAR(10)) as POSTAL_CODE,
+    cast(COUNTRY_CODE as CHAR(3)) as COUNTRY_CODE,
+    cast(LATITUDE as DECIMAL(10,7)) as LATITUDE,
+    cast(LONGITUDE as DECIMAL(10,7)) as LONGITUDE,
+    cast(MANAGER_ID as NUMBER(10,0)) as MANAGER_ID,
+    cast(OPENING_DATE as DATE) as OPENING_DATE,
+    cast(CLOSING_DATE as DATE) as CLOSING_DATE,
+    cast(IS_ACTIVE as NUMBER(5,0)) as IS_ACTIVE,
+    cast(EMPLOYEE_COUNT as NUMBER(5,0)) as EMPLOYEE_COUNT,
+    cast(ETL_BATCH_ID as NUMBER(19,0)) as ETL_BATCH_ID,
+    cast(ETL_INSERT_TS as TIMESTAMP_NTZ(0)) as ETL_INSERT_TS
+from {{ source('td_source', 'DIM_BRANCH') }}

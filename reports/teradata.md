@@ -1,0 +1,36 @@
+# Reconciliation
+
+| Object | Status | Baseline rows | Actual rows | Matched rows |
+|---|---|---:|---:|---:|
+| AML_SCREENING_1 | GREEN | 1 | 1 | 1 |
+| AML_SCREENING_2 | GREEN | 12 | 12 | 12 |
+| AML_SCREENING_3 | GREEN | 1 | 1 | 1 |
+| BTEQ_AML_SCREENING_1 | GREEN | 1 | 1 | 1 |
+| BTEQ_AML_SCREENING_2 | GREEN | 12 | 12 | 12 |
+| BTEQ_AML_SCREENING_3 | GREEN | 1 | 1 | 1 |
+| BTEQ_BRANCH_PERFORMANCE | GREEN | 10 | 10 | 10 |
+| BTEQ_LARGE_TXN_REPORT | GREEN | 228 | 228 | 228 |
+| CUSTOMER_TXN_HISTORY | GREEN | 227 | 227 | 227 |
+| DAILY_BALANCE_CHECK_1 | GREEN | 8 | 8 | 8 |
+| DAILY_BALANCE_CHECK_2 | GREEN | 1 | 1 | 1 |
+| DIM_ACCOUNT | GREEN | 20 | 20 | 20 |
+| DIM_BRANCH | GREEN | 14 | 14 | 14 |
+| DIM_CUSTOMER | GREEN | 17 | 17 | 17 |
+| DIM_DATE | GREEN | 10958 | 10958 | 10958 |
+| DIM_EXCHANGE_RATES | GREEN | 6 | 6 | 6 |
+| DIM_PRODUCT | GREEN | 10 | 10 | 10 |
+| ETL_BATCH_CONTROL | GREEN | 2 | 2 | 2 |
+| ETL_LOG | GREEN | 2 | 2 | 2 |
+| FACT_MONTHLY_ACCOUNT_SNAPSHOT | GREEN | 1920 | 1920 | 1920 |
+| FACT_TRANSACTION | GREEN | 50009 | 50009 | 50009 |
+| STG_CUSTOMER | GREEN | 5 | 5 | 5 |
+| STG_TRANSACTIONS | GREEN | 11 | 11 | 11 |
+| STG_TRANSACTION_ERRORS | GREEN | 2 | 2 | 2 |
+| VW_BRANCH_PERFORMANCE | RED | 250 | 250 | 92 |
+
+`VW_BRANCH_PERFORMANCE`: {"actual_rows": 250, "baseline_rows": 250, "column_differences": {"MOVING_AVG_VOLUME_3M": 158}, "extra_columns": [], "extra_keys": [], "matched_rows": 92, "missing_columns": [], "missing_keys": [], "repeated_keys": [], "status": "RED"}
+
+| VW_CUSTOMER_360 | GREEN | 16 | 16 | 16 |
+| VW_REGULATORY_LARGE_TRANSACTIONS | GREEN | 4939 | 4939 | 4939 |
+
+Full match: False

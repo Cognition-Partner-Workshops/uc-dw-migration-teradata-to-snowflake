@@ -1,0 +1,53 @@
+version: 2
+unit_tests:
+  - name: valid_account_is_not_rejected
+    model: stg_transaction_errors
+    given:
+      - input: source('td_source', 'STG_TRANSACTION_ERRORS')
+        rows: []
+      - input: source('td_source', 'ETL_BATCH_CONTROL')
+        rows:
+          - {BATCH_ID: 20260130}
+      - input: ref('stg_transactions')
+        rows:
+          - {TRANSACTION_ID: 1, ACCOUNT_ID: A1, LOAD_DATE: '2026-01-31'}
+      - input: ref('dim_account')
+        rows:
+          - {ACCOUNT_ID: A1, CURRENT_FLAG: Y}
+    expect:
+      rows: []
+  - name: empty_staging_preserves_existing_errors
+    model: stg_transaction_errors
+    given:
+      - input: source('td_source', 'STG_TRANSACTION_ERRORS')
+        rows:
+          - {TRANSACTION_ID: 7, ERROR_REASON: INVALID_ACCOUNT, BATCH_ID: 20260130}
+      - input: source('td_source', 'ETL_BATCH_CONTROL')
+        rows:
+          - {BATCH_ID: 20260130}
+      - input: ref('stg_transactions')
+        rows: []
+      - input: ref('dim_account')
+        rows: []
+    expect:
+      rows:
+        - {TRANSACTION_ID: 7, ERROR_REASON: INVALID_ACCOUNT, BATCH_ID: 20260130}
+  - name: invalid_account_rejected_but_null_and_other_dates_not_rejected
+    model: stg_transaction_errors
+    given:
+      - input: source('td_source', 'STG_TRANSACTION_ERRORS')
+        rows: []
+      - input: source('td_source', 'ETL_BATCH_CONTROL')
+        rows:
+          - {BATCH_ID: 20260130}
+      - input: ref('stg_transactions')
+        rows:
+          - {TRANSACTION_ID: 1, ACCOUNT_ID: BAD, LOAD_DATE: '2026-01-31'}
+          - {TRANSACTION_ID: 2, ACCOUNT_ID: null, LOAD_DATE: '2026-01-31'}
+          - {TRANSACTION_ID: 3, ACCOUNT_ID: BAD, LOAD_DATE: '2026-01-30'}
+      - input: ref('dim_account')
+        rows:
+          - {ACCOUNT_ID: A1, CURRENT_FLAG: Y}
+    expect:
+      rows:
+        - {TRANSACTION_ID: 1, ERROR_REASON: INVALID_ACCOUNT, BATCH_ID: 20260131}

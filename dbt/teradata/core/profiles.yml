@@ -1,0 +1,13 @@
+snowflake:
+  target: snowflake
+  outputs:
+    snowflake:
+      type: snowflake
+      account: "{{ env_var('SNOWFLAKE_NFR_ACCOUNT') }}"
+      user: "{{ env_var('SNOWFLAKE_NFR_USER') }}"
+      private_key: "{{ env_var('SNOWFLAKE_NFR_PRIVATE_KEY') }}"
+      role: "{{ env_var('SNOWFLAKE_NFR_ROLE') }}"
+      warehouse: "{{ env_var('SNOWFLAKE_NFR_WAREHOUSE', 'FSX_20261105_WH') }}"
+      database: "{{ env_var('SNOWFLAKE_NFR_DATABASE', 'FSX_20261105_DB') }}"
+      schema: "{{ env_var('SNOWFLAKE_NFR_SCHEMA', 'TD_TARGET') }}"
+      threads: 4
