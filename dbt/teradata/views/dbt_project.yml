@@ -1,0 +1,17 @@
+name: td_views
+version: 1.0.0
+config-version: 2
+
+profile: td_views
+model-paths: ["models"]
+macro-paths: ["macros"]
+clean-targets: ["target", "dbt_packages"]
+
+models:
+  td_views:
+    +materialized: table
+    +schema: main
+
+vars:
+  current_date: '2026-01-31'
+  td_core_schema: td_src_views
