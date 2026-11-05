@@ -73,7 +73,8 @@ Application `Devin_Demo` is **unregistered**. Every query inherits compact JSON
 `csid,workload,phase,commit,run_id,session_url` from connection establishment.
 
 Before any compute, the loader reads back
-`RM_SFEXT_20261105A_20261119_MIG_TD_SCHEMA`, validates its positive quota and suspend
+`RM_SFEXT_20261105A_20261119_MIG_TD_SCHEMA`, validates its quota is positive and at most
+10 credits, with suspend at or below 90% and immediate suspend at or below 100%
 triggers, and verifies its attachment to the single-cluster XSMALL warehouse
 `WH_MIG_TD_SCHEMA_SEED_SFEXT_20261105A` with auto-suspend <= 60 seconds.
 Missing/misattached controls stop execution before DML. Only ACCOUNTADMIN may attach

@@ -5,6 +5,8 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
+import time
 from datetime import date
 from pathlib import Path
 
@@ -16,6 +18,7 @@ SCOPE = f"mig_td_schema_seed_{sf.RUN_TOKEN.lower()}"
 DATABASE = sf.database_name(SCOPE)
 WAREHOUSE = sf.warehouse_name(SCOPE)
 MONITOR = sf.resource_monitor_name("mig_td_schema")
+MAX_CREDIT_QUOTA = 10
 SCHEMA = "BANKING_DW"
 LOAD_ORDER = ("DIM_PRODUCT", "DIM_BRANCH", "DIM_CUSTOMER", "DIM_DATE", "DIM_ACCOUNT",
               "FACT_TRANSACTION", "FACT_MONTHLY_ACCOUNT_SNAPSHOT", "SEED_FK_EXCEPTION")
@@ -78,10 +81,15 @@ class Runner:
             raise RuntimeError(f"required monitor not visible: {MONITOR}; no compute started")
         monitor = exact[0]
         self.evidence["monitor_read_back"] = monitor
-        if (float(monitor["credit_quota"] or 0) <= 0 or
+        def earliest_trigger(name: str) -> float:
+            values = re.findall(r"(\d+(?:\.\d+)?)%", str(monitor.get(name, "")))
+            return min(map(float, values), default=float("inf"))
+
+        if (not 0 < float(monitor["credit_quota"] or 0) <= MAX_CREDIT_QUOTA or
                 str(monitor.get("frequency", "")).upper() not in ("MONTHLY", "NEVER") or
-                not monitor.get("suspend_at") or not monitor.get("suspend_immediately_at")):
-            raise RuntimeError("monitor needs a positive quota and suspend triggers")
+                not 0 < earliest_trigger("suspend_at") <= 90 or
+                not 0 < earliest_trigger("suspend_immediately_at") <= 100):
+            raise RuntimeError("monitor exceeds the 10-credit/90%-suspend/100%-immediate budget")
         warehouses = self.show("warehouse_read_back", f"SHOW WAREHOUSES LIKE '{WAREHOUSE}'")
         exact = [r for r in warehouses if r["name"] == WAREHOUSE]
         if len(exact) != 1 or exact[0].get("resource_monitor") != MONITOR:
@@ -144,6 +152,18 @@ class Runner:
                 result[table] = {"count": count, "hash_agg": checksum}
         return result
 
+    def suspend(self):
+        rows = self.show("warehouse_before_suspend", f"SHOW WAREHOUSES LIKE '{WAREHOUSE}'")
+        if any(r["name"] == WAREHOUSE and r["state"] not in ("SUSPENDED", "SUSPENDING") for r in rows):
+            self.command("warehouse_suspend", f"ALTER WAREHOUSE {WAREHOUSE} SUSPEND")
+        for _ in range(30):
+            rows = self.show("warehouse_after_suspend", f"SHOW WAREHOUSES LIKE '{WAREHOUSE}'")
+            self.evidence["warehouse_after"] = rows
+            if any(r["name"] == WAREHOUSE and r["state"] == "SUSPENDED" for r in rows):
+                return
+            time.sleep(1)
+        raise RuntimeError("warehouse suspension did not complete within 30 read-backs")
+
     def verify(self, tables: dict[str, list[dict]]):
         self.guard()
         active = False
@@ -170,10 +190,7 @@ class Runner:
                             raise AssertionError("unmasked officer value")
         finally:
             if active:
-                rows = self.show("warehouse_before_suspend", f"SHOW WAREHOUSES LIKE '{WAREHOUSE}'")
-                if any(r["name"] == WAREHOUSE and r["state"] != "SUSPENDED" for r in rows):
-                    self.command("warehouse_suspend", f"ALTER WAREHOUSE {WAREHOUSE} SUSPEND")
-                self.evidence["warehouse_after"] = self.show("warehouse_after_suspend", f"SHOW WAREHOUSES LIKE '{WAREHOUSE}'")
+                self.suspend()
 
 
 def main():

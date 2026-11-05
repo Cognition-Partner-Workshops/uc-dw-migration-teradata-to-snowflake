@@ -101,7 +101,7 @@ class GuardRunner(load_seed.Runner):
         self.calls.append(label)
         if "MONITORS" in sql:
             return [{"name": load_seed.MONITOR, "credit_quota": 5, "frequency": "MONTHLY",
-                     "suspend_at": "100%", "suspend_immediately_at": "110%"}] if self.monitor else []
+                     "suspend_at": "90%", "suspend_immediately_at": "100%"}] if self.monitor else []
         return [{"name": load_seed.WAREHOUSE, "resource_monitor": load_seed.MONITOR if self.attached else "OTHER",
                  "size": "X-Small", "auto_suspend": 60, "max_cluster_count": 1}]
 
@@ -187,3 +187,18 @@ def test_verify_suspends_warehouse_on_load_failure():
         runner.verify({})
     assert "warehouse_suspend" in runner.calls
     assert runner.evidence["warehouse_after"][0]["state"] == "SUSPENDED"
+
+
+@pytest.mark.parametrize("field,value", [("credit_quota", 100000), ("suspend_at", "1000%"),
+                                        ("suspend_immediately_at", "110%"), ("suspend_at", ""),
+                                        ("credit_quota", 0)])
+def test_monitor_budget_cannot_be_bypassed(field, value):
+    class UnsafeMonitor(GuardRunner):
+        def show(self, label, sql):
+            rows = super().show(label, sql)
+            if label == "monitor_read_back":
+                rows[0][field] = value
+            return rows
+
+    with pytest.raises(RuntimeError, match="budget"):
+        UnsafeMonitor().guard()
