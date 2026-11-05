@@ -1,12 +1,11 @@
 # Teradata core on DuckDB
 
 Run from the repository root (Python 3.10+). No Snowflake connection or objects
-are used. Install dbt-core 1.9 explicitly because the adapter's dependency range
-also permits newer core releases:
+are used. requirements.txt pins dbt-core 1.9.11 and dbt-duckdb 1.9.6 alongside
+duckdb 1.4.1:
 
 ```sh
 python -m pip install -r requirements.txt
-python -m pip install 'dbt-core==1.9.10' 'duckdb==1.4.1'
 python tools/generate_seed.py --check
 python tools/td_baseline.py --check
 export TD_DUCKDB_PATH="$PWD/dbt/teradata/core/target/td.duckdb"
