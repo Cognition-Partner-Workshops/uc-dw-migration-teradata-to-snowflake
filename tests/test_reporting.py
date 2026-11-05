@@ -22,6 +22,27 @@ ORDER = ['VW_CUSTOMER_360', 'VW_REGULATORY_LARGE_TRANSACTIONS', 'VW_BRANCH_PERFO
          'BTEQ_LARGE_TXN_REPORT']
 
 
+@pytest.mark.parametrize('role', [None, '', 'REPORTING_ROLE'])
+def test_reporting_profile(role):
+    renderer = pytest.importorskip('dbt.config.renderer')
+    yaml = pytest.importorskip('yaml')
+    from dbt.exceptions import CompilationError
+    from dbt_common.context import set_invocation_context
+
+    env = {'SNOWFLAKE_NFR_' + name: 'fixture' for name in ['ACCOUNT', 'USER', 'PRIVATE_KEY']}
+    if role is not None:
+        env['SNOWFLAKE_NFR_ROLE'] = role
+    set_invocation_context(env)
+    profile = yaml.safe_load((PROJECT / 'profiles.yml').read_text())
+    rendered = renderer.ProfileRenderer({'token': 'OTHER_RUN'}).render_data(profile)
+    output = rendered['td_reporting']['outputs']['dev']
+    assert output['database'] == 'OTHER_RUN_DB'
+    assert output['warehouse'] == 'OTHER_RUN_WH'
+    assert output['role'] == (role or None)
+    with pytest.raises(CompilationError, match="Required var 'token' not found"):
+        renderer.ProfileRenderer({}).render_data(profile)
+
+
 @pytest.mark.parametrize('empty', [False, True])
 def test_reporting_contract(empty):
     manifest = json.loads((BASELINE / 'manifest.json').read_text())

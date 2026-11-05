@@ -6,9 +6,9 @@ td_reporting:
       account: "{{ env_var('SNOWFLAKE_NFR_ACCOUNT') }}"
       user: "{{ env_var('SNOWFLAKE_NFR_USER') }}"
       private_key: "{{ env_var('SNOWFLAKE_NFR_PRIVATE_KEY') }}"
-      role: "{{ env_var('SNOWFLAKE_NFR_ROLE') }}"
-      database: FSX_20261105_DB
-      warehouse: FSX_20261105_WH
+      role: "{{ env_var('SNOWFLAKE_NFR_ROLE', '') or none }}"
+      database: "{{ var('token') }}_DB"
+      warehouse: "{{ var('token') }}_WH"
       schema: TD_TARGET
       threads: 4
       session_parameters:

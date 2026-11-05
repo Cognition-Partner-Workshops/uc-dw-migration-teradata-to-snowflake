@@ -1,7 +1,7 @@
 version: 2
 sources:
   - name: core
-    database: FSX_20261105_DB
+    database: "{{ target.database }}"
     schema: "{{ var('core_schema', 'TD_TARGET') }}"
     tables:
       - name: DIM_ACCOUNT
